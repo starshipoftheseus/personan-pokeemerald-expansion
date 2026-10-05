@@ -1068,6 +1068,7 @@ gStdScripts_End::
 	.include "data/scripts/std_msgbox.inc"
 	.include "data/scripts/trainer_battle.inc"
 	.include "data/scripts/new_game.inc"
+	.include "data/scripts/rumours.inc"
 @ Hoenn script: shared flag names mean Hoenn's own flags here (see hoenn_script_names.h)
 #if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
 #include "constants/hoenn_script_names.h"

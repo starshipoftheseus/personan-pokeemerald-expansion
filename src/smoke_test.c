@@ -3,6 +3,7 @@
 #include "battle_main.h"
 #include "data.h"
 #include "event_data.h"
+#include "rumour.h"
 #include "pokemon.h"
 #include "overworld.h"
 #include "script.h"
@@ -20,6 +21,7 @@ const volatile u16 gSmokeTestMap = SMOKE_TEST_OFF; // (map group << 8) | map num
 const volatile u16 gSmokeTestFrames = 300;
 const volatile u16 gSmokeTestTrainers = FALSE; // 1: build every trainer's party and check it;
                                                // 2: the same with every badge and league won (level scaling on)
+                                               // 3: start a starter rumour on this map and log it
 
 enum
 {
@@ -125,6 +127,16 @@ static void CB2_SmokeTest(void)
 {
     u32 group, num;
 
+    if (gSmokeTestTrainers == 3)
+    {
+        TryStartStarterRumour(NULL);
+        LogValue("rumour=", gSpecialVar_Result);
+        LogValue("rumour_species=", gSaveBlock1Ptr->outbreakPokemonSpecies);
+        LogValue("rumour_group=", gSaveBlock1Ptr->outbreakLocationMapGroup);
+        LogValue("rumour_num=", gSaveBlock1Ptr->outbreakLocationMapNum);
+        LogValue("rumour_level=", gSaveBlock1Ptr->outbreakPokemonLevel);
+        Exit(SMOKE_TEST_ON_MAP);
+    }
     if (gSmokeTestTrainers)
         CheckTrainerParties();
 

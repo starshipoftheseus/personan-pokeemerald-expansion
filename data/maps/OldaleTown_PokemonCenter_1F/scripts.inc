@@ -17,7 +17,13 @@ OldaleTown_PokemonCenter_1F_EventScript_Nurse::
 	end
 
 OldaleTown_PokemonCenter_1F_EventScript_Gentleman::
-	msgbox OldaleTown_PokemonCenter_1F_Text_TrainersCanUsePC, MSGBOX_NPC
+	lock
+	faceplayer
+	call Common_EventScript_TryStarterRumour
+	goto_if_eq VAR_RESULT, TRUE, OldaleTown_PokemonCenter_1F_EventScript_GentlemanEnd
+	msgbox OldaleTown_PokemonCenter_1F_Text_TrainersCanUsePC, MSGBOX_DEFAULT
+OldaleTown_PokemonCenter_1F_EventScript_GentlemanEnd:
+	release
 	end
 
 OldaleTown_PokemonCenter_1F_EventScript_Boy::

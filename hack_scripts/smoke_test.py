@@ -58,6 +58,9 @@ def run_one(rom_bytes, offset, name, group, num, timeout):
         result = RESULTS.get(proc.returncode, "error")
         if not values:
             result = "error"
+        if "rumour" in values:
+            values["trainers"] = (f"rumour species {values['rumour_species']} on map "
+                                  f"{values['rumour_group']}.{values['rumour_num']} level {values['rumour_level']}")
         if "trainers_checked" in values:
             values["trainers"] = f"{values['trainers_checked']} checked, {values['trainers_bad']} bad, lowest level {values.get('lowest_level')}"
             bad = re.findall(r"SMOKE bad_trainer=(\d+)", proc.stdout)
@@ -79,9 +82,10 @@ def main():
     parser.add_argument("--rom", default=os.path.join(ROOT, "pokehns.gba"))
     parser.add_argument("--elf", default=os.path.join(ROOT, "pokehns.elf"))
     parser.add_argument("--timeout", type=float, default=30)
-    parser.add_argument("--trainers", type=int, choices=(1, 2), metavar="MODE",
+    parser.add_argument("--trainers", type=int, choices=(1, 2, 3), metavar="MODE",
                         help="build every trainer's party on the first map given and check it "
-                             "(2: with every badge and league won, so level scaling applies)")
+                             "(2: with every badge and league won, so level scaling applies; "
+                             "3: start a starter rumour there and report it)")
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 1)
     args = parser.parse_args()
 

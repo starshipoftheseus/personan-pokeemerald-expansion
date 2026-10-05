@@ -19,7 +19,13 @@ ViridianCity_PokemonCenter_1F_EventScript_Boy::
 	end
 
 ViridianCity_PokemonCenter_1F_EventScript_Gentleman::
-	msgbox ViridianCity_PokemonCenter_1F_Text_FeelFreeToUsePC, MSGBOX_NPC
+	lock
+	faceplayer
+	call Common_EventScript_TryStarterRumour
+	goto_if_eq VAR_RESULT, TRUE, ViridianCity_PokemonCenter_1F_EventScript_GentlemanEnd
+	msgbox ViridianCity_PokemonCenter_1F_Text_FeelFreeToUsePC, MSGBOX_DEFAULT
+ViridianCity_PokemonCenter_1F_EventScript_GentlemanEnd:
+	release
 	end
 
 ViridianCity_PokemonCenter_1F_EventScript_Youngster::

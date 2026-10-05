@@ -17,8 +17,11 @@ CherryGrove_Pokecenter_EventScript_Fisher::
 CherryGrove_Pokecenter_EventScript_Gentleman::
 	lock
 	faceplayer
+	call Common_EventScript_TryStarterRumour
+	goto_if_eq VAR_RESULT, TRUE, CherryGrove_Pokecenter_EventScript_GentlemanEnd
 	msgbox CherryGrove_Pokecenter_Text_Gentleman, MSGBOX_DEFAULT
 	closemessage
+CherryGrove_Pokecenter_EventScript_GentlemanEnd:
 	release
 	end
 

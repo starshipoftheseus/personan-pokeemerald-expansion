@@ -4,7 +4,13 @@ Generated inventory (2026-10-05). Goal: every Pokémon obtainable. Wild Pokémon
 `hack_scripts/regionalize_wild_encounters.py`; these need events instead:
 
 - **Legendaries, Mythicals, Ultra Beasts, Paradox**: small events (design open).
-- **Starters**: rumour encounters (an NPC tells a rumour, the starter then appears somewhere once).
+- **Starters**: rumour encounters, built (`src/rumour.c`, `data/scripts/rumours.inc`). The
+  gentleman in the Pokémon Centers of Viridian (Kanto), Cherrygrove (Johto) and Oldale (Hoenn)
+  tells of the next starter of his region you haven't caught, and the route it was seen on. The
+  next wild encounter in that route's grass is that starter, once (Emerald's mass outbreak with a
+  rumour mark). Level: the region's level cap - 5 (Johto: 8 + 4 per Johto badge; 30 after its
+  league). The routes are in the tables in `src/rumour.c`; more NPCs can call
+  `Common_EventScript_TryStarterRumour`.
 
 "In scripts" means some map or common script already names the species (an existing static
 encounter or gift), so it may already be obtainable; check before building an event.
