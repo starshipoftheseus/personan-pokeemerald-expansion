@@ -20,9 +20,11 @@ $(MID_BUILDDIR)/%.o: $(MID_ASM_DIR)/%.s
 	$(AS) $(ASFLAGS) -I sound -o $@ $<
 
 # Compressed cries
-$(CRY_BIN_DIR)/%.bin: $(CRY_SUBDIR)/%.wav
-# NOTE: If using ipatix's High Quality Audio Mixer, remove "--no-pad" below.
-	$(WAV2AGB) -b -c -l 1 --no-pad $< $@
+# Cries recorded above this rate (Hz) are resampled down before compression to save ROM space.
+# 10512 is the rate of the original Gen 3 cries. 0 keeps every cry at its recorded rate.
+CRY_SAMPLE_RATE := 10512
+$(CRY_BIN_DIR)/%.bin: $(CRY_SUBDIR)/%.wav audio_rules.mk hack_scripts/cry_to_bin.sh
+	hack_scripts/cry_to_bin.sh $(WAV2AGB) $(CRY_SAMPLE_RATE) $< $@
 
 # Uncompressed cries
 $(CRY_BIN_DIR)/uncomp_%.bin: $(CRY_SUBDIR)/uncomp_%.aif
