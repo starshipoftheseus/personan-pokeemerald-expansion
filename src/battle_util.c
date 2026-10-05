@@ -5747,6 +5747,24 @@ enum Obedience GetAttackerObedienceForAction(void)
     if (FlagGet(FLAG_BADGE07_GET)) // Mind Badge
         obedienceLevel = 80;
 
+#if IS_HNS && defined(MAPS_EMERALD)
+    // Hoenn's badges count too: whichever region allows the higher level wins.
+    {
+        u32 hoennLevel = 10;
+        u32 i;
+
+        if (FlagGet(FLAG_HOENN_BADGE08_GET))
+            return OBEYS;
+        for (i = 0; i < 7; i++)
+        {
+            if (FlagGet(FLAG_HOENN_BADGE01_GET + i))
+                hoennLevel = 20 + 10 * i;
+        }
+        if (hoennLevel > obedienceLevel)
+            obedienceLevel = hoennLevel;
+    }
+#endif
+
     if (B_OBEDIENCE_MECHANICS >= GEN_8
      && !IsOtherTrainer(gBattleMons[gBattlerAttacker].otId, gBattleMons[gBattlerAttacker].otName))
         levelReferenced = gBattleMons[gBattlerAttacker].metLevel;

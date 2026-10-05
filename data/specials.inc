@@ -709,3 +709,6 @@ gSpecials::
 	def_special GivePartyMonNationalRibbon
 	def_special GetMaxPartySize
 	def_special IsPartyLimitChallengeActive
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+	def_special IsFieldMoveAllowedInAnyRegion
+#endif

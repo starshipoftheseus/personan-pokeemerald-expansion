@@ -1,8 +1,14 @@
 @ Interact with cuttable tree
 EventScript_CutTree::
 	lockall
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+	setvar VAR_0x8004, FIELD_MOVE_CUT
+	specialvar VAR_RESULT, IsFieldMoveAllowedInAnyRegion
+	goto_if_eq VAR_RESULT, FALSE, EventScript_CheckTreeCantCut
+#else
 	goto_if_unset FLAG_RECEIVED_HM_CUT, EventScript_CheckTreeCantCut
 	goto_if_unset FLAG_BADGE02_GET, EventScript_CheckTreeCantCut
+#endif
 	checkpartymove MOVE_CUT
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CheckTreeCantCut
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
@@ -66,9 +72,16 @@ EventScript_UseRockSmash::
 @ Interact with smashable rock
 EventScript_RockSmash::
 	lockall
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+	setvar VAR_0x8004, FIELD_MOVE_ROCK_SMASH
+	specialvar VAR_RESULT, IsFieldMoveAllowedInAnyRegion
+	goto_if_eq VAR_RESULT, FALSE, EventScript_CantSmashRock
+	checkpartymove MOVE_ROCK_SMASH
+#else
 	checkpartymove MOVE_ROCK_SMASH
 	goto_if_unset FLAG_BADGE01_GET, EventScript_CantSmashRock
 	goto_if_unset FLAG_RECEIVED_HM_ROCK_SMASH, EventScript_CantSmashRock
+#endif
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantSmashRock
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
 	setfieldeffectargument 0, VAR_RESULT
@@ -323,7 +336,13 @@ Text_CantHeadbutt:
 
 EventScript_StrengthBoulder::
 	lockall
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+	setvar VAR_0x8004, FIELD_MOVE_STRENGTH
+	specialvar VAR_RESULT, IsFieldMoveAllowedInAnyRegion
+	goto_if_eq VAR_RESULT, FALSE, EventScript_CantStrength
+#else
 	goto_if_unset FLAG_BADGE03_GET, EventScript_CantStrength
+#endif
 	checkitem ITEM_HM_STRENGTH
 	goto_if_eq VAR_RESULT, FALSE, EventScript_CantStrength
 	goto_if_set FLAG_SYS_USE_STRENGTH, EventScript_CheckActivatedBoulder
@@ -385,7 +404,13 @@ Text_StrengthActivated:
 
 EventScript_UseWaterfall::
 	lockall
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+	setvar VAR_0x8004, FIELD_MOVE_WATERFALL
+	specialvar VAR_RESULT, IsFieldMoveAllowedInAnyRegion
+	goto_if_eq VAR_RESULT, FALSE, EventScript_CantWaterfall
+#else
 	goto_if_unset FLAG_BADGE08_GET, EventScript_CantWaterfall
+#endif
 	checkpartymove MOVE_WATERFALL
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantWaterfall
 	bufferpartymonnick STR_VAR_1, VAR_RESULT

@@ -126,6 +126,56 @@ static bool32 IsFieldMoveUnlocked_Defog(void)
 }
 #endif
 
+#if IS_HNS && defined(MAPS_EMERALD)
+// Hoenn's field move rules (as in Emerald): the Hoenn badge each move needs, and the flag for
+// receiving Hoenn's HM. Hoenn's scripts set these through hoenn_script_names.h.
+static const struct {
+    u16 badgeFlag;
+    u16 receivedHmFlag;
+} sHoennFieldMoveRules[FIELD_MOVES_COUNT] =
+{
+    [FIELD_MOVE_CUT]        = { FLAG_HOENN_BADGE01_GET, FLAG_HOENN_RECEIVED_HM_CUT },
+    [FIELD_MOVE_FLASH]      = { FLAG_HOENN_BADGE02_GET, FLAG_HOENN_RECEIVED_HM_FLASH },
+    [FIELD_MOVE_ROCK_SMASH] = { FLAG_HOENN_BADGE03_GET, FLAG_HOENN_RECEIVED_HM_ROCK_SMASH },
+    [FIELD_MOVE_STRENGTH]   = { FLAG_HOENN_BADGE04_GET, FLAG_HOENN_RECEIVED_HM_STRENGTH },
+    [FIELD_MOVE_SURF]       = { FLAG_HOENN_BADGE05_GET, FLAG_HOENN_RECEIVED_HM_SURF },
+    [FIELD_MOVE_FLY]        = { FLAG_HOENN_BADGE06_GET, FLAG_RECEIVED_HM_FLY },
+    [FIELD_MOVE_DIVE]       = { FLAG_HOENN_BADGE07_GET, FLAG_RECEIVED_HM_DIVE },
+    [FIELD_MOVE_WATERFALL]  = { FLAG_HOENN_BADGE08_GET, FLAG_RECEIVED_HM_WATERFALL },
+};
+
+// The HM gift Heart & Soul's field move scripts also check, where they check one.
+static const u16 sHnsFieldMoveReceivedHmFlags[FIELD_MOVES_COUNT] =
+{
+    [FIELD_MOVE_CUT]        = FLAG_RECEIVED_HM_CUT,
+    [FIELD_MOVE_ROCK_SMASH] = FLAG_RECEIVED_HM_ROCK_SMASH,
+};
+
+bool32 IsHoennFieldMoveUnlocked(enum FieldMove fieldMove, bool32 needHm)
+{
+    if (fieldMove >= FIELD_MOVES_COUNT || sHoennFieldMoveRules[fieldMove].badgeFlag == 0)
+        return FALSE;
+    if (needHm && !FlagGet(sHoennFieldMoveRules[fieldMove].receivedHmFlag))
+        return FALSE;
+    return FlagGet(sHoennFieldMoveRules[fieldMove].badgeFlag);
+}
+
+// specialvar: whether the field move in VAR_0x8004 may be used from an overworld script
+// (cuttable tree, rock, boulder, waterfall), by Heart & Soul's rule or Hoenn's.
+u16 IsFieldMoveAllowedInAnyRegion(void)
+{
+    enum FieldMove fieldMove = gSpecialVar_0x8004;
+
+    if (fieldMove >= FIELD_MOVES_COUNT)
+        return FALSE;
+    if (IsHoennFieldMoveUnlocked(fieldMove, TRUE))
+        return TRUE;
+    if (sHnsFieldMoveReceivedHmFlags[fieldMove] != 0 && !FlagGet(sHnsFieldMoveReceivedHmFlags[fieldMove]))
+        return FALSE;
+    return gFieldMoveInfo[fieldMove].isUnlockedFunc();
+}
+#endif
+
 const struct FieldMoveInfo gFieldMoveInfo[FIELD_MOVES_COUNT] =
 {
     [FIELD_MOVE_CUT] =

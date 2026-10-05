@@ -128,6 +128,10 @@ gStdScripts::
 gStdScripts_End::
 
 
+@ Hoenn map scripts: shared flag names mean Hoenn's own flags here (see hoenn_script_names.h)
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names.h"
+#endif
 	.include "data/maps/PetalburgCity/scripts.inc"
 	.include "data/maps/SlateportCity/scripts.inc"
 	.include "data/maps/MauvilleCity/scripts.inc"
@@ -601,6 +605,9 @@ gStdScripts_End::
 	.include "data/maps/Route119_WeatherInstitute_2F/scripts.inc"
 	.include "data/maps/Route119_House/scripts.inc"
 	.include "data/maps/Route124_DivingTreasureHuntersHouse/scripts.inc"
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names_end.h"
+#endif
 
 .if IS_FRLG
 
@@ -1054,7 +1061,14 @@ gStdScripts_End::
 	.include "data/scripts/std_msgbox.inc"
 	.include "data/scripts/trainer_battle.inc"
 	.include "data/scripts/new_game.inc"
+@ Hoenn script: shared flag names mean Hoenn's own flags here (see hoenn_script_names.h)
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names.h"
+#endif
 	.include "data/scripts/hall_of_fame.inc"
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names_end.h"
+#endif
 	.include "data/scripts/hall_of_fame_frlg.inc"
 
 	.include "data/scripts/config.inc"
@@ -1283,7 +1297,14 @@ Common_EventScript_StopBrineysBoatMusic::
 	fadedefaultbgm
 	return
 
+@ Hoenn script: shared flag names mean Hoenn's own flags here (see hoenn_script_names.h)
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names.h"
+#endif
 	.include "data/scripts/prof_birch.inc"
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names_end.h"
+#endif
 
 @ Below could be split as ferry.inc aside from the Rusturf tunnel script
 Common_EventScript_FerryDepart::
@@ -1798,7 +1819,14 @@ EventScript_PalletTown_PlayersHouse_2F_TurnOnPC::
 	.include "data/scripts/abnormal_weather.inc"
 	.include "data/scripts/trainer_script.inc"
 	.include "data/scripts/berry_tree.inc"
+@ Hoenn script: shared flag names mean Hoenn's own flags here (see hoenn_script_names.h)
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names.h"
+#endif
 	.include "data/scripts/secret_base.inc"
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names_end.h"
+#endif
 	.include "data/scripts/cable_club.inc"
 	.include "data/text/cable_club.inc"
 	.include "data/scripts/contest_hall.inc"
@@ -1818,7 +1846,14 @@ EventScript_PalletTown_PlayersHouse_2F_TurnOnPC::
 	.include "data/scripts/day_care.inc"
 	.include "data/scripts/flash.inc"
 	.include "data/scripts/players_house.inc"
+@ Hoenn script: shared flag names mean Hoenn's own flags here (see hoenn_script_names.h)
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names.h"
+#endif
 	.include "data/scripts/berry_blender.inc"
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names_end.h"
+#endif
 	.include "data/text/mauville_man.inc"
 	.include "data/text/trainers.inc"
 	.include "data/scripts/repel.inc"

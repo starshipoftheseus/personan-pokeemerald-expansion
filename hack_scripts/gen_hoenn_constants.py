@@ -27,8 +27,23 @@ from name_usage import usage_index
 OUT_FLAGS = os.path.join(ROOT, "include/constants/hoenn_flags.h")
 OUT_VARS = os.path.join(ROOT, "include/constants/hoenn_vars.h")
 OUT_TRAINERS = os.path.join(ROOT, "include/constants/hoenn_trainers.h")
+OUT_SCRIPT_NAMES = os.path.join(ROOT, "include/constants/hoenn_script_names.h")
+OUT_SCRIPT_NAMES_END = os.path.join(ROOT, "include/constants/hoenn_script_names_end.h")
 VAR_OFFSET = 0x100
 FIRST_MOVABLE_VAR = 0x4020  # 0x4000-0x401F are temp vars and object graphics vars, shared by every map
+
+# Flags both regions use for their own story. Inside Hoenn's scripts these names are redirected to
+# FLAG_HOENN_<name> (a copy in the Hoenn flag block); everywhere else they keep Heart & Soul's meaning.
+REGION_SPECIFIC_FLAGS = [
+    "FLAG_BADGE01_GET", "FLAG_BADGE02_GET", "FLAG_BADGE03_GET", "FLAG_BADGE04_GET",
+    "FLAG_BADGE05_GET", "FLAG_BADGE06_GET", "FLAG_BADGE07_GET", "FLAG_BADGE08_GET",
+    "FLAG_SYS_GAME_CLEAR", "FLAG_IS_CHAMPION",
+    "FLAG_ADVENTURE_STARTED", "FLAG_RECEIVED_RUNNING_SHOES", "FLAG_RECEIVED_POKENAV", "FLAG_RECEIVED_BIKE",
+    "FLAG_RECEIVED_HM_CUT", "FLAG_RECEIVED_HM_FLASH", "FLAG_RECEIVED_HM_ROCK_SMASH",
+    "FLAG_RECEIVED_HM_STRENGTH", "FLAG_RECEIVED_HM_SURF",
+    "FLAG_DEFEATED_SUDOWOODO", "FLAG_RECEIVED_REVIVED_FOSSIL_MON",
+    "FLAG_GOOD_LUCK_SAFARI_ZONE", "FLAG_DAILY_PICKED_LOTO_TICKET",
+]
 
 # Engine flags both regions share, even when only one side's scripts mention them.
 KEEP_SHARED_PREFIXES = ("FLAG_SYS_", "FLAG_DECORATION_", "FLAG_TEMP_")
@@ -113,9 +128,26 @@ def main():
     ]
     for name in sorted(flags, key=lambda n: (flags[n], n)):
         lines += [f"#undef {name}", f"#define {name} (HOENN_FLAGS_START + 0x{flags[name]:X})"]
+    lines += ["", "// Hoenn's own copy of flags both regions use (see hoenn_script_names.h)"]
+    for name in REGION_SPECIFIC_FLAGS:
+        if name in flags or name not in em_flags or em_flags[name] == 0:
+            raise SystemExit(f"{name}: expected a shared flag with an Emerald value")
+        lines.append(f"#define FLAG_HOENN_{name[len('FLAG_'):]} (HOENN_FLAGS_START + 0x{em_flags[name]:X})")
     lines += ["", "#undef FLAGS_COUNT", "#define FLAGS_COUNT (HOENN_FLAGS_END + 1)", "",
               "#endif // GUARD_CONSTANTS_HOENN_FLAGS_H", ""]
     open(OUT_FLAGS, "w").write("\n".join(lines))
+
+    begin = header + [
+        "// Included before Hoenn's scripts in data/event_scripts.s: inside Hoenn's scripts these",
+        "// names mean Hoenn's own flag. hoenn_script_names_end.h restores them. No include guard.",
+    ]
+    end = header + ["// Included after Hoenn's scripts: restores the names hoenn_script_names.h redirected."]
+    for name in REGION_SPECIFIC_FLAGS:
+        begin += [f'#pragma push_macro("{name}")', f"#undef {name}",
+                  f"#define {name} FLAG_HOENN_{name[len('FLAG_'):]}"]
+        end.append(f'#pragma pop_macro("{name}")')
+    open(OUT_SCRIPT_NAMES, "w").write("\n".join(begin) + "\n")
+    open(OUT_SCRIPT_NAMES_END, "w").write("\n".join(end) + "\n")
 
     lines = header + [
         "// Hoenn's vars, moved clear of Heart & Soul's for the combined build.",
