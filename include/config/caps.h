@@ -18,6 +18,11 @@
 #define B_RARE_CANDY_CAP                FALSE // If set to true, Rare Candies can't be used to go over the level cap
 #define B_LEVEL_CAP_EXP_UP              FALSE // If set to true, mons under level cap will receive more experience
 
+// Level scaling (this hack; approach from Pokémon R.O.W.E. by BelialClover). Trainers' and wild
+// Pokémon's levels are raised, never lowered, to keep up with the player's total badge count across
+// regions when you revisit a region whose league is beaten. See src/level_scaling.c.
+#define B_LEVEL_SCALING                 TRUE
+
 // EV Cap Constants
 #define EV_CAP_NONE                     0 // Regular behavior, no EV caps are applied
 #define EV_CAP_FLAG_LIST                1 // EV cap is chosen according to the first unset flag in `sEVCapFlagMap`

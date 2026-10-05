@@ -20,6 +20,7 @@
 #include "script.h"
 #include "tv.h"
 #include "wild_encounter.h"
+#include "level_scaling.h"
 #include "randomizer.h"
 #include "battle_debug.h"
 #include "battle_pike.h"
@@ -653,7 +654,7 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, enum 
         break;
     }
 
-    level = ChooseWildMonLevel(wildMonInfo->wildPokemon, wildMonIndex, area);
+    level = GetScaledWildMonLevel(ChooseWildMonLevel(wildMonInfo->wildPokemon, wildMonIndex, area));
     if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))
         return FALSE;
     if ((gMapHeader.mapLayoutId != LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS && gMapHeader.mapLayoutId != LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS_HNS) && flags & WILD_CHECK_KEEN_EYE && !IsAbilityAllowingEncounter(level))
@@ -664,6 +665,8 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, enum 
         #if RANDOMIZER_AVAILABLE == TRUE
         species = RandomizeWildEncounter(species, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, area, wildMonIndex);
         #endif
+        if (level > wildMonInfo->wildPokemon[wildMonIndex].maxLevel)
+            species = GetScaledSpecies(species, level);
         CreateWildMon(species, level);
     }
     return TRUE;
@@ -673,11 +676,13 @@ static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 
 {
     u8 wildMonIndex = ChooseWildMonIndex_Fishing(rod);
     u16 wildMonSpecies = wildMonInfo->wildPokemon[wildMonIndex].species;
-    u8 level = ChooseWildMonLevel(wildMonInfo->wildPokemon, wildMonIndex, WILD_AREA_FISHING);
+    u8 level = GetScaledWildMonLevel(ChooseWildMonLevel(wildMonInfo->wildPokemon, wildMonIndex, WILD_AREA_FISHING));
 
     #if RANDOMIZER_AVAILABLE == TRUE
     wildMonSpecies = RandomizeWildEncounter(wildMonSpecies, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, WILD_AREA_FISHING, wildMonIndex);
     #endif
+    if (level > wildMonInfo->wildPokemon[wildMonIndex].maxLevel)
+        wildMonSpecies = GetScaledSpecies(wildMonSpecies, level);
 
     UpdateChainFishingStreak();
     CreateWildMon(wildMonSpecies, level);

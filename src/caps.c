@@ -2,6 +2,7 @@
 #include "battle.h"
 #include "event_data.h"
 #include "caps.h"
+#include "level_scaling.h"
 #include "pokemon.h"
 
 static u8 GetCurrentBadgeCount(void)
@@ -63,6 +64,15 @@ u32 GetCurrentLevelCap(void)
 
     u8 challengeLevelCap = gSaveBlock3Ptr->challengeSettings.tx_Challenges_LevelCap;
 
+#if IS_HNS && defined(MAPS_EMERALD) && defined(MAPS_FIRERED)
+    // Combined build: Hoenn and FireRed Kanto use their own badges' caps until their league is
+    // beaten (src/level_scaling.c); Johto and Heart & Soul's Kanto keep the caps below.
+    if (challengeLevelCap != 0 && gMapHeader.mapLayout->layoutVersion != LAYOUT_VERSION_HNS)
+    {
+        u32 regionCap = GetScaledLevelCap(challengeLevelCap != 1);
+        return regionCap != 0 ? regionCap : MAX_LEVEL;
+    }
+#endif
     if (challengeLevelCap != 0)
     {
         u8 badgeCount = GetCurrentBadgeCount();

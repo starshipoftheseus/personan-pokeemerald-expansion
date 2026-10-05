@@ -45,8 +45,8 @@ and story gates allow.
 
 Open-world Emerald (Hoenn only), source at github.com/BelialClover/RoweSource (v1.9.4, Jan 2024)
 and github.com/BelialClover/PokemonROWE (older, 2022). Built on a 2021-era pokeemerald-expansion,
-so its code doesn't drop into our current expansion without porting. **No licence file in either
-repo**: ask BelialClover before copying code or assets; ideas are free to use.
+so its code doesn't drop into our current expansion without porting. BelialClover gave permission to build on it if credited (`credits/README.md`). The source in
+the uploaded RAR matches GitHub exactly.
 
 Worth studying:
 - `src/level_scaling.c`: trainers' and wild Pokémon levels scale with badge count (with evolutions
@@ -56,3 +56,9 @@ Worth studying:
 - `data/scripts/flying_taxi.inc`: fly to visited towns from the start, without the HM.
 - Quests (`src/quests.c`), game modes (randomised, inverse, double battles), DexNav.
 Already in our expansion base: following Pokémon, Gen 8+ mechanics, physical/special split.
+
+## R.O.W.E. 2.1.9.1 Experimental (ROM only, newer than the source)
+
+Adds a game-modes menu: Limit Gen Mode, Monotype, Little Cup, Metronome only, Random Team, Random
+Leader Type, No EVs, No Signature Move, No Custom Forms, Grindless, Showdown, God Mode; and level cap
+options (No cap / Strict cap / Stat cap). "Limit Gen Mode" is close to our region rule.

@@ -10,6 +10,7 @@
 #include "battle_hold_effects.h"
 #include "battle_interface.h"
 #include "battle_main.h"
+#include "level_scaling.h"
 #include "battle_message.h"
 #include "battle_pyramid.h"
 #include "battle_scripts.h"
@@ -2027,6 +2028,7 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
 
         u32 monIndices[monsCount];
         DoTrainerPartyPool(trainer, monIndices, monsCount, battleTypeFlags);
+        u32 levelBoost = GetTrainerPartyLevelBoost(trainer, monIndices, monsCount);
 
         for (i = 0; i < monsCount; i++)
         {
@@ -2064,7 +2066,9 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
                 #if RANDOMIZER_AVAILABLE == TRUE
                 species = RandomizeTrainerMon(trainer->trainerClass, i, monsCount, species);
                 #endif
-                CreateMon(&party[i], species, partyData[monIndex].lvl, personalityValue, otId);
+                if (levelBoost != 0)
+                    species = GetScaledSpecies(species, partyData[monIndex].lvl + levelBoost);
+                CreateMon(&party[i], species, partyData[monIndex].lvl + levelBoost, personalityValue, otId);
             }
             SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[monIndex].heldItem);
 
