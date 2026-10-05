@@ -55,7 +55,7 @@
 #include "follower_npc.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
-#if IS_FRLG
+#if IS_FRLG || defined(MAPS_FIRERED)
 extern const u8 EventScript_ResetAllMapFlagsFrlg[];
 #endif
 #if IS_HNS
@@ -276,6 +276,12 @@ void NewGameInitData(void)
     RunScriptImmediately(EventScript_ResetAllMapFlagsFrlg);
 #elif IS_HNS
     RunScriptImmediately(EventScript_ResetAllMapFlagsHnS);
+#ifdef MAPS_EMERALD
+    RunScriptImmediately(EventScript_ResetAllMapFlags); // Hoenn's story flags
+#endif
+#ifdef MAPS_FIRERED
+    RunScriptImmediately(EventScript_ResetAllMapFlagsFrlg); // FireRed Kanto's story flags
+#endif
 #else
     RunScriptImmediately(EventScript_ResetAllMapFlags);
 #endif

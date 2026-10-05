@@ -36,6 +36,9 @@ LittlerootTown_MapScripts::
 
 LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
+#ifdef POKEMON_HNS
+	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 0, LittlerootTown_EventScript_ArriveFromAnotherRegion
+#endif
 	call Common_EventScript_SetupRivalGfxId
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_MoveMomToMaysDoor
 	call_if_unset FLAG_RESCUED_BIRCH, LittlerootTown_EventScript_SetTwinPos
@@ -70,6 +73,17 @@ LittlerootTown_EventScript_SetExitedHouseAfterLatiSSTicketEvent::
 	setvar VAR_LITTLEROOT_HOUSES_STATE_BRENDAN, 5
 	return
 
+#ifdef POKEMON_HNS
+@ Arriving from another region: skip the moving-truck intro and start where Emerald does after
+@ the clock-setting scene, with the player's next step being to visit the rival next door.
+LittlerootTown_EventScript_ArriveFromAnotherRegion::
+	setvar VAR_LITTLEROOT_INTRO_STATE, 7
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_TRUCK
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_TRUCK
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE
+	return
+
+#endif
 LittlerootTown_EventScript_MoveMomToMaysDoor::
 	setobjectxyperm LOCALID_LITTLEROOT_MOM, 14, 8
 	return

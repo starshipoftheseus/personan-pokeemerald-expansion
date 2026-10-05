@@ -154,6 +154,10 @@ EventScript_ResetAllBerries::
 #endif
 	return
 
+@ In the combined build this is Hoenn's reset: shared flag names mean Hoenn's own flags here.
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names.h"
+#endif
 EventScript_ResetAllMapFlags::
 	setflag FLAG_HIDE_CONTEST_POKE_BALL
 	setflag FLAG_HIDE_ROUTE_111_VICTORIA_WINSTRATE
@@ -314,8 +318,14 @@ EventScript_ResetAllMapFlags::
 	setflag FLAG_HIDE_EVER_GRANDE_POKEMON_CENTER_1F_SCOTT
 	setflag FLAG_HIDE_SKY_PILLAR_WALLACE
 	setflag FLAG_HIDE_SKY_PILLAR_TOP_RAYQUAZA_STILL
+@ Heart & Soul's own reset plants the berry trees
+#if !IS_HNS
 	call EventScript_ResetAllBerries
+#endif
 	end
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+#include "constants/hoenn_script_names_end.h"
+#endif
 
 #if IS_HNS
 EventScript_ResetAllMapFlagsHnS::
@@ -460,7 +470,11 @@ EventScript_ResetAllMapFlagsHnS::
 	end
 #endif
 
-#if IS_FRLG
+#if IS_FRLG || defined(MAPS_FIRERED)
+@ FireRed's flag names mean FireRed's own flags here
+#if IS_HNS
+#include "constants/frlg_context.h"
+#endif
 EventScript_ResetAllMapFlagsFrlg::
 	setflag FLAG_HIDE_OAK_IN_HIS_LAB
 	setflag FLAG_HIDE_OAK_IN_PALLET_TOWN
@@ -513,4 +527,7 @@ EventScript_ResetAllMapFlagsFrlg::
 	setflag FLAG_HIDE_SAFFRON_CITY_POKECENTER_SABRINA_JOURNALS
 	setvar VAR_MASSAGE_COOLDOWN_STEP_COUNTER, 500
 	end
+#if IS_HNS
+#include "constants/frlg_context_end.h"
+#endif
 #endif

@@ -513,7 +513,7 @@ const u16 gFieldEffectObjectPalette_CaveDust[] = INCBIN_U16("graphics/field_effe
 
 const u32 gObjectEventPic_ApricornTree[] = INCBIN_U32("graphics/object_events/pics/misc/apricorn_tree.4bpp");
 
-#if IS_FRLG
+#if IS_FRLG || defined(MAPS_FIRERED) // FireRed NPCs, also needed when FireRed maps are built in
 
 const u16 gObjectEventPic_RedNormal[] = INCBIN_U16("graphics/object_events/pics/people/red/red_normal.4bpp");
 const u16 gObjectEventPic_RedBike[] = INCBIN_U16("graphics/object_events/pics/people/red/red_bike.4bpp");

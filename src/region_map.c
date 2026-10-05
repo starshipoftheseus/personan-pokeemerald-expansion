@@ -151,6 +151,25 @@ static const u8 sRegionMapPlayerIcon_KrisGfx[] = INCBIN_U8("graphics/pokenav/reg
 #endif
 #include "data/region_map/region_map_entries.h"
 
+#if IS_HNS && defined(MAPS_EMERALD) && defined(MAPS_FIRERED)
+// Hoenn and FireRed Kanto show their own region maps. FireRed Kanto shares Kanto's map sections
+// with Heart & Soul's Kanto, so each region is told apart by its maps' layouts.
+#define COMBINED_REGION_MAPS TRUE
+static bool32 IsOnHoennMap(void)
+{
+    return gMapHeader.mapLayout->layoutVersion == LAYOUT_VERSION_EMERALD;
+}
+
+static bool32 IsOnFrlgMap(void)
+{
+    return gMapHeader.mapLayout->layoutVersion == LAYOUT_VERSION_FRLG;
+}
+#else
+#define COMBINED_REGION_MAPS FALSE
+#define IsOnHoennMap() FALSE
+#define IsOnFrlgMap() FALSE
+#endif
+
 #if IS_HNS
 // Johto-only map coordinates (before FLAG_VISITED_KANTO is set).
 // The auto-generated gRegionMapEntries has JK combined coordinates.
@@ -281,7 +300,9 @@ const struct RegionMapLocation *GetActiveRegionMapEntries(void)
 {
 #if IS_HNS
     const struct RegionMapLocation *entries;
-    if (FlagGet(FLAG_VISITED_KANTO))
+    if (IsOnHoennMap() || IsOnFrlgMap())
+        entries = gRegionMapEntries;
+    else if (FlagGet(FLAG_VISITED_KANTO))
         entries = sRegionMapEntries_Johto;
     else
         entries = gRegionMapEntries;
@@ -1490,6 +1511,22 @@ void PokedexAreaScreen_UpdateRegionMapVariablesAndVideoRegs(s16 x, s16 y)
 enum RegionMapType GetRegionMapType(u32 mapSecId)
 {
 #if IS_HNS
+    if (IsOnHoennMap())
+        return REGION_MAP_HOENN;
+    if (IsOnFrlgMap())
+    {
+        switch (GetKantoSubregion(mapSecId))
+        {
+        case KANTO_SUBREGION_SEVII123:
+            return REGION_MAP_SEVII123;
+        case KANTO_SUBREGION_SEVII45:
+            return REGION_MAP_SEVII45;
+        case KANTO_SUBREGION_SEVII67:
+            return REGION_MAP_SEVII67;
+        default:
+            return REGION_MAP_KANTO;
+        }
+    }
     if (FlagGet(FLAG_VISITED_KANTO))
         return REGION_MAP_JK;
     return REGION_MAP_JOHTO;
@@ -1526,6 +1563,21 @@ static mapsec_u16_t GetMapSecIdAt(u16 x, u16 y)
     x -= MAPCURSOR_X_MIN;
 
 #if IS_HNS
+    switch (IsOnHoennMap() || IsOnFrlgMap() ? GetRegionMapType(gMapHeader.regionMapSectionId) : REGION_MAP_JOHTO)
+    {
+    case REGION_MAP_HOENN:
+        return sRegionMap_MapSectionLayout[y][x];
+    case REGION_MAP_KANTO:
+        return sRegionMapSections_Kanto[y][x];
+    case REGION_MAP_SEVII123:
+        return sRegionMapSections_Sevii123[y][x];
+    case REGION_MAP_SEVII45:
+        return sRegionMapSections_Sevii45[y][x];
+    case REGION_MAP_SEVII67:
+        return sRegionMapSections_Sevii67[y][x];
+    default:
+        break;
+    }
     if (FlagGet(FLAG_VISITED_KANTO))
         return sRegionMapSections_JK[y][x];
     return sRegionMapSections_Johto[y][x];
@@ -1761,8 +1813,97 @@ static void RegionMap_InitializeStateBasedOnSSTidalLocation(void)
     sRegionMap->cursorPosY = GetActiveRegionMapEntries()[sRegionMap->mapSecId].y + y + MAPCURSOR_Y_MIN;
 }
 
+#if COMBINED_REGION_MAPS
+#define MAPSEC_TYPE_FLAG(flag) (FlagGet(flag) ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY)
+
+// Fly spots on the Hoenn map, using Hoenn's own visited flags.
+static u8 GetHoennMapsecType(mapsec_u16_t mapSecId)
+{
+    switch (mapSecId)
+    {
+    case MAPSEC_LITTLEROOT_TOWN:  return MAPSEC_TYPE_FLAG(FLAG_VISITED_LITTLEROOT_TOWN);
+    case MAPSEC_OLDALE_TOWN:      return MAPSEC_TYPE_FLAG(FLAG_VISITED_OLDALE_TOWN);
+    case MAPSEC_DEWFORD_TOWN:     return MAPSEC_TYPE_FLAG(FLAG_VISITED_DEWFORD_TOWN);
+    case MAPSEC_LAVARIDGE_TOWN:   return MAPSEC_TYPE_FLAG(FLAG_VISITED_LAVARIDGE_TOWN);
+    case MAPSEC_FALLARBOR_TOWN:   return MAPSEC_TYPE_FLAG(FLAG_VISITED_FALLARBOR_TOWN);
+    case MAPSEC_VERDANTURF_TOWN:  return MAPSEC_TYPE_FLAG(FLAG_VISITED_VERDANTURF_TOWN);
+    case MAPSEC_PACIFIDLOG_TOWN:  return MAPSEC_TYPE_FLAG(FLAG_VISITED_PACIFIDLOG_TOWN);
+    case MAPSEC_PETALBURG_CITY:   return MAPSEC_TYPE_FLAG(FLAG_VISITED_PETALBURG_CITY);
+    case MAPSEC_SLATEPORT_CITY:   return MAPSEC_TYPE_FLAG(FLAG_VISITED_SLATEPORT_CITY);
+    case MAPSEC_MAUVILLE_CITY:    return MAPSEC_TYPE_FLAG(FLAG_VISITED_MAUVILLE_CITY);
+    case MAPSEC_RUSTBORO_CITY:    return MAPSEC_TYPE_FLAG(FLAG_VISITED_RUSTBORO_CITY);
+    case MAPSEC_FORTREE_CITY:     return MAPSEC_TYPE_FLAG(FLAG_VISITED_FORTREE_CITY);
+    case MAPSEC_LILYCOVE_CITY:    return MAPSEC_TYPE_FLAG(FLAG_VISITED_LILYCOVE_CITY);
+    case MAPSEC_MOSSDEEP_CITY:    return MAPSEC_TYPE_FLAG(FLAG_VISITED_MOSSDEEP_CITY);
+    case MAPSEC_SOOTOPOLIS_CITY:  return MAPSEC_TYPE_FLAG(FLAG_VISITED_SOOTOPOLIS_CITY);
+    case MAPSEC_EVER_GRANDE_CITY: return MAPSEC_TYPE_FLAG(FLAG_VISITED_EVER_GRANDE_CITY);
+    default:                      return 0xFF;
+    }
+}
+
+// Fly spots on FireRed's Kanto and Sevii maps. FireRed's flag names mean FireRed's own flags here.
+#include "constants/frlg_context.h"
+static u8 GetFrlgMapsecType(mapsec_u16_t mapSecId)
+{
+    switch (mapSecId)
+    {
+    case MAPSEC_PALLET_TOWN:      return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_PALLET_TOWN);
+    case MAPSEC_VIRIDIAN_CITY:    return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_VIRIDIAN_CITY);
+    case MAPSEC_PEWTER_CITY:      return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_PEWTER_CITY);
+    case MAPSEC_CERULEAN_CITY:    return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_CERULEAN_CITY);
+    case MAPSEC_LAVENDER_TOWN:    return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_LAVENDER_TOWN);
+    case MAPSEC_VERMILION_CITY:   return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_VERMILION_CITY);
+    case MAPSEC_CELADON_CITY:     return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_CELADON_CITY);
+    case MAPSEC_FUCHSIA_CITY:     return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_FUCHSIA_CITY);
+    case MAPSEC_CINNABAR_ISLAND:  return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_CINNABAR_ISLAND);
+    case MAPSEC_INDIGO_PLATEAU:   return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_INDIGO_PLATEAU_EXTERIOR);
+    case MAPSEC_SAFFRON_CITY:     return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_SAFFRON_CITY);
+    case MAPSEC_ROUTE_4:          return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_ROUTE4_POKEMON_CENTER_1F);
+    case MAPSEC_ROUTE_10:         return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_ROUTE10_POKEMON_CENTER_1F);
+    case MAPSEC_ONE_ISLAND:       return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_ONE_ISLAND);
+    case MAPSEC_TWO_ISLAND:       return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_TWO_ISLAND);
+    case MAPSEC_THREE_ISLAND:     return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_THREE_ISLAND);
+    case MAPSEC_FOUR_ISLAND:      return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_FOUR_ISLAND);
+    case MAPSEC_FIVE_ISLAND:      return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_FIVE_ISLAND);
+    case MAPSEC_SIX_ISLAND:       return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_SIX_ISLAND);
+    case MAPSEC_SEVEN_ISLAND:     return MAPSEC_TYPE_FLAG(FLAG_WORLD_MAP_SEVEN_ISLAND);
+    default:                      return 0xFF;
+    }
+}
+
+// FireRed's fly spots. Heart & Soul's Kanto shares these sections, and sMapHealLocations points
+// them at Heart & Soul's towns.
+static const u8 sFrlgFlyHealLocations[][2] =
+{
+    {MAPSEC_PALLET_TOWN,     HEAL_LOCATION_PALLET_TOWN},
+    {MAPSEC_VIRIDIAN_CITY,   HEAL_LOCATION_VIRIDIAN_CITY},
+    {MAPSEC_PEWTER_CITY,     HEAL_LOCATION_PEWTER_CITY},
+    {MAPSEC_CERULEAN_CITY,   HEAL_LOCATION_CERULEAN_CITY},
+    {MAPSEC_LAVENDER_TOWN,   HEAL_LOCATION_LAVENDER_TOWN},
+    {MAPSEC_VERMILION_CITY,  HEAL_LOCATION_VERMILION_CITY},
+    {MAPSEC_CELADON_CITY,    HEAL_LOCATION_CELADON_CITY},
+    {MAPSEC_FUCHSIA_CITY,    HEAL_LOCATION_FUCHSIA_CITY},
+    {MAPSEC_CINNABAR_ISLAND, HEAL_LOCATION_CINNABAR_ISLAND},
+    {MAPSEC_INDIGO_PLATEAU,  HEAL_LOCATION_INDIGO_PLATEAU},
+    {MAPSEC_SAFFRON_CITY,    HEAL_LOCATION_SAFFRON_CITY},
+    {MAPSEC_ROUTE_4,         HEAL_LOCATION_ROUTE4},
+    {MAPSEC_ROUTE_10,        HEAL_LOCATION_ROUTE10},
+};
+#include "constants/frlg_context_end.h"
+#undef MAPSEC_TYPE_FLAG
+#endif
+
 static u8 GetMapsecType(mapsec_u16_t mapSecId)
 {
+#if COMBINED_REGION_MAPS
+    u8 type = 0xFF;
+    if (IsOnHoennMap())
+        type = GetHoennMapsecType(mapSecId);
+    else if (IsOnFrlgMap())
+        type = GetFrlgMapsecType(mapSecId);
+    if (type != 0xFF)
+        return type;
+#endif
     switch (mapSecId)
     {
     case MAPSEC_NONE:
@@ -2660,6 +2801,9 @@ static const struct FlyLocation sFlyLocations[] =
         .mapsec = MAPSEC_EVER_GRANDE_CITY,
         .flag = FLAG_VISITED_EVER_GRANDE_CITY,
     },
+#if COMBINED_REGION_MAPS
+#include "constants/frlg_context.h" // FireRed's world map flags
+#endif
     {
         .regionMapType = REGION_MAP_KANTO,
         .mapsec = MAPSEC_PALLET_TOWN,
@@ -2760,6 +2904,9 @@ static const struct FlyLocation sFlyLocations[] =
         .mapsec = MAPSEC_ROUTE_10_POKECENTER,
         .flag = FLAG_WORLD_MAP_ROUTE10_POKEMON_CENTER_1F,
     },
+#if COMBINED_REGION_MAPS
+#include "constants/frlg_context_end.h"
+#endif
 #if IS_HNS
     // Johto-only map fly destinations
     { .regionMapType = REGION_MAP_JOHTO, .mapsec = MAPSEC_NEW_BARK_TOWN, .flag = FLAG_VISITED_NEWBARK_TOWN },
@@ -3021,6 +3168,18 @@ static void CB_ExitFlyMap(void)
 
 u32 FilterFlyDestination(struct RegionMap* regionMap)
 {
+#if COMBINED_REGION_MAPS
+    if (IsOnFrlgMap())
+    {
+        for (u32 i = 0; i < ARRAY_COUNT(sFrlgFlyHealLocations); i++)
+        {
+            if (sFrlgFlyHealLocations[i][0] == regionMap->mapSecId)
+                return sFrlgFlyHealLocations[i][1];
+        }
+    }
+    if (regionMap->mapSecId == MAPSEC_LITTLEROOT_TOWN)
+        return (gSaveBlock2Ptr->playerGender == MALE ? HEAL_LOCATION_LITTLEROOT_TOWN_BRENDANS_HOUSE : HEAL_LOCATION_LITTLEROOT_TOWN_MAYS_HOUSE);
+#endif
     switch (regionMap->mapSecId)
     {
     case MAPSEC_SOUTHERN_ISLAND:
