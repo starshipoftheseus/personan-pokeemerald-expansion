@@ -24,9 +24,14 @@ Small, specific tasks for Claude. One per request.
 - [ ] Level caps, prize money and the catch malus count only Johto's 8 badges (gBadgeFlags). Open-world design decision.
 - [ ] Hoenn and Johto share some story-gift flags where that seemed harmless (TM Attract/Torment gifts, running shoes effect, Pokédex). Revisit if it matters.
 
-## FireRed Kanto (next)
-- [x] Decided: keep both Kantos. FireRed = first era, Heart & Soul's Kanto = second era after a time jump. Both sets of Kanto maps live in the ROM; the two eras need separate flags, badges (FireRed's 8 vs Heart & Soul's Kanto badges 9-16) and a way to switch era.
-- [ ] Map sections: only 33 values are left below 0xFD; FireRed adds 62 sections of its own (Sevii Islands, Silph Co., S.S. Anne...). Reuse Heart & Soul's Kanto sections; Sevii may share names (decided).
-- [ ] Save space: FireRed flags need ~288 bytes of SaveBlock1 (108 free). Candidates: dex padding (110), roamer padding (84), link-only trainer name records (240).
-- [ ] ROM space: FireRed tilesets, scripts, text and trainers are not in the ROM yet; expect 2+ MB, ~1.9 MB free. Surf sprites cut (2.02 MB): ROM 29.62 MB, ~3.9 MB free.
-- [ ] Same steps as Hoenn: MAPS_FIRERED in MAP_VERSION, flags/vars/trainers generator, region-specific names, smoke test.
+## FireRed Kanto (first era)
+- [x] Built in (`MAP_VERSION := hns+emerald+firered`): FireRed context (`frlg_context.h`) for its flags and 146 clashing labels, vars in SaveBlock2, trainers after Hoenn's
+- [x] Save space: dex/roamer padding removed and wireless trainer-name records cut to 1 in the combined build. SaveBlock1 15644/15872, SaveBlock2 3756/3968
+- [x] Map sections: 31 own values, 31 share a name (`frlg_alias`); MAPSEC_NONE = 251 (limit 0xFC)
+- [x] Field moves, obedience and badge totals count FireRed's badges and HM gifts
+- [x] Smoke test 416/417 FireRed maps (Union Room needs a link)
+- [ ] Getting there: no link to FireRed Kanto yet (debug warp only). Future Kanto vs. FireRed Kanto via a portal/time travel: to design later.
+- [ ] FireRed's own start (Oak's lab, Pallet intro, rival name) and how it relates to the player arriving from another region
+- [ ] FireRed-only features compiled for FireRed builds only (Fame Checker UI, Trainer Tower, Sevii pass, help system, teachy TV): check each FireRed script that uses them
+- [ ] Trainer card shows neither Hoenn's nor FireRed's badges; region map/Fly shows Johto
+- [ ] ROM: 31.33 MB, ~2.2 MB free
