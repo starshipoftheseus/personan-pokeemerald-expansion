@@ -609,7 +609,11 @@ gStdScripts_End::
 #include "constants/hoenn_script_names_end.h"
 #endif
 
-.if IS_FRLG
+#ifdef MAPS_FIRERED // FireRed Kanto scripts
+@ FireRed's flag names and clashing labels mean FireRed's own here (see frlg_context.h)
+#if defined(POKEMON_HNS)
+#include "constants/frlg_context.h"
+#endif
 
 @ FRLG scripts
 	.include "data/maps/BattleColosseum_2P_Frlg/scripts.inc"
@@ -1056,7 +1060,10 @@ gStdScripts_End::
 	.include "data/scripts/flavor_text.inc"
 	.include "data/scripts/pkmn_center_nurse_frlg.inc"
 
-.endif
+#if defined(POKEMON_HNS)
+#include "constants/frlg_context_end.h"
+#endif
+#endif // MAPS_FIRERED
 
 	.include "data/scripts/std_msgbox.inc"
 	.include "data/scripts/trainer_battle.inc"

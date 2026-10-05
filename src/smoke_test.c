@@ -68,6 +68,8 @@ static void CB2_SmokeTest(void)
     u32 group, num;
 
     CB2_Overworld();
+    if ((sFramesRun % 100) == 0)
+        LogValue("frame=", sFramesRun); // shows how far a run got before a timeout
     if (++sFramesRun < gSmokeTestFrames)
         return;
 
@@ -99,4 +101,5 @@ void SmokeTest_Start(void)
     sFramesRun = 0;
     gMain.state = 0; // the map loader runs from state 0; the copyright screen left its own state here
     NewGameOnMap(gSmokeTestMap >> 8, gSmokeTestMap & 0xFF, CB2_SmokeTest);
+    LogValue("loaded=", 1); // a timeout without this line hung while loading the map
 }

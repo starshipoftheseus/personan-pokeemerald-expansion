@@ -56,6 +56,9 @@ void InitEventData(void)
 #if defined(MAPS_EMERALD) && IS_HNS
     memset(gSaveBlock2Ptr->hoennVars, 0, sizeof(gSaveBlock2Ptr->hoennVars));
 #endif
+#if defined(MAPS_FIRERED) && IS_HNS
+    memset(gSaveBlock2Ptr->frlgVars, 0, sizeof(gSaveBlock2Ptr->frlgVars));
+#endif
     memset(sSpecialFlags, 0, sizeof(sSpecialFlags));
 }
 
@@ -78,6 +81,10 @@ void ClearDailyFlags(void)
         FlagClear(i);
 #ifdef MAPS_EMERALD
     for (i = HOENN_DAILY_FLAGS_START; i <= HOENN_DAILY_FLAGS_END; i++)
+        FlagClear(i);
+#endif
+#ifdef MAPS_FIRERED
+    for (i = FRLG_DAILY_FLAGS_START; i <= FRLG_DAILY_FLAGS_END; i++)
         FlagClear(i);
 #endif
 #else
@@ -201,6 +208,10 @@ u16 *GetVarPointer(u16 id)
 #if defined(MAPS_EMERALD) && IS_HNS
     else if (id >= HOENN_VARS_START && id <= HOENN_VARS_END)
         return &gSaveBlock2Ptr->hoennVars[id - HOENN_VARS_START];
+#endif
+#if defined(MAPS_FIRERED) && IS_HNS
+    else if (id >= FRLG_VARS_START && id <= FRLG_VARS_END)
+        return &gSaveBlock2Ptr->frlgVars[id - FRLG_VARS_START];
 #endif
     else if (id <= VARS_END)
         return &gSaveBlock1Ptr->vars[id - VARS_START];

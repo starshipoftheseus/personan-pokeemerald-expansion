@@ -28,6 +28,7 @@ using std::numeric_limits;
 using json11::Json;
 
 #include <regex>
+#include <set>
 
 #include "mapjson.h"
 
@@ -37,6 +38,9 @@ string version;
 // The map sets included in this build. <game-version> may list several, joined with '+'
 // (e.g. "hns+emerald" builds Johto and Hoenn maps into one ROM).
 vector<string> included_versions;
+// FireRed maps in a build that also has other map sets: their data is wrapped in
+// include/constants/frlg_context.h so FireRed's flag names and labels mean FireRed's own.
+vector<string> frlg_context_maps;
 // System directory separator
 string sep;
 
@@ -538,6 +542,16 @@ string generate_connections_text(Json groups_data, vector<string> &invalid_maps,
     return text.str();
 }
 
+// Wraps one map's .include line in the FireRed context when needed (see frlg_context_maps).
+static void write_map_include(ostringstream &text, const string &map_name, const string &line) {
+    bool frlg = find(frlg_context_maps.begin(), frlg_context_maps.end(), map_name) != frlg_context_maps.end();
+    if (frlg)
+        text << "#include \"constants/frlg_context.h\"\n";
+    text << line;
+    if (frlg)
+        text << "#include \"constants/frlg_context_end.h\"\n";
+}
+
 string generate_headers_text(Json groups_data, vector<string> &invalid_maps, string include_path) {
     vector<string> map_names;
 
@@ -555,7 +569,7 @@ string generate_headers_text(Json groups_data, vector<string> &invalid_maps, str
     text << get_generated_warning("data/maps/map_groups.json", true);
 
     for (string map_name : map_names)
-        text << "\t.include \"" << include_path << "/" << map_name << "/header.inc\"\n";
+        write_map_include(text, map_name, "\t.include \"" + include_path + "/" + map_name + "/header.inc\"\n");
 
     return text.str();
 }
@@ -578,7 +592,7 @@ string generate_events_text(Json groups_data, vector<string> &invalid_maps, stri
     text << get_generated_warning(include_path + "/map_groups.json", true);
 
     for (string map_name : map_names)
-        text << "\t.include \"" << include_path << "/" << map_name << "/events.inc\"\n";
+        write_map_include(text, map_name, "\t.include \"" + include_path + "/" + map_name + "/events.inc\"\n");
 
     return text.str();
 }
@@ -740,6 +754,8 @@ void process_groups(string groups_filepath, vector<string> &map_filepaths, strin
 
         if (!is_version_included(game_ver)) {
             invalid_maps.push_back(map_name);
+        } else if (game_ver == "frlg" && included_versions.size() > 1) {
+            frlg_context_maps.push_back(map_name);
         }
     }
 

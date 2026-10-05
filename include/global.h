@@ -713,6 +713,9 @@ struct SaveBlock2
 #if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
              u16 hoennVars[HOENN_VARS_COUNT]; // Hoenn's vars in the combined build, see GetVarPointer
 #endif
+#if defined(POKEMON_HNS) && defined(MAPS_FIRERED)
+             u16 frlgVars[FRLG_VARS_COUNT]; // FireRed Kanto's vars in the combined build, see GetVarPointer
+#endif
 }; // sizeof=0xF2C
 
 extern struct SaveBlock2 *gSaveBlock2Ptr;
@@ -1284,7 +1287,9 @@ struct SaveBlock1
     /*0x31B3*/ struct ExternalEventData externalEventData;
     /*0x31C7*/ struct ExternalEventFlags externalEventFlags;
     /*0x31DC*/ struct Roamer roamer[ROAMER_COUNT];
+#if !(defined(POKEMON_HNS) && defined(MAPS_FIRERED)) // the combined build needs this space for flags
     /*0x3???*/ struct Roamer roamerPadding[7 - ROAMER_COUNT]; // Padding for extra roamers
+#endif
 #if FREE_ENIGMA_BERRY == FALSE
     /*0x31F8*/ struct EnigmaBerry enigmaBerry;
 #endif //FREE_ENIGMA_BERRY
@@ -1292,9 +1297,13 @@ struct SaveBlock1
     /*0x322C*/ struct MysteryGiftSave mysteryGift;
 #endif //FREE_MYSTERY_GIFT
     /*0x3???*/ u8 dexSeen[NUM_DEX_FLAG_BYTES];
+#if !(defined(POKEMON_HNS) && defined(MAPS_FIRERED))
     /*0x3???*/ u8 dexPadding1[0xBF - NUM_DEX_FLAG_BYTES]; // Padding so the dex can be expanded later
+#endif
     /*0x3???*/ u8 dexCaught[NUM_DEX_FLAG_BYTES];
+#if !(defined(POKEMON_HNS) && defined(MAPS_FIRERED))
     /*0x3???*/ u8 dexPadding2[0xBF - NUM_DEX_FLAG_BYTES]; // Padding so the dex can be expanded later
+#endif
 #if FREE_TRAINER_HILL == FALSE
     /*0x3???*/ u32 trainerHillTimes[NUM_TRAINER_HILL_MODES];
 #endif //FREE_TRAINER_HILL
@@ -1303,7 +1312,11 @@ struct SaveBlock1
 #endif //FREE_MYSTERY_EVENT_BUFFERS
     /*0x3???*/ struct RecordMixingGift recordMixingGift;
     /*0x3???*/ LilycoveLady lilycoveLady;
+#if defined(POKEMON_HNS) && defined(MAPS_FIRERED)
+    /*0x3???*/ struct TrainerNameRecord trainerNameRecords[1]; // wireless link only; the space holds FireRed's flags
+#else
     /*0x3???*/ struct TrainerNameRecord trainerNameRecords[20];
+#endif
 #if FREE_UNION_ROOM_CHAT == FALSE
     /*0x3???*/ u8 registeredTexts[UNION_ROOM_KB_ROW_COUNT][21];
 #endif //FREE_UNION_ROOM_CHAT

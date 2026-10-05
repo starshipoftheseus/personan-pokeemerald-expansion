@@ -24,8 +24,8 @@ ifeq (hns, $(or $(BUILD), $(MAKECMDGOALS)))
 	GAME_CODE   	:= BPEE
 	BUILD_NAME  	:= hns
 	# Map sets to include, joined with "+". Each set adds -DMAPS_<SET> to the C/asm flags.
-	# hns = Johto (Heart & Soul), emerald = Hoenn. Run `make clean` after changing this.
-	MAP_VERSION 	:= hns+emerald
+	# hns = Johto (Heart & Soul), emerald = Hoenn, firered = FireRed Kanto. Run `make clean` after changing this.
+	MAP_VERSION 	:= hns+emerald+firered
 endif
 endif
 endif

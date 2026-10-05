@@ -244,6 +244,14 @@ const struct Trainer gTrainers[DIFFICULTY_COUNT][TRAINERS_COUNT] =
 #undef TRAINER_NONE
 #define TRAINER_NONE 0
 #endif
+#ifdef MAPS_FIRERED
+// FireRed Kanto's trainers, numbered after Hoenn's (see frlg_trainers.h).
+#undef TRAINER_NONE
+#define TRAINER_NONE FRLG_TRAINERS_START
+#include "data/trainers_frlg.h"
+#undef TRAINER_NONE
+#define TRAINER_NONE 0
+#endif
 #else
 #include "data/trainers.h"
 #endif

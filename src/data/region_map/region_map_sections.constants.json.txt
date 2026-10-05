@@ -13,7 +13,9 @@ enum {
     MAPSEC_UNUSED_ZERO = 0,
 ## for map_section in map_sections
 {% if existsIn(map_section, "in_hns") %}{% else %}{% if existsIn(map_section, "frlg_only") %}
+#ifndef MAPS_FIRERED
     {{ map_section.id }} = 0,
+#endif
 {% else %}
 #ifndef MAPS_EMERALD
     {{ map_section.id }} = 0,
@@ -35,8 +37,24 @@ enum {
 {% endif %}{% endif %}
 ## endfor
 #endif
+#ifdef MAPS_FIRERED
+// FireRed Kanto's own sections (those without a frlg_alias), after Hoenn's.
+## for map_section in map_sections
+{% if existsIn(map_section, "frlg_only") %}{% if existsIn(map_section, "frlg_alias") %}{% else %}
+    {{ map_section.id }},
+{% endif %}{% endif %}
+## endfor
+#endif
     MAPSEC_NONE,
     MAPSEC_COUNT,
+#ifdef MAPS_FIRERED
+// FireRed sections that share another section's name (frlg_alias); the u8 section space is full.
+## for map_section in map_sections
+{% if existsIn(map_section, "frlg_alias") %}
+    {{ map_section.id }} = {{ map_section.frlg_alias }},
+{% endif %}
+## endfor
+#endif
 };
 
 #define KANTO_MAPSEC_START  MAPSEC_PALLET_TOWN

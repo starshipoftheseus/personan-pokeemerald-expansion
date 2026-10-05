@@ -13,6 +13,10 @@ def sections():
     state = "hoenn_maps"; seen_frlg = False; depth = 0; block = None
     for l in lines:
         s = l.strip()
+        if s.startswith("#ifdef MAPS_FIRERED"):
+            state = "frlg"; seen_frlg = True; continue
+        if s.startswith("#endif // MAPS_FIRERED"):
+            state = "common"; continue
         m = re.match(r"\.if\s+(\S+)", s)
         if m and depth == 0:
             cond = m.group(1)

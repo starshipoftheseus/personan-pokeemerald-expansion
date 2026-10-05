@@ -882,11 +882,21 @@
 // Heart & Soul with Hoenn maps: Hoenn's trainers come after Heart & Soul's (generated).
 #include "constants/hoenn_trainers.h"
 #endif
+#if defined(POKEMON_HNS) && defined(MAPS_FIRERED)
+// FireRed Kanto's trainers come after Hoenn's (generated).
+#include "constants/frlg_trainers.h"
+#endif
 
 #define TRAINER_PARTNER(partner)           (MAX_TRAINERS_COUNT + partner)
 
 // The flag that records whether a trainer has been beaten.
-#ifdef HOENN_TRAINERS_START
+#ifdef FRLG_TRAINERS_START
+#define TRAINER_FLAG(trainerId) ((trainerId) >= FRLG_TRAINERS_START \
+                                 ? FRLG_TRAINER_FLAGS_START + (trainerId) - FRLG_TRAINERS_START \
+                                 : (trainerId) >= HOENN_TRAINERS_START \
+                                 ? HOENN_TRAINER_FLAGS_START + (trainerId) - HOENN_TRAINERS_START \
+                                 : TRAINER_FLAGS_START + (trainerId))
+#elif defined(HOENN_TRAINERS_START)
 #define TRAINER_FLAG(trainerId) ((trainerId) >= HOENN_TRAINERS_START \
                                  ? HOENN_TRAINER_FLAGS_START + (trainerId) - HOENN_TRAINERS_START \
                                  : TRAINER_FLAGS_START + (trainerId))

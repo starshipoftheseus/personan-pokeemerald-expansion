@@ -58,8 +58,11 @@ def run_one(rom_bytes, offset, name, group, num, timeout):
         if not values:
             result = "error"
         return name, result, values, proc.stdout[-500:] if result == "error" else ""
-    except subprocess.TimeoutExpired:
-        return name, "timeout", {}, ""
+    except subprocess.TimeoutExpired as e:
+        out = e.stdout.decode(errors="ignore") if isinstance(e.stdout, bytes) else (e.stdout or "")
+        frames = re.findall(r"SMOKE frame=(\d+)", out)
+        where = "while loading" if "SMOKE loaded=" not in out else f"after frame {frames[-1] if frames else 0}"
+        return name, "timeout", {"hung": where}, ""
     finally:
         os.unlink(path)
 
@@ -75,7 +78,10 @@ def main():
     args = parser.parse_args()
 
     ids = map_ids()
-    names = list(args.maps) + (maps_for_version(args.all) if args.all else [])
+    names = list(args.maps)
+    if args.all:
+        # --all skips map folders that aren't in any map group (unused maps).
+        names += [n for n in maps_for_version(args.all) if n in ids]
     if not names:
         parser.error("give map names or --all VERSION")
     unknown = [n for n in names if n not in ids]
@@ -92,7 +98,7 @@ def main():
             if result in ("timeout", "error"):
                 failed += 1
             detail = " ".join(f"{k}={v}" for k, v in values.items()
-                              if k in ("map_group", "map_num", "mapsec", "x", "y", "controls_locked", "script_running"))
+                              if k in ("map_group", "map_num", "mapsec", "x", "y", "controls_locked", "script_running", "hung"))
             print(f"{result:8} {name:50} {detail}")
             if log:
                 print("         " + log.replace("\n", "\n         "))
