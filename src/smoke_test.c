@@ -1,5 +1,9 @@
 #include "global.h"
 #include "main.h"
+#include "battle_main.h"
+#include "data.h"
+#include "event_data.h"
+#include "pokemon.h"
 #include "overworld.h"
 #include "script.h"
 #include "sprite.h"
@@ -14,6 +18,8 @@
 
 const volatile u16 gSmokeTestMap = SMOKE_TEST_OFF; // (map group << 8) | map number
 const volatile u16 gSmokeTestFrames = 300;
+const volatile u16 gSmokeTestTrainers = FALSE; // 1: build every trainer's party and check it;
+                                               // 2: the same with every badge and league won (level scaling on)
 
 enum
 {
@@ -63,9 +69,64 @@ static void Exit(u32 exitCode)
     asm volatile("swi 0x3" :: "r" (r0));
 }
 
+// Builds every trainer's party as a battle would and checks each Pokémon is a real species at a
+// sane level. Logs the bad trainers and exits with the count of them.
+static void CheckTrainerParties(void)
+{
+    u32 id, i, bad = 0, checked = 0, lowest = MAX_LEVEL;
+
+    if (gSmokeTestTrainers == 2)
+    {
+        for (i = 0; i < NUM_BADGES; i++)
+            FlagSet(FLAG_BADGE01_GET + i);
+        FlagSet(FLAG_IS_CHAMPION);
+#if defined(MAPS_EMERALD) && defined(MAPS_FIRERED)
+        for (i = 0; i < 8; i++)
+        {
+            FlagSet(FLAG_HOENN_BADGE01_GET + i);
+            FlagSet(FLAG_FRLG_BADGE01_GET + i);
+        }
+        FlagSet(FLAG_HOENN_IS_CHAMPION);
+        FlagSet(FLAG_FRLG_IS_CHAMPION);
+#endif
+    }
+
+    for (id = 1; id < TRAINERS_COUNT; id++)
+    {
+        const struct Trainer *trainer = GetTrainerStructFromId(id);
+        u32 count;
+
+        if (trainer == NULL || trainer->partySize == 0 || trainer->party == NULL)
+            continue;
+        ZeroEnemyPartyMons();
+        count = CreateNPCTrainerPartyFromTrainer(gEnemyParty, trainer, TRUE, BATTLE_TYPE_TRAINER);
+        checked++;
+        for (i = 0; i < count && i < PARTY_SIZE; i++)
+        {
+            u32 species = GetMonData(&gEnemyParty[i], MON_DATA_SPECIES);
+            u32 level = GetMonData(&gEnemyParty[i], MON_DATA_LEVEL);
+            if (level < lowest)
+                lowest = level;
+            if (species == SPECIES_NONE || !IsSpeciesEnabled(species) || level == 0 || level > MAX_LEVEL)
+            {
+                LogValue("bad_trainer=", id);
+                bad++;
+                break;
+            }
+        }
+    }
+    LogValue("trainers_checked=", checked);
+    LogValue("trainers_bad=", bad);
+    LogValue("lowest_level=", lowest);
+    Exit(bad != 0 ? 2 : SMOKE_TEST_ON_MAP);
+}
+
 static void CB2_SmokeTest(void)
 {
     u32 group, num;
+
+    if (gSmokeTestTrainers)
+        CheckTrainerParties();
 
     CB2_Overworld();
     if ((sFramesRun % 100) == 0)

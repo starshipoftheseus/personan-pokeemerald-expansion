@@ -9,6 +9,7 @@ Build first (make hns), then for example:
     python3 hack_scripts/smoke_test.py MAP_LITTLEROOT_TOWN MAP_NEW_BARK_TOWN_HNS
     python3 hack_scripts/smoke_test.py --all emerald      # every Hoenn map (game_version emerald)
     python3 hack_scripts/smoke_test.py --all hns --jobs 8
+    python3 hack_scripts/smoke_test.py --trainers 1 MAP_NEW_BARK_TOWN_HNS   # check every trainer's party
 
 Results: ok (still on the map), moved (a script warped the player elsewhere: fine for cutscenes),
 timeout (crash or hang), error (emulator failed). Exit status is 1 if any map timed out or errored.
@@ -57,6 +58,10 @@ def run_one(rom_bytes, offset, name, group, num, timeout):
         result = RESULTS.get(proc.returncode, "error")
         if not values:
             result = "error"
+        if "trainers_checked" in values:
+            values["trainers"] = f"{values['trainers_checked']} checked, {values['trainers_bad']} bad, lowest level {values.get('lowest_level')}"
+            bad = re.findall(r"SMOKE bad_trainer=(\d+)", proc.stdout)
+            return name, result, values, ("bad trainer ids: " + " ".join(bad)) if bad else ""
         return name, result, values, proc.stdout[-500:] if result == "error" else ""
     except subprocess.TimeoutExpired as e:
         out = e.stdout.decode(errors="ignore") if isinstance(e.stdout, bytes) else (e.stdout or "")
@@ -74,6 +79,9 @@ def main():
     parser.add_argument("--rom", default=os.path.join(ROOT, "pokehns.gba"))
     parser.add_argument("--elf", default=os.path.join(ROOT, "pokehns.elf"))
     parser.add_argument("--timeout", type=float, default=30)
+    parser.add_argument("--trainers", type=int, choices=(1, 2), metavar="MODE",
+                        help="build every trainer's party on the first map given and check it "
+                             "(2: with every badge and league won, so level scaling applies)")
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 1)
     args = parser.parse_args()
 
@@ -90,15 +98,21 @@ def main():
 
     rom = open(args.rom, "rb").read()
     offset = symbol_offset(args.elf, "gSmokeTestMap")
+    if args.trainers:
+        rom = bytearray(rom)
+        t = symbol_offset(args.elf, "gSmokeTestTrainers")
+        rom[t:t + 2] = bytes([args.trainers, 0])
+        names = names[:1]
+        RESULTS[2] = "BAD TRAINERS"
     failed = 0
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         jobs = [pool.submit(run_one, rom, offset, n, *ids[n], args.timeout) for n in names]
         for job in jobs:
             name, result, values, log = job.result()
-            if result in ("timeout", "error"):
+            if result in ("timeout", "error", "BAD TRAINERS"):
                 failed += 1
             detail = " ".join(f"{k}={v}" for k, v in values.items()
-                              if k in ("map_group", "map_num", "mapsec", "x", "y", "controls_locked", "script_running", "hung"))
+                              if k in ("map_group", "map_num", "mapsec", "x", "y", "controls_locked", "script_running", "hung", "trainers"))
             print(f"{result:8} {name:50} {detail}")
             if log:
                 print("         " + log.replace("\n", "\n         "))
