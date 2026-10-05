@@ -56,7 +56,14 @@ static void SetTrainerSlideParameters(enum BattlerId battler, u32* firstId, u32*
 static bool32 IsSlideInitalizedOrPlayed(enum BattlerId battler, enum TrainerSlideType slideId);
 
 // Partner trainers must be added as TRAINER_PARTNER(PARTNER_XXXX)
-static const u8* const sTrainerSlides[DIFFICULTY_COUNT][TRAINER_PARTNER(PARTNER_COUNT)][TRAINER_SLIDE_COUNT] =
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD) && defined(MAPS_FIRERED)
+// No trainer has slides yet, and a full table for 2,000+ trainers is ~360 KB of NULLs.
+// To add slides, set this back to TRAINER_PARTNER(PARTNER_COUNT).
+#define TRAINER_SLIDES_TABLE_SIZE 1
+#else
+#define TRAINER_SLIDES_TABLE_SIZE TRAINER_PARTNER(PARTNER_COUNT)
+#endif
+static const u8* const sTrainerSlides[DIFFICULTY_COUNT][TRAINER_SLIDES_TABLE_SIZE][TRAINER_SLIDE_COUNT] =
 {
     [DIFFICULTY_NORMAL] =
     {
@@ -143,8 +150,10 @@ static const u8* const *GetTrainerSlideArray(enum DifficultyLevel difficulty, u3
 #else
     if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
         return sFrontierTrainerSlides[difficulty][trainerId];
-    else
+    else if (trainerId < TRAINER_SLIDES_TABLE_SIZE)
         return sTrainerSlides[difficulty][trainerId];
+    else
+        return sTrainerSlides[difficulty][0]; // no slides: TRAINER_NONE's empty row (callers index it)
 #endif // TESTING
 }
 
