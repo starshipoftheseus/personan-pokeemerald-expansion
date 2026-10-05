@@ -22,14 +22,17 @@ extern const struct SpriteTemplate *const gFieldEffectObjectTemplatePointers[];
 extern void SynchroniseSurfAnim(struct ObjectEvent *playerObj, struct Sprite *sprite);
 extern void SynchroniseSurfPosition(struct ObjectEvent *playerObj, struct Sprite *sprite);
 
-static void CreateOverlaySprite(bool8 isShiny);
-static void UpdateSurfMonOverlay(struct Sprite *sprite);
 
 struct RideablePokemon
 {
     u16 species;
     u8 trainerPose;
 };
+
+#if OW_SURF_ON_PARTY_MON
+
+static void CreateOverlaySprite(bool8 isShiny);
+static void UpdateSurfMonOverlay(struct Sprite *sprite);
 
 #include "data/object_events/surfable/surfable_pokemon.h"
 #include "data/object_events/surfable/surfable_pokemon_graphics.h"
@@ -180,3 +183,27 @@ static void UpdateSurfMonOverlay(struct Sprite *sprite)
         DestroySprite(sprite);
 }
 
+#else
+
+u32 CreateSurfablePokemonSprite(void)
+{
+    // Surfing on the party Pokémon is off: always the generic surf blob.
+    u8 spriteId;
+
+    SetSpritePosToOffsetMapCoords((s16 *)&gFieldEffectArguments[0], (s16 *)&gFieldEffectArguments[1], 8, 8);
+    spriteId = CreateSpriteAtEnd(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_SURF_BLOB], gFieldEffectArguments[0], gFieldEffectArguments[1], 0x96);
+    if (spriteId != MAX_SPRITES)
+    {
+        struct Sprite *sprite = &gSprites[spriteId];
+        sprite->coordOffsetEnabled = TRUE;
+        sprite->oam.paletteNum = LoadPlayerObjectEventPalette(gSaveBlock2Ptr->playerGender);
+        sprite->data[2] = gFieldEffectArguments[2];
+        sprite->data[3] = -1;
+        sprite->data[6] = -1;
+        sprite->data[7] = -1;
+    }
+    FieldEffectActiveListRemove(FLDEFF_SURF_BLOB);
+    return spriteId;
+}
+
+#endif // OW_SURF_ON_PARTY_MON

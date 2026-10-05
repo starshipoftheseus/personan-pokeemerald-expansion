@@ -25,8 +25,8 @@ Small, specific tasks for Claude. One per request.
 - [ ] Hoenn and Johto share some story-gift flags where that seemed harmless (TM Attract/Torment gifts, running shoes effect, Pokédex). Revisit if it matters.
 
 ## FireRed Kanto (next)
-- [ ] Decide: FireRed Kanto replaces Heart & Soul's Kanto, whose post-game (Kanto gyms, Red, Snorlax, Power Plant, Magnet Train, S.S. Aqua) is wired into Johto's story.
-- [ ] Map sections: only 33 values are left below 0xFD; FireRed adds 62 sections of its own (Sevii Islands, Silph Co., S.S. Anne...). Reuse Heart & Soul's Kanto sections and decide what to do with Sevii.
+- [x] Decided: keep both Kantos. FireRed = first era, Heart & Soul's Kanto = second era after a time jump. Both sets of Kanto maps live in the ROM; the two eras need separate flags, badges (FireRed's 8 vs Heart & Soul's Kanto badges 9-16) and a way to switch era.
+- [ ] Map sections: only 33 values are left below 0xFD; FireRed adds 62 sections of its own (Sevii Islands, Silph Co., S.S. Anne...). Reuse Heart & Soul's Kanto sections; Sevii may share names (decided).
 - [ ] Save space: FireRed flags need ~288 bytes of SaveBlock1 (108 free). Candidates: dex padding (110), roamer padding (84), link-only trainer name records (240).
-- [ ] ROM space: FireRed tilesets, scripts, text and trainers are not in the ROM yet; expect 2+ MB, ~1.9 MB free. Needs a cut (see design/rom_budget.md).
+- [ ] ROM space: FireRed tilesets, scripts, text and trainers are not in the ROM yet; expect 2+ MB, ~1.9 MB free. Surf sprites cut (2.02 MB): ROM 29.62 MB, ~3.9 MB free.
 - [ ] Same steps as Hoenn: MAPS_FIRERED in MAP_VERSION, flags/vars/trainers generator, region-specific names, smoke test.

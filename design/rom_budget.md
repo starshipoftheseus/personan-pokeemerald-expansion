@@ -4,6 +4,7 @@ Hard limit: 32 MB (33,554,432 bytes), set by the GBA's cartridge address space. 
 Measured from the unmodified Heart & Soul 2.0.6 build (`make hns`) on 2026-10-05: 31.71 MB used, about 1.85 MB free.
 After resampling cries to 10,512 Hz: 30.36 MB used, about 3.19 MB free.
 After adding Hoenn (maps 0.97 MB, trainers 0.31 MB): 31.65 MB used, about 1.9 MB free.
+After cutting surf sprites: 29.62 MB used, about 3.9 MB free.
 Re-measure after each big change: `make hns` prints `ROM: ... %` at the end of the build.
 
 ## What fills the ROM
@@ -52,7 +53,7 @@ Expected shortfall: roughly 1–1.5 MB, possibly more once scripts and text are 
 | Saves | Option | What you lose |
 |---:|---|---|
 | ~1.0 | Surf sprites: drop shiny variants | Shiny Pokémon surf with normal colours. |
-| 2.0 | Surf sprites: remove feature | Player surfs on the standard blob instead of their Pokémon. |
+| **2.02 (done)** | Surf sprites removed (`OW_SURF_ON_PARTY_MON` FALSE) | Player surfs on the standard blob instead of their Pokémon. |
 | **1.34 (done)** | Cries resampled to 10,512 Hz (`CRY_SAMPLE_RATE` in `audio_rules.mk`) | Gen 4+ cries drop to the original Gen 3 cry quality. |
 | 2.92 total | Cries at 8,000 Hz instead | Noticeably muffled. Measured; not chosen. |
 | ~0.5 | Link / multiplayer features | Link trades and battles, Mystery Gift (no use on emulators). |

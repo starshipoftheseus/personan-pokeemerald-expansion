@@ -12,4 +12,6 @@
 - Badges: each region has its own 8 badges (24 total). Badge checks (HMs, obedience) must count per region.
 - League: each region has its own Elite Four and Champion. "End game" (FLAG_SYS_GAME_CLEAR, credits, post-game) only after all three Champions are beaten.
 - Day Care: one per region, each with its own egg/state.
-- Kanto: FireRed's Kanto (`_Frlg` maps), not HnS's GSC-style Kanto. Authentic FRLG experience; the game is meant to be open world.
+- Kanto: both. FireRed's Kanto (`_Frlg` maps) is the first era; Heart & Soul's GSC-style Kanto (`_hns` Kanto maps and its post-game) is kept as the second era, after a time jump in the story. The game is meant to be open world.
+- Sevii Islands may share map-section names with Kanto areas if needed (u8 map-section limit).
+- Surfing on your own Pokémon is cut (`OW_SURF_ON_PARTY_MON` FALSE): the generic surf blob is used.
