@@ -11,6 +11,7 @@ rare wild encounter slots so every Pokémon of its generations can be caught the
 |---|---|
 | Aerodactyl | land, land |
 | Bidoof | land, land |
+| Bonsly | land, land |
 | Bounsweet | land, land |
 | Bronzor | land, land |
 | Bruxish | fishing, fishing |
@@ -75,7 +76,6 @@ rare wild encounter slots so every Pokémon of its generations can be caught the
 | Stunky | land, land |
 | Togedemaru | land, land |
 | Turtonator | land, land |
-| Tyrogue | land, land |
 | Vulpix_Alola | land, land |
 | Wimpod | water, water |
 | Wishiwashi_Solo | water, water |
@@ -98,7 +98,6 @@ rare wild encounter slots so every Pokémon of its generations can be caught the
 | Basculin_Red_Striped | fishing, water |
 | Blipbug | land, land |
 | Blitzle | land, land |
-| Bonsly | land, land |
 | Bouffalant | land, land |
 | Chewtle | water, water |
 | Clobbopus | land, land |
@@ -188,6 +187,7 @@ rare wild encounter slots so every Pokémon of its generations can be caught the
 | Trubbish | land, land |
 | Tympole | water, water |
 | Tynamo | land, land |
+| Tyrogue | land, land |
 | Vanillite | land, land |
 | Venipede | land, land |
 | Vullaby | land, land |
@@ -202,7 +202,7 @@ rare wild encounter slots so every Pokémon of its generations can be caught the
 
 ## Hoenn (Gen 3, 6, 9)
 
-73 families added; 713 rare slots kept as they were.
+72 families added; 715 rare slots kept as they were.
 
 | Family | Slots |
 |---|---|
@@ -213,7 +213,6 @@ rare wild encounter slots so every Pokémon of its generations can be caught the
 | Binacle | fishing, fishing |
 | Bombirdier | land, land |
 | Bramblin | land, land |
-| Budew | land, land |
 | Bunnelby | land, land |
 | Capsakid | land, land |
 | Carbink | land, land |

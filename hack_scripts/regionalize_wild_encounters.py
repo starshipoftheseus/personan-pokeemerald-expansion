@@ -42,7 +42,19 @@ EXCLUDE = ("isLegendary", "isSubLegendary", "isRestrictedLegendary", "isMythical
            "isUltraBurst", "isTeraForm")
 
 
+GEN_STARTS = [1, 152, 252, 387, 494, 650, 722, 810, 906]  # first National Dex number of each generation
+
+
+def national_dex_numbers():
+    text = open(os.path.join(ROOT, "include/constants/pokedex.h")).read()
+    body = text[text.index("NATIONAL_DEX_NONE"):]
+    body = body[:body.index("}")]
+    names = [re.match(r"\s*(\w+)", x).group(1) for x in body.split(",") if re.match(r"\s*NATIONAL_DEX_\w+", x)]
+    return {n: i for i, n in enumerate(names)}
+
+
 def load_species():
+    dexnum = national_dex_numbers()
     species = {}
     for gen in range(1, 10):
         text = open(os.path.join(ROOT, f"src/data/pokemon/species_info/gen_{gen}_families.h")).read()
@@ -52,8 +64,10 @@ def load_species():
             types = (re.findall(r"\.types\s*=\s*MON_TYPES\(([^)]*)\)", body) or [None])[-1]
             flags = set(re.findall(r"\.(is\w+)\s*=\s*TRUE", body))
             evos = re.findall(r"\{\s*EVO_\w+\s*,\s*[^,{}]+,\s*(SPECIES_\w+)", body)
-            g = next((FORM_GEN[f] for f in FORM_GEN if f in flags), gen)
             dex = re.search(r"\.natDexNum\s*=\s*(NATIONAL_DEX_\w+)", body)
+            if dex and dex.group(1) in dexnum:   # the family files group families, not generations
+                gen = sum(dexnum[dex.group(1)] >= start for start in GEN_STARTS)
+            g = next((FORM_GEN[f] for f in FORM_GEN if f in flags), gen)
             species[name] = {
                 "dex": dex.group(1) if dex else None,
                 "gen": g,

@@ -8960,11 +8960,11 @@ Music: Aqua
 Double Battle: No
 AI: Check Bad Move
 
-Houndour
+SPECIES_MEOWTH_ALOLA
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Houndour
+SPECIES_MEOWTH_ALOLA
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -8977,13 +8977,9 @@ Music: Intense
 Double Battle: No
 AI: Check Bad Move
 
-Natu
+SPECIES_DROWZEE
 Level: 48
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Night Shade
-- Confuse Ray
-- Future Sight
-- Wish
 
 Slowbro
 Level: 48
@@ -9056,7 +9052,7 @@ Clefairy
 Level: 48
 IVs: 3 HP / 3 Atk / 3 Def / 3 SpA / 3 SpD / 3 Spe
 
-Marill
+SPECIES_PIDGEOTTO
 Level: 48
 IVs: 3 HP / 3 Atk / 3 Def / 3 SpA / 3 SpD / 3 Spe
 
@@ -9160,11 +9156,11 @@ Items: Full Restore
 Double Battle: No
 AI: Check Bad Move
 
-Hoppip @ Stardust
+SPECIES_BELLSPROUT @ Stardust
 Level: 48
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Skiploom @ Stardust
+SPECIES_WEEPINBELL @ Stardust
 Level: 50
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -9177,13 +9173,9 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Smeargle
+SPECIES_FARFETCHD
 Level: 50
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
-- Dynamic Punch
-- Dizzy Punch
-- Focus Punch
-- Mega Punch
 
 === TRAINER_BIKER_GOON ===
 Name: GOON
@@ -9548,13 +9540,9 @@ IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
 - Explosion
 - Shadow Ball
 
-Houndoom
+SPECIES_PERSIAN_ALOLA
 Level: 55
 IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Flamethrower
-- Crunch
-- Iron Tail
-- Shadow Ball
 
 === TRAINER_SCIENTIST_GIDEON ===
 Name: GIDEON
@@ -9926,13 +9914,9 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Smeargle
+SPECIES_FARFETCHD
 Level: 50
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
-- Fly
-- Dig
-- Dive
-- Bounce
 
 === TRAINER_PAINTER_RAYNA ===
 Name: RAYNA
@@ -9943,13 +9927,9 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Smeargle
+SPECIES_FARFETCHD
 Level: 50
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
-- Cross Chop
-- Megahorn
-- Double Edge
-- Self Destruct
 
 === TRAINER_LADY_GILLIAN ===
 Name: GILLIAN
@@ -9961,15 +9941,15 @@ Items: Full Restore
 Double Battle: No
 AI: Check Bad Move
 
-Mareep @ Stardust
+SPECIES_SHINX @ Stardust
 Level: 47
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Mareep @ Stardust
+SPECIES_SHINX @ Stardust
 Level: 48
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Flaaffy @ Nugget
+SPECIES_LUXIO @ Nugget
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10121,11 +10101,11 @@ Music: Cool
 Double Battle: No
 AI: Check Bad Move
 
-Hoothoot
+SPECIES_DODUO
 Level: 47
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Noctowl
+SPECIES_DODRIO
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10138,11 +10118,11 @@ Music: Hiker
 Double Battle: No
 AI: Check Bad Move
 
-Qwilfish
+SPECIES_TENTACOOL
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Qwilfish
+SPECIES_TENTACOOL
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10172,7 +10152,7 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Marill
+SPECIES_PIDGEOTTO
 Level: 50
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10202,11 +10182,11 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Sunkern
+SPECIES_MORELULL
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Sunflora
+SPECIES_SHIINOTIC
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10232,11 +10212,11 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Chinchou
+SPECIES_FINNEON
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Lanturn
+SPECIES_LUMINEON
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10313,7 +10293,7 @@ Music: Hiker
 Double Battle: No
 AI: Check Bad Move
 
-Sudowoodo
+SPECIES_SUDOWOODO
 Level: 50
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10343,13 +10323,9 @@ Music: Intense
 Double Battle: No
 AI: Check Bad Move
 
-Girafarig
+SPECIES_ORANGURU
 Level: 52
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Crunch
-- Psybeam
-- Odor Sleuth
-- Agility
 
 === TRAINER_PSYCHIC_RODETTE ===
 Name: RODETTE
@@ -10360,13 +10336,9 @@ Music: Intense
 Double Battle: No
 AI: Check Bad Move
 
-Natu
+SPECIES_DROWZEE
 Level: 48
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Night Shade
-- Confuse Ray
-- Wish
-- Future Sight
 
 Drowzee
 Level: 48
@@ -10393,11 +10365,11 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Bellossom
+SPECIES_BELLOSSOM
 Level: 50
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Bellossom
+SPECIES_BELLOSSOM
 Level: 50
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10435,13 +10407,9 @@ IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 - Spark
 - Sonic Boom
 
-Pineco
+SPECIES_CUTIEFLY
 Level: 47
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
-- Spikes
-- Bide
-- Rapid Spin
-- Take Down
 
 Voltorb
 Level: 47
@@ -10451,13 +10419,9 @@ IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 - Spark
 - Sonic Boom
 
-Pineco
+SPECIES_CUTIEFLY
 Level: 47
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
-- Spikes
-- Bide
-- Rapid Spin
-- Explosion
 
 === TRAINER_CRUSH_GIRL_CYNDY ===
 Name: CYNDY
@@ -10472,7 +10436,7 @@ Primeape @ Black Belt
 Level: 48
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
-Hitmontop @ Black Belt
+SPECIES_CRABOMINABLE @ Black Belt
 Level: 48
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
@@ -10514,7 +10478,7 @@ Lickitung
 Level: 48
 IVs: 4 HP / 4 Atk / 4 Def / 4 SpA / 4 SpD / 4 Spe
 
-Ursaring
+SPECIES_CHANSEY
 Level: 49
 IVs: 4 HP / 4 Atk / 4 Def / 4 SpA / 4 SpD / 4 Spe
 
@@ -10677,13 +10641,9 @@ IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 - Revenge
 - Seismic Toss
 
-Ursaring
+SPECIES_CHANSEY
 Level: 50
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Slash
-- Faint Attack
-- Snore
-- Rest
 
 === TRAINER_COOLTRAINER_MICHELLE ===
 Name: MICHELLE
@@ -10727,13 +10687,9 @@ IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 - Fire Spin
 - Take Down
 
-Girafarig
+SPECIES_ORANGURU
 Level: 50
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Crunch
-- Psybeam
-- Stomp
-- Odor Sleuth
 
 === TRAINER_COOL_COUPLE_LEX_NYA ===
 Name: LEX & NYA
@@ -10745,13 +10701,9 @@ Items: Full Restore / Full Restore
 Double Battle: Yes
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Miltank
+SPECIES_DRAMPA
 Level: 52
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Body Slam
-- Milk Drink
-- Growl
-- Defense Curl
 
 Tauros
 Level: 52
@@ -10816,13 +10768,9 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Smeargle
+SPECIES_FARFETCHD
 Level: 50
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
-- Fake Out
-- Extreme Speed
-- Protect
-- Quick Attack
 
 === TRAINER_GENTLEMAN_CLIFFORD ===
 Name: CLIFFORD
@@ -10897,15 +10845,15 @@ Music: Intense
 Double Battle: No
 AI: Check Bad Move
 
-Natu
+SPECIES_DROWZEE
 Level: 48
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
-Natu
+SPECIES_DROWZEE
 Level: 48
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
-Xatu
+SPECIES_HYPNO
 Level: 49
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
@@ -10952,7 +10900,7 @@ Music: Male
 Double Battle: No
 AI: Check Bad Move
 
-Heracross
+SPECIES_PINSIR
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10965,7 +10913,7 @@ Music: Male
 Double Battle: No
 AI: Check Bad Move
 
-Yanma
+SPECIES_SCYTHER
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10973,7 +10921,7 @@ Beedrill
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Yanma
+SPECIES_SCYTHER
 Level: 46
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -11045,19 +10993,19 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Hoppip
+SPECIES_BELLSPROUT
 Level: 46
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Hoppip
+SPECIES_BELLSPROUT
 Level: 47
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Skiploom
+SPECIES_WEEPINBELL
 Level: 47
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Skiploom
+SPECIES_WEEPINBELL
 Level: 48
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -11070,7 +11018,7 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Snubbull
+SPECIES_GLAMEOW
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -11087,7 +11035,7 @@ Pinsir
 Level: 49
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Heracross
+SPECIES_PINSIR
 Level: 50
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -12688,13 +12636,9 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Smeargle
+SPECIES_FARFETCHD
 Level: 54
 IVs: 14 HP / 14 Atk / 14 Def / 14 SpA / 14 SpD / 14 Spe
-- Cross Chop
-- Megahorn
-- Double Edge
-- Self Destruct
 
 === TRAINER_YOUNGSTER_DESTIN_2 ===
 Name: DESTIN
@@ -12730,7 +12674,7 @@ Clefairy
 Level: 53
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
-Marill
+SPECIES_PIDGEOTTO
 Level: 53
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
@@ -12811,11 +12755,11 @@ Music: Cool
 Double Battle: No
 AI: Check Bad Move
 
-Noctowl
+SPECIES_DODRIO
 Level: 53
 IVs: 14 HP / 14 Atk / 14 Def / 14 SpA / 14 SpD / 14 Spe
 
-Noctowl
+SPECIES_DODRIO
 Level: 55
 IVs: 14 HP / 14 Atk / 14 Def / 14 SpA / 14 SpD / 14 Spe
 
@@ -12828,7 +12772,7 @@ Music: Female
 Double Battle: No
 AI: Check Bad Move
 
-Marill
+SPECIES_PIDGEOTTO
 Level: 54
 IVs: 14 HP / 14 Atk / 14 Def / 14 SpA / 14 SpD / 14 Spe
 
@@ -12841,13 +12785,9 @@ Music: Intense
 Double Battle: No
 AI: Check Bad Move
 
-Natu
+SPECIES_DROWZEE
 Level: 52
 IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Psychic
-- Confuse Ray
-- Future Sight
-- Wish
 
 Slowbro
 Level: 52
@@ -12938,13 +12878,9 @@ Music: Intense
 Double Battle: No
 AI: Check Bad Move
 
-Girafarig
+SPECIES_ORANGURU
 Level: 56
 IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Crunch
-- Psybeam
-- Odor Sleuth
-- Agility
 
 === TRAINER_PSYCHIC_RODETTE_2 ===
 Name: RODETTE
@@ -12955,13 +12891,9 @@ Music: Intense
 Double Battle: No
 AI: Check Bad Move
 
-Natu
+SPECIES_DROWZEE
 Level: 53
 IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Psychic
-- Confuse Ray
-- Wish
-- Future Sight
 
 Hypno
 Level: 53
@@ -12992,7 +12924,7 @@ Electrode
 Level: 52
 IVs: 14 HP / 14 Atk / 14 Def / 14 SpA / 14 SpD / 14 Spe
 
-Pineco
+SPECIES_CUTIEFLY
 Level: 52
 IVs: 14 HP / 14 Atk / 14 Def / 14 SpA / 14 SpD / 14 Spe
 
@@ -13000,7 +12932,7 @@ Electrode
 Level: 52
 IVs: 14 HP / 14 Atk / 14 Def / 14 SpA / 14 SpD / 14 Spe
 
-Pineco
+SPECIES_CUTIEFLY
 Level: 52
 IVs: 14 HP / 14 Atk / 14 Def / 14 SpA / 14 SpD / 14 Spe
 
@@ -13069,7 +13001,7 @@ Primeape @ Black Belt
 Level: 54
 IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
 
-Hitmontop @ Black Belt
+SPECIES_CRABOMINABLE @ Black Belt
 Level: 54
 IVs: 20 HP / 20 Atk / 20 Def / 20 SpA / 20 SpD / 20 Spe
 
@@ -13094,7 +13026,7 @@ Lickitung
 Level: 52
 IVs: 19 HP / 19 Atk / 19 Def / 19 SpA / 19 SpD / 19 Spe
 
-Ursaring
+SPECIES_CHANSEY
 Level: 55
 IVs: 19 HP / 19 Atk / 19 Def / 19 SpA / 19 SpD / 19 Spe
 
@@ -13192,13 +13124,9 @@ IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
 - Revenge
 - Seismic Toss
 
-Ursaring
+SPECIES_CHANSEY
 Level: 55
 IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Slash
-- Faint Attack
-- Snore
-- Rest
 
 === TRAINER_COOLTRAINER_MICHELLE_2 ===
 Name: MICHELLE
@@ -13242,13 +13170,9 @@ IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
 - Fire Spin
 - Take Down
 
-Girafarig
+SPECIES_ORANGURU
 Level: 56
 IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Crunch
-- Psybeam
-- Stomp
-- Odor Sleuth
 
 === TRAINER_COOL_COUPLE_LEX_NYA_2 ===
 Name: LEX & NYA
@@ -13260,13 +13184,9 @@ Items: Full Restore / Full Restore
 Double Battle: Yes
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Miltank
+SPECIES_DRAMPA
 Level: 57
 IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Body Slam
-- Milk Drink
-- Growl
-- Defense Curl
 
 Tauros
 Level: 57
