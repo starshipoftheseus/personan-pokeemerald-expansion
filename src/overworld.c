@@ -1993,6 +1993,28 @@ void CB2_NewGame(void)
         RtcCalcLocalTimeOffset(0, 10, 0, 0);
 }
 
+// Starts a new game on another map instead of the usual start, then hands over to callback2.
+// Used by the headless smoke test (src/smoke_test.c).
+void NewGameOnMap(s8 mapGroup, s8 mapNum, void (*callback2)(void))
+{
+    FieldClearVBlankHBlankCallbacks();
+    StopMapMusic();
+    ResetSafariZoneFlag_();
+    NewGameInitData();
+    SetWarpDestination(mapGroup, mapNum, 0, -1, -1); // first warp, or the middle of the map
+    WarpIntoMap();
+    ResetInitialPlayerAvatarState();
+    PlayTimeCounter_Start();
+    ScriptContext_Init();
+    UnlockPlayerFieldControls();
+    gFieldCallback = FieldCB_WarpExitFadeFromBlack;
+    gFieldCallback2 = NULL;
+    DoMapLoadLoop(&gMain.state);
+    SetFieldVBlankCallback();
+    SetMainCallback1(CB1_Overworld);
+    SetMainCallback2(callback2);
+}
+
 void CB2_WhiteOut(void)
 {
     u8 state;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "smoke_test.h"
 #include "main.h"
 #include "palette.h"
 #include "scanline_effect.h"
@@ -1156,6 +1157,8 @@ void CB2_InitCopyrightScreenAfterBootup(void)
         }
         SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
         InitHeap(gHeap, HEAP_SIZE);
+        if (gSmokeTestMap != SMOKE_TEST_OFF)
+            SmokeTest_Start();
     }
 }
 

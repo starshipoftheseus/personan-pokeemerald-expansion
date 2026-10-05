@@ -164,6 +164,7 @@ bool32 CurrentMapHasShadows(void);
 void UpdateAltBgPalettes(u16 palettes);
 void UpdatePalettesWithTime(u32);
 void CB2_Overworld(void);
+void NewGameOnMap(s8 mapGroup, s8 mapNum, void (*callback2)(void));
 void SetMainCallback1(void (*cb)(void));
 void SetUnusedCallback(void *func);
 void CB2_NewGame(void);
