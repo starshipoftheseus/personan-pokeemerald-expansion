@@ -38,5 +38,21 @@ and story gates allow.
   route from Hoenn to FireRed's Cinnabar). That gives a real open world, and ferries cover the rest.
 - **Gating by field moves**, not region locks: Surf opens the sea links, so region order emerges
   from what you can traverse.
-- **Start choice** (our plan): Extended Cut always starts in Hoenn. Ours can start in any of the
-  three hometowns and use the same links.
+- **Single start**: like Extended Cut (Littleroot), ours starts in one place, Pallet Town
+  (`story.md`).
+
+# Pokémon R.O.W.E. (BelialClover)
+
+Open-world Emerald (Hoenn only), source at github.com/BelialClover/RoweSource (v1.9.4, Jan 2024)
+and github.com/BelialClover/PokemonROWE (older, 2022). Built on a 2021-era pokeemerald-expansion,
+so its code doesn't drop into our current expansion without porting. **No licence file in either
+repo**: ask BelialClover before copying code or assets; ideas are free to use.
+
+Worth studying:
+- `src/level_scaling.c`: trainers' and wild Pokémon levels scale with badge count (with evolutions
+  applied to scaled mons), per-difficulty tables, boss minimum levels. This is what makes "any order"
+  work. Our version would need to count all regions' badges.
+- Soft level caps per badge count (`sLevelCaps`, hard mode).
+- `data/scripts/flying_taxi.inc`: fly to visited towns from the start, without the HM.
+- Quests (`src/quests.c`), game modes (randomised, inverse, double battles), DexNav.
+Already in our expansion base: following Pokémon, Gen 8+ mechanics, physical/special split.
