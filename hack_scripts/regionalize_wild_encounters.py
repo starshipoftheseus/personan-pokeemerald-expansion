@@ -48,8 +48,8 @@ GEN_STARTS = [1, 152, 252, 387, 494, 650, 722, 810, 906]  # first National Dex n
 def national_dex_numbers():
     text = open(os.path.join(ROOT, "include/constants/pokedex.h")).read()
     body = text[text.index("NATIONAL_DEX_NONE"):]
-    body = body[:body.index("}")]
-    names = [re.match(r"\s*(\w+)", x).group(1) for x in body.split(",") if re.match(r"\s*NATIONAL_DEX_\w+", x)]
+    body = re.sub(r"//[^\n]*|/\*.*?\*/", "", body[:body.index("}")], flags=re.S)
+    names = re.findall(r"\b(NATIONAL_DEX_\w+)\b", body)
     return {n: i for i, n in enumerate(names)}
 
 
