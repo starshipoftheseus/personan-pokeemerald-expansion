@@ -23,7 +23,9 @@ ifeq (hns, $(or $(BUILD), $(MAKECMDGOALS)))
 	TITLE       	:= POKEMON HNS
 	GAME_CODE   	:= BPEE
 	BUILD_NAME  	:= hns
-	MAP_VERSION 	:= hns
+	# Map sets to include, joined with "+". Each set adds -DMAPS_<SET> to the C/asm flags.
+	# hns = Johto (Heart & Soul), emerald = Hoenn. Run `make clean` after changing this.
+	MAP_VERSION 	:= hns+emerald
 endif
 endif
 endif
@@ -166,6 +168,10 @@ else
 O_LEVEL ?= 2
 endif
 CPPFLAGS := $(INCLUDE_CPP_ARGS) -Wno-trigraphs -DMODERN=1 -DTESTING=$(TEST) -D$(GAME_VERSION) -std=gnu17
+# One define per map set in MAP_VERSION, e.g. hns+emerald -> MAPS_HNS and MAPS_EMERALD.
+MAP_SET_DEFINES := $(foreach set,$(subst +, ,$(MAP_VERSION)),MAPS_$(shell echo $(set) | tr a-z A-Z))
+CPPFLAGS += $(MAP_SET_DEFINES:%=-D%)
+ASFLAGS += $(MAP_SET_DEFINES:%=--defsym %=1)
 ifeq ($(RELEASE),1)
 	override CPPFLAGS += -DRELEASE
 	ifeq ($(USE_LTO_ON_RELEASE),1)

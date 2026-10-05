@@ -34,8 +34,21 @@ using json11::Json;
 #include <filesystem>
 
 string version;
+// The map sets included in this build. <game-version> may list several, joined with '+'
+// (e.g. "hns+emerald" builds Johto and Hoenn maps into one ROM).
+vector<string> included_versions;
 // System directory separator
 string sep;
+
+// Whether maps/layouts tagged with this "game_version" (emerald, frlg, hns) are part of the build.
+bool is_version_included(const string &game_ver) {
+    for (const string &v : included_versions) {
+        string set = (v == "firered") ? "frlg" : v;
+        if (set == game_ver)
+            return true;
+    }
+    return false;
+}
 
 string read_text_file(string filepath) {
     ifstream in_file(filepath);
@@ -725,11 +738,7 @@ void process_groups(string groups_filepath, vector<string> &map_filepaths, strin
 
         string map_name = json_to_string(map_data, "name");
 
-        string expected_game_ver = version;
-        if (expected_game_ver == "firered")
-            expected_game_ver = "frlg";
-
-        if (game_ver != expected_game_ver) {
+        if (!is_version_included(game_ver)) {
             invalid_maps.push_back(map_name);
         }
     }
@@ -755,10 +764,7 @@ bool layout_matches_version(const Json &layout) {
     string game_ver = json_to_string(layout, "game_version", true);
     if (game_ver.empty())
         game_ver = "emerald";
-    string expected = version;
-    if (expected == "firered")
-        expected = "frlg";
-    return game_ver == expected;
+    return is_version_included(game_ver);
 }
 
 string generate_layout_headers_text(Json layouts_data) {
@@ -919,8 +925,19 @@ int main(int argc, char *argv[]) {
 
     char *version_arg = argv[2];
     version = string(version_arg);
-    if (version != "emerald" && version != "ruby" && version != "firered" && version != "hns")
-        FATAL_ERROR("ERROR: <game-version> must be 'emerald', 'firered', 'hns', or 'ruby'.\n");
+    {
+        std::stringstream versions(version);
+        string v;
+        while (std::getline(versions, v, '+')) {
+            if (v != "emerald" && v != "ruby" && v != "firered" && v != "hns")
+                FATAL_ERROR("ERROR: <game-version> must be 'emerald', 'firered', 'hns', or 'ruby', or several joined with '+'.\n");
+            included_versions.push_back(v);
+        }
+        if (included_versions.empty())
+            FATAL_ERROR("ERROR: <game-version> is empty.\n");
+        // Map headers keep the format of the first (main) version.
+        version = included_versions.front();
+    }
 
     char *mode_arg = argv[1];
     string mode(mode_arg);

@@ -1,6 +1,16 @@
 import json
 import re
 
+# Which build includes each version's encounters. MAPS_<SET> comes from MAP_VERSION in the
+# Makefile, so a build that lists several map sets (e.g. hns+emerald) gets all of their encounters.
+MAP_SET_CONDITIONS = {
+    "EMERALD": "defined(MAPS_EMERALD)",
+    "FIRERED": "defined(MAPS_FIRERED) && !defined(LEAFGREEN)",
+    "LEAFGREEN": "defined(LEAFGREEN)",
+    "POKEMON_HNS": "defined(MAPS_HNS)",
+}
+
+
 class Config:
     def __init__(self, config_file_name, rtc_constants_file_name, encounters_json_data):
         self.times_of_day = None
@@ -171,7 +181,7 @@ class WildEncounterAssembler:
             elif "_Hns" in shared_label or "_hns" in shared_label:
                 version = "POKEMON_HNS"
 
-            self.WriteLine(f"#ifdef {version}")
+            self.WriteLine(f"#if {MAP_SET_CONDITIONS[version]}")
 
             self.WriteLine("{", 1)
             self.WriteLine(f".mapGroup = {map_group},", 2)
@@ -245,7 +255,7 @@ class WildEncounterAssembler:
                     version = "LEAFGREEN"
                 elif "_Hns" in shared_label or "_hns" in shared_label:
                     version = "POKEMON_HNS"
-                self.WriteLine(f"#ifdef {version}")
+                self.WriteLine(f"#if {MAP_SET_CONDITIONS[version]}")
                 for mon_type in self.config.mon_types:
                     if mon_type not in map_encounters:
                         headers["data"][shared_label][mon_type] = "NULL"
