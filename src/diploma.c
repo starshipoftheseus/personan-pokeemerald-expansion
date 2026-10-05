@@ -18,6 +18,7 @@
 
 extern const u8 gText_DexNational[];
 extern const u8 gText_DexHoenn[];
+extern const u8 gText_Johto[];
 extern const u8 gText_PokedexDiploma[];
 
 static void MainCB2(void);
@@ -40,12 +41,12 @@ static void VBlankCB(void)
 
 static const u16 sDiplomaPalettes[][16] =
 {
-    INCGFX_U16("graphics/diploma/national.pal", ".gbapal"),
-    INCGFX_U16("graphics/diploma/hoenn.pal", ".gbapal"),
+    INCBIN_U16("graphics/diploma/national.gbapal"),
+    INCBIN_U16("graphics/diploma/hoenn.gbapal"),
 };
 
-static const u32 sDiplomaTilemap[] = INCGFX_U32("graphics/diploma/tilemap.bin", ".smolTM");
-static const u32 sDiplomaTiles[] = INCGFX_U32("graphics/diploma/tiles.png", ".4bpp.smol");
+static const u32 sDiplomaTilemap[] = INCBIN_U32("graphics/diploma/tilemap.bin.smolTM");
+static const u32 sDiplomaTiles[] = INCBIN_U32("graphics/diploma/tiles.4bpp.smol");
 
 void CB2_ShowDiploma(void)
 {
@@ -135,7 +136,11 @@ static void DisplayDiplomaText(void)
     else
     {
         SetGpuReg(REG_OFFSET_BG1HOFS, 0);
+#if IS_HNS
+        StringCopy(gStringVar1, gText_Johto);
+#else
         StringCopy(gStringVar1, gText_DexHoenn);
+#endif
     }
     StringExpandPlaceholders(gStringVar4, gText_PokedexDiploma);
     PrintDiplomaText(gStringVar4, 0, 1);

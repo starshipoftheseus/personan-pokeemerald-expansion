@@ -704,7 +704,7 @@ void ConditionGraph_CalcPositions(u8 *conditions, struct UCoords16 *positions)
 // Move relearner
 //----------------
 
-void InitMoveRelearnerWindows(bool32 useContestWindow)
+void InitMoveRelearnerWindows(bool8 useContestWindow)
 {
     u8 i;
 
@@ -716,11 +716,16 @@ void InitMoveRelearnerWindows(bool32 useContestWindow)
     for (i = 0; i < ARRAY_COUNT(sMoveRelearnerWindowTemplates) - 1; i++)
         FillWindowPixelBuffer(i, PIXEL_FILL(1));
 
-    if (C_HIDE_CONTEST_DATA || !useContestWindow)
+    if (!useContestWindow)
+    {
+        PutWindowTilemap(RELEARNERWIN_DESC_BATTLE);
         DrawStdFrameWithCustomTileAndPalette(RELEARNERWIN_DESC_BATTLE, FALSE, 0x1, 0xE);
+    }
     else
+    {
+        PutWindowTilemap(RELEARNERWIN_DESC_CONTEST);
         DrawStdFrameWithCustomTileAndPalette(RELEARNERWIN_DESC_CONTEST, FALSE, 1, 0xE);
-
+    }
     PutWindowTilemap(RELEARNERWIN_MOVE_LIST);
     PutWindowTilemap(RELEARNERWIN_MSG);
     DrawStdFrameWithCustomTileAndPalette(RELEARNERWIN_MOVE_LIST, FALSE, 1, 0xE);
@@ -806,10 +811,7 @@ static void MoveRelearnerLoadBattleMoveDescription(u32 chosenMove)
         str = buffer;
     }
     AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NORMAL, str, 106, 41, TEXT_SKIP_DRAW, NULL);
-
-    const u8 *moveDescription = GetMoveDescription(chosenMove);
-    u32 fontId = GetFontIdToFit(moveDescription, FONT_NARROW, 0, WindowWidthPx(RELEARNERWIN_DESC_BATTLE));
-    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, fontId, moveDescription, 0, 65, 0, NULL);
+    AddTextPrinterParameterized(RELEARNERWIN_DESC_BATTLE, FONT_NARROW, GetMoveDescription(chosenMove), 0, 65, 0, NULL);
 }
 
 static void MoveRelearnerMenuLoadContestMoveDescription(u32 chosenMove)
@@ -864,6 +866,12 @@ void MoveRelearnerPrintMessage(u8 *str)
     AddTextPrinterParameterized2(RELEARNERWIN_MSG, FONT_NORMAL, str, speed, NULL, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, 3);
 }
 
+bool16 MoveRelearnerRunTextPrinters(void)
+{
+    RunTextPrinters();
+    return IsTextPrinterActiveOnWindow(RELEARNERWIN_MSG);
+}
+
 void MoveRelearnerCreateYesNoMenu(void)
 {
     CreateYesNoMenu(&sMoveRelearnerYesNoMenuTemplate, 1, 0xE, 0);
@@ -880,9 +888,9 @@ s32 GetBoxOrPartyMonData(u16 boxId, u16 monId, s32 request, u8 *dst)
     if (boxId == TOTAL_BOXES_COUNT) // Party mon.
     {
         if (request == MON_DATA_NICKNAME || request == MON_DATA_OT_NAME)
-            ret = GetMonData(&gParties[B_TRAINER_PLAYER][monId], request, dst);
+            ret = GetMonData(&gPlayerParty[monId], request, dst);
         else
-            ret = GetMonData(&gParties[B_TRAINER_PLAYER][monId], request);
+            ret = GetMonData(&gPlayerParty[monId], request);
     }
     else
     {
@@ -898,8 +906,7 @@ s32 GetBoxOrPartyMonData(u16 boxId, u16 monId, s32 request, u8 *dst)
 // Gets the name/gender/level string for the condition menu
 static u8 *GetConditionMenuMonString(u8 *dst, u16 boxId, u16 monId)
 {
-    u16 box, mon, level, gender;
-    enum Species species;
+    u16 box, mon, species, level, gender;
     struct BoxPokemon *boxMon;
     u8 *str;
 
@@ -920,8 +927,8 @@ static u8 *GetConditionMenuMonString(u8 *dst, u16 boxId, u16 monId)
     species = GetBoxOrPartyMonData(box, mon, MON_DATA_SPECIES, NULL);
     if (box == TOTAL_BOXES_COUNT) // Party mon.
     {
-        level = GetMonData(&gParties[B_TRAINER_PLAYER][mon], MON_DATA_LEVEL);
-        gender = GetMonGender(&gParties[B_TRAINER_PLAYER][mon]);
+        level = GetMonData(&gPlayerParty[mon], MON_DATA_LEVEL);
+        gender = GetMonGender(&gPlayerParty[mon]);
     }
     else
     {
@@ -1069,8 +1076,8 @@ void GetConditionMenuMonGfx(void *tilesDst, void *palDst, u16 boxId, u16 monId, 
 
     if (partyId != numMons)
     {
-        enum Species species = GetBoxOrPartyMonData(boxId, monId, MON_DATA_SPECIES, NULL);
-        bool32 isShiny = GetBoxOrPartyMonData(boxId, monId, MON_DATA_IS_SHINY, NULL);
+        u16 species = GetBoxOrPartyMonData(boxId, monId, MON_DATA_SPECIES, NULL);
+        bool8 isShiny = GetBoxOrPartyMonData(boxId, monId, MON_DATA_IS_SHINY, NULL);
         u32 personality = GetBoxOrPartyMonData(boxId, monId, MON_DATA_PERSONALITY, NULL);
         bool32 isEgg = GetBoxOrPartyMonData(boxId, monId, MON_DATA_IS_EGG, NULL);
 
@@ -1113,10 +1120,10 @@ bool8 ConditionMenu_UpdateMonExit(struct ConditionGraph *graph, s16 *x)
     return (graphUpdating || monUpdating);
 }
 
-static const u32 sConditionPokeball_Gfx[] = INCGFX_U32("graphics/pokenav/condition/pokeball.png", ".4bpp");
-static const u32 sConditionPokeballPlaceholder_Gfx[] = INCGFX_U32("graphics/pokenav/condition/pokeball_placeholder.png", ".4bpp");
-static const u16 sConditionSparkle_Gfx[] = INCGFX_U16("graphics/pokenav/condition/sparkle.png", ".gbapal");
-static const u32 sConditionSparkle_Pal[] = INCGFX_U32("graphics/pokenav/condition/sparkle.png", ".4bpp");
+static const u32 sConditionPokeball_Gfx[] = INCBIN_U32("graphics/pokenav/condition/pokeball.4bpp");
+static const u32 sConditionPokeballPlaceholder_Gfx[] = INCBIN_U32("graphics/pokenav/condition/pokeball_placeholder.4bpp");
+static const u16 sConditionSparkle_Gfx[] = INCBIN_U16("graphics/pokenav/condition/sparkle.gbapal");
+static const u32 sConditionSparkle_Pal[] = INCBIN_U32("graphics/pokenav/condition/sparkle.4bpp");
 
 static const struct OamData sOam_ConditionMonPic =
 {
@@ -1388,7 +1395,7 @@ void CreateConditionSparkleSprites(struct Sprite **sprites, u8 monSpriteId, u8 _
 
     for (i = 0; i < count + 1; i++)
     {
-        spriteId = CreateSpriteUnchecked(&sSpriteTemplate_ConditionSparkle, 0, 0, 0);
+        spriteId = CreateSprite(&sSpriteTemplate_ConditionSparkle, 0, 0, 0);
         if (spriteId != MAX_SPRITES)
         {
             sprites[i] = &gSprites[spriteId];
@@ -1502,7 +1509,7 @@ static const u8 *const sLvlUpStatStrings[NUM_STATS] =
 
 void DrawLevelUpWindowPg1(u16 windowId, u16 *statsBefore, u16 *statsAfter, u8 bgClr, u8 fgClr, u8 shadowClr)
 {
-    u16 i, x;
+    u16 i, x, numDigits;
     s16 statsDiff[NUM_STATS];
     u8 text[12];
     u8 color[3];
@@ -1539,12 +1546,20 @@ void DrawLevelUpWindowPg1(u16 windowId, u16 *statsBefore, u16 *statsAfter, u8 bg
                                      color,
                                      TEXT_SKIP_DRAW,
                                      text);
-        if (abs(statsDiff[i]) <= 9)
-            x = 18;
+        if (abs(statsDiff[i]) > 999)
+            numDigits = 4;
+        else if (abs(statsDiff[i]) > 99)
+            numDigits = 3;
+        else if (abs(statsDiff[i]) > 9)
+            numDigits = 2;
         else
-            x = 12;
+            numDigits = 1;
 
-        ConvertIntToDecimalStringN(text, abs(statsDiff[i]), STR_CONV_MODE_LEFT_ALIGN, 2);
+        // Right-align the number against the right edge of the window,
+        // leaving room for the +/- sign drawn at x = 56.
+        x = (numDigits >= 4) ? 0 : 6 * (4 - numDigits);
+
+        ConvertIntToDecimalStringN(text, abs(statsDiff[i]), STR_CONV_MODE_LEFT_ALIGN, numDigits);
         AddTextPrinterParameterized3(windowId,
                                      FONT_NORMAL,
                                      56 + x,
@@ -1558,7 +1573,7 @@ void DrawLevelUpWindowPg1(u16 windowId, u16 *statsBefore, u16 *statsAfter, u8 bg
 void DrawLevelUpWindowPg2(u16 windowId, u16 *currStats, u8 bgClr, u8 fgClr, u8 shadowClr)
 {
     u16 i, numDigits, x;
-    s16 stats[NUM_STATS];
+    u16 stats[NUM_STATS];
     u8 text[12];
     u8 color[3];
 
@@ -1577,7 +1592,9 @@ void DrawLevelUpWindowPg2(u16 windowId, u16 *currStats, u8 bgClr, u8 fgClr, u8 s
 
     for (i = 0; i < NUM_STATS; i++)
     {
-        if (stats[i] > 99)
+        if (stats[i] > 999)
+            numDigits = 4;
+        else if (stats[i] > 99)
             numDigits = 3;
         else if (stats[i] > 9)
             numDigits = 2;

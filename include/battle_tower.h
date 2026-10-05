@@ -16,16 +16,10 @@ struct RSBattleTowerRecord
     /*0xA0*/ u32 checksum;
 };
 
-struct FacilityClass {
-    u16 class;
-    u16 gfxId;
-};
-
-#define FACILITY_CLASSES_MALE   30
-#define FACILITY_CLASSES_FEMALE 20
-
-extern const struct FacilityClass gTowerMaleFacilityClasses[FACILITY_CLASSES_MALE];
-extern const struct FacilityClass gTowerFemaleFacilityClasses[FACILITY_CLASSES_FEMALE];
+extern const u8 gTowerMaleFacilityClasses[30];
+extern const u16 gTowerMaleTrainerGfxIds[30];
+extern const u8 gTowerFemaleFacilityClasses[20];
+extern const u16 gTowerFemaleTrainerGfxIds[20];
 extern const struct TrainerMon gSlateportBattleTentMons[];
 extern const struct BattleFrontierTrainer gSlateportBattleTentTrainers[];
 
@@ -40,6 +34,7 @@ bool32 EmeraldBattleTowerRecordToRuby(struct EmeraldBattleTowerRecord *src, stru
 void CalcApprenticeChecksum(struct Apprentice *apprentice);
 void GetBattleTowerTrainerLanguage(u8 *dst, u16 trainerId);
 u8 SetTentPtrsGetLevel(void);
+bool32 ValidateBattleTowerRecord(u8 recordId); // unused
 void TrySetLinkBattleTowerEnemyPartyLevel(void);
 void FillTentTrainerParty(u8 monsCount);
 

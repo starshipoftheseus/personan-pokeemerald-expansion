@@ -1,6 +1,8 @@
 #include "global.h"
 #include "main.h"
 #include "bike.h"
+#include "challenge_menu.h"
+#include "item.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "field_camera.h"
@@ -71,7 +73,6 @@ static void npc_clear_strange_bits(struct ObjectEvent *);
 static void MovePlayerAvatarUsingKeypadInput(enum Direction, u16, u16);
 static void PlayerAllowForcedMovementIfMovingSameDirection(void);
 static u8 GetForcedMovementByMetatileBehavior(void);
-static void PlayerSetCopyableMovement(enum CopyMovement movement);
 
 static bool8 ForcedMovement_None(void);
 static bool8 ForcedMovement_Slip(void);
@@ -513,7 +514,6 @@ static bool8 ForcedMovement_None(void)
         playerObjEvent->enableAnim = TRUE;
         SetObjectEventDirection(playerObjEvent, playerObjEvent->facingDirection);
         gPlayerAvatar.flags &= ~PLAYER_AVATAR_FLAG_FORCED_MOVE;
-        PlayerSetCopyableMovement(COPY_MOVE_NONE);
     }
     return FALSE;
 }
@@ -806,6 +806,7 @@ static void WindUpSpinTimer(enum Direction direction)
 bool32 CanTriggerSpinEvolution()
 {
     gSpecialVar_0x8000 = EVO_NONE;
+    bool32 canStopEvo = TRUE;
     if (gPlayerSpinData.triggerEvo)
     {
         u32 seconds = gPlayerSpinData.VBlanksSpinning / 60;
@@ -829,10 +830,22 @@ bool32 CanTriggerSpinEvolution()
             else if (direction == SPIN_DIRECTION_COUNTER_CLOCKWISE)
                 gSpecialVar_0x8000 = SPIN_CCW_SHORT;
         }
+        gSpecialVar_0x8001 = FALSE; //canStopEvo
+        canStopEvo = FALSE;
+        gSpecialVar_0x8002 = TRUE; //tryMultiple
         gPlayerSpinData.triggerEvo = FALSE;
     }
     if (gSpecialVar_0x8000 != EVO_NONE)
-        return TRUE;
+    {
+        for (u32 i = 0; i < PARTY_SIZE; i++)
+        {
+            u16 species = GetEvolutionTargetSpecies(&gPlayerParty[i], EVO_MODE_OVERWORLD_SPECIAL, 0, NULL, &canStopEvo, CHECK_EVO);
+            if (species != SPECIES_NONE)
+            {
+                return TRUE;
+            }
+        }
+    }
 
     return FALSE;
 }
@@ -899,27 +912,46 @@ static void PlayerNotOnBikeMoving(enum Direction direction, u16 heldKeys)
             gPlayerAvatar.creeping = TRUE;
             PlayerWalkSlow(direction);
         }
+        else if (gSaveBlock3Ptr->challengeSettings.autorunSurf == 0)
+        {
+            if (heldKeys & B_BUTTON)
+                PlayerWalkFast(direction);
+            else
+                PlayerWalkFaster(direction);
+        }
         else
         {
-            // speed 2 is fast, same speed as running
-            PlayerWalkFast(direction);
+            if (heldKeys & B_BUTTON)
+                PlayerWalkFaster(direction);
+            else
+                PlayerWalkFast(direction);
         }
         return;
     }
 
     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER)
-     && (heldKeys & B_BUTTON)
+     && (gSaveBlock3Ptr->challengeSettings.autoRun == 0 || (heldKeys & B_BUTTON))
      && FlagGet(FLAG_SYS_B_DASH)
      && IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior) == 0
      && !FollowerNPCComingThroughDoor()
      && (I_ORAS_DOWSING_FLAG == 0 || (I_ORAS_DOWSING_FLAG != 0 && !FlagGet(I_ORAS_DOWSING_FLAG))))
     {
-        if (ObjectMovingOnRockStairs(&gObjectEvents[gPlayerAvatar.objectEventId], direction))
-            PlayerRunSlow(direction);
+        if (heldKeys & B_BUTTON && gSaveBlock3Ptr->challengeSettings.autoRun == 0)
+        {
+            if (ObjectMovingOnRockStairs(&gObjectEvents[gPlayerAvatar.objectEventId], direction))
+                PlayerWalkSlow(direction);
+            else
+                PlayerWalkNormal(direction);
+        }
         else
-            PlayerRun(direction);
+        {
+            if (ObjectMovingOnRockStairs(&gObjectEvents[gPlayerAvatar.objectEventId], direction))
+                PlayerRunSlow(direction);
+            else
+                PlayerRun(direction);
 
-        gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_DASH;
+            gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_DASH;
+        }
         return;
     }
     else if (FlagGet(DN_FLAG_SEARCHING) && (heldKeys & A_BUTTON))
@@ -1030,7 +1062,7 @@ static bool8 TryPushBoulder(s16 x, s16 y, enum Direction direction)
     {
         u8 objectEventId = GetObjectEventIdByXY(x, y);
 
-        if (objectEventId != OBJECT_EVENTS_COUNT && (gObjectEvents[objectEventId].graphicsId == OBJ_EVENT_GFX_PUSHABLE_BOULDER || gObjectEvents[objectEventId].graphicsId == OBJ_EVENT_GFX_PUSHABLE_BOULDER_FRLG))
+        if (objectEventId != OBJECT_EVENTS_COUNT && (gObjectEvents[objectEventId].graphicsId == OBJ_EVENT_GFX_PUSHABLE_BOULDER || gObjectEvents[objectEventId].graphicsId == OBJ_EVENT_GFX_PUSHABLE_BOULDER_FRLG || gObjectEvents[objectEventId].graphicsId == OBJ_EVENT_GFX_PUSHABLE_BOULDER_HNS))
         {
             x = gObjectEvents[objectEventId].currentCoords.x;
             y = gObjectEvents[objectEventId].currentCoords.y;
@@ -1073,7 +1105,10 @@ bool8 IsPlayerCollidingWithFarawayIslandMew(enum Direction direction)
     playerY = object->currentCoords.y;
 
     MoveCoords(direction, &playerX, &playerY);
-    mewObjectId = GetObjectEventIdByLocalIdAndMap(LOCALID_FARAWAY_ISLAND_MEW, MAP_NUM(MAP_FARAWAY_ISLAND_INTERIOR), MAP_GROUP(MAP_FARAWAY_ISLAND_INTERIOR));
+    if (gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_FARAWAY_ISLAND_INTERIOR_HNS) && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_FARAWAY_ISLAND_INTERIOR_HNS))
+        mewObjectId = GetObjectEventIdByLocalIdAndMap(LOCALID_FARAWAY_ISLAND_INTERIOR_HNS_MEW, MAP_NUM(MAP_FARAWAY_ISLAND_INTERIOR_HNS), MAP_GROUP(MAP_FARAWAY_ISLAND_INTERIOR_HNS));
+    else
+        mewObjectId = GetObjectEventIdByLocalIdAndMap(LOCALID_FARAWAY_ISLAND_MEW, MAP_NUM(MAP_FARAWAY_ISLAND_INTERIOR), MAP_GROUP(MAP_FARAWAY_ISLAND_INTERIOR));
     if (mewObjectId == OBJECT_EVENTS_COUNT)
         return FALSE;
 
@@ -1527,6 +1562,12 @@ u8 PlayerGetElevation(void)
     return gObjectEvents[gPlayerAvatar.objectEventId].previousElevation;
 }
 
+// unused
+void MovePlayerToMapCoords(s16 x, s16 y)
+{
+    MoveObjectEventToMapCoords(&gObjectEvents[gPlayerAvatar.objectEventId], x, y);
+}
+
 u8 TestPlayerAvatarFlags(u8 flag)
 {
     return gPlayerAvatar.flags & flag;
@@ -1562,7 +1603,7 @@ void StopPlayerAvatar(void)
 
 u16 GetRivalAvatarGraphicsIdByStateIdAndGender(u8 state, enum Gender gender)
 {
-    if (IS_FRLG)
+    if (IS_FRLG || IS_HNS)
         return GetPlayerAvatarGraphicsIdByStateIdAndGender(state, gender);
     else
         return sRivalAvatarGfxIds[state][gender];
@@ -1607,6 +1648,15 @@ enum Gender GetPlayerAvatarGenderByGraphicsId(u16 gfxId)
     case OBJ_EVENT_GFX_GREEN_FISH:
     case OBJ_EVENT_GFX_GREEN_VS_SEEKER:
     case OBJ_EVENT_GFX_GREEN_VS_SEEKER_BIKE:
+    case OBJ_EVENT_GFX_KRIS_NORMAL_HNS:
+    case OBJ_EVENT_GFX_KRIS_MACH_BIKE_HNS:
+    case OBJ_EVENT_GFX_KRIS_ACRO_BIKE_HNS:
+    case OBJ_EVENT_GFX_KRIS_SURFING_HNS:
+    case OBJ_EVENT_GFX_KRIS_UNDERWATER_HNS:
+    case OBJ_EVENT_GFX_KRIS_FIELD_MOVE_HNS:
+    case OBJ_EVENT_GFX_KRIS_FISHING_HNS:
+    case OBJ_EVENT_GFX_KRIS_WATERING_HNS:
+    case OBJ_EVENT_GFX_KRIS_DECORATING_HNS:
         return FEMALE;
     default:
         return MALE;
@@ -1621,9 +1671,24 @@ bool8 PartyHasMonWithSurf(void)
     {
         for (i = 0; i < PARTY_SIZE; i++)
         {
-            if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES) == SPECIES_NONE)
+            if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE)
                 break;
-            if (MonKnowsMove(&gParties[B_TRAINER_PLAYER][i], MOVE_SURF))
+            if (MonKnowsMove(&gPlayerParty[i], MOVE_SURF))
+                return TRUE;
+        }
+        if (CheckBagHasItem(ITEM_HM03, 1))
+        {
+            for (i = 0; i < PARTY_SIZE; i++)
+            {
+                u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+                if (!species)
+                    break;
+                if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) && CanLearnTeachableMove(species, MOVE_SURF))
+                    return TRUE;
+            }
+            // Challenge runs (mono-type, randomized moves, etc.) can lock the player out of
+            // every Surf learner, so owning HM03 is enough on its own.
+            if (HMsOverwriteOptionActive())
                 return TRUE;
         }
     }
@@ -1699,12 +1764,19 @@ void SetPlayerAvatarExtraStateTransition(u16 graphicsId, u8 transitionFlag)
 
 void InitPlayerAvatar(s16 x, s16 y, enum Direction direction, enum Gender gender)
 {
-    struct ObjectEventTemplate playerObjEventTemplate;
+    // Must be zero-initialised, and `kind` must be set explicitly.
+    // InitObjectEventStateFromTemplate branches on template->kind, and
+    // OBJ_KIND_CLONE is 255; left as stack garbage a 0xFF byte here sends the
+    // player spawn down the clone path, which reads objectEvents[-1] of an
+    // arbitrary map and overwrites the player object's localId. Lookups for
+    // LOCALID_PLAYER then fail and every scripted player movement on that map
+    // is silently discarded.
+    struct ObjectEventTemplate playerObjEventTemplate = {0};
     u8 objectEventId;
     struct ObjectEvent *objectEvent;
 
-    playerObjEventTemplate.kind = OBJ_KIND_NORMAL;
     playerObjEventTemplate.localId = LOCALID_PLAYER;
+    playerObjEventTemplate.kind = OBJ_KIND_NORMAL;
     playerObjEventTemplate.graphicsId = GetPlayerAvatarGraphicsIdByStateIdAndGender(PLAYER_AVATAR_STATE_NORMAL, gender);
     playerObjEventTemplate.x = x - MAP_OFFSET;
     playerObjEventTemplate.y = y - MAP_OFFSET;
@@ -2225,9 +2297,6 @@ bool8 ObjectMovingOnRockStairs(struct ObjectEvent *objectEvent, enum Direction d
     #if SLOW_MOVEMENT_ON_STAIRS == TRUE
         s16 x = objectEvent->currentCoords.x;
         s16 y = objectEvent->currentCoords.y;
-
-        if (IsFollowerVisible() && GetFollowerObject() != NULL && (objectEvent->isPlayer || objectEvent->localId == OBJ_EVENT_ID_FOLLOWER))
-            return FALSE;
 
         switch (direction)
         {

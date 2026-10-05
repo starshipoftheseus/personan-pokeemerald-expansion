@@ -13,8 +13,7 @@
 #define METATILE_BattleFrontier_CorridorOpenDoor_Bottom  0x20F
 #define METATILE_BattleFrontier_CorridorOpenDoor_Top     0x207
 #define METATILE_BattleFrontier_Door_Elevator            0x20E
-#define METATILE_BattleFrontier_Door_MultiCorridor_Left  0x2AD
-#define METATILE_BattleFrontier_Door_MultiCorridor_Right 0x2AE
+#define METATILE_BattleFrontier_Door_MultiCorridor       0x2AD
 #define METATILE_BattleFrontier_Elevator_Bottom0         0x339
 #define METATILE_BattleFrontier_Elevator_Bottom1         0x33A
 #define METATILE_BattleFrontier_Elevator_Bottom2         0x33B
@@ -148,7 +147,8 @@
 #define METATILE_CeladonCity_DeptStoreDoor      0x294
 
 // gTileset_CeruleanCity
-#define METATILE_CeruleanCity_Door  0x298
+#define METATILE_CeruleanCity_Door      0x298
+#define METATILE_CeruleanCity_Door_Hns  0x298
 
 // gTileset_CinnabarGym
 #define METATILE_CinnabarGym_Floor                  0x281
@@ -170,6 +170,7 @@
 #define METATILE_Contest_WallShadow          0x221
 
 // gTileset_DepartmentStore
+#define METATILE_DepartmentStore_Door_Hns      0x28D
 #define METATILE_DepartmentStore_ElevatorDoor  0x28D
 
 // gTileset_Dewford
@@ -322,6 +323,16 @@
 #define METATILE_InsideShip_IntactDoor_Bottom_Locked    0x233
 #define METATILE_InsideShip_IntactDoor_Bottom_Unlocked  0x22B
 
+// gTileset_Johto_Building_Hns
+#define METATILE_Johto_Building_Hns_DARK_FLOOR            0x009
+#define METATILE_Johto_Building_Hns_STAIRS_BACK           0x005
+#define METATILE_Johto_Building_Hns_STAIRS_BOTTOM_CARPET  0x00F
+#define METATILE_Johto_Building_Hns_STAIRS_CORNER         0x00D
+#define METATILE_Johto_Building_Hns_STAIRS_FRONT          0x006
+#define METATILE_Johto_Building_Hns_STAIRS_RAIL           0x00E
+#define METATILE_Johto_Building_Hns_STAIRS_TOP_CARPET     0x007
+#define METATILE_Johto_Building_Hns_STAIRS_WALL           0x015
+
 // gTileset_Lavaridge
 #define METATILE_Lavaridge_AshGrass             0x207
 #define METATILE_Lavaridge_CaveEntrance_Bottom  0x25E
@@ -331,7 +342,8 @@
 #define METATILE_Lavaridge_RockWall             0x274
 
 // gTileset_LavenderTown
-#define METATILE_LavenderTown_Door  0x2A2
+#define METATILE_LavenderTown_Door      0x2A2
+#define METATILE_LavenderTown_Door_Hns  0x2EC
 
 // gTileset_Lilycove
 #define METATILE_Lilycove_Door             0x246
@@ -438,6 +450,13 @@
 // gTileset_MtEmber
 #define METATILE_MtEmber_CaveEntrance  0x346
 
+// gTileset_MtSilver_Exp_Hns
+#define METATILE_MtSilver_Exp_Hns_STAIRS_LEFT   0x089
+#define METATILE_MtSilver_Exp_Hns_STAIRS_RIGHT  0x091
+
+// gTileset_MtSilver_NewSinjoh_Hns
+#define METATILE_MtSilver_NewSinjoh_Hns_METATILE_MtSilverNewSinjoh_Door_Hns  0x32B
+
 // gTileset_Pacifidlog
 #define METATILE_Pacifidlog_Door                               0x21A
 #define METATILE_Pacifidlog_FloatingLogs_HorizontalLeft        0x250
@@ -457,8 +476,10 @@
 #define METATILE_Pacifidlog_SubmergedLogs_VerticalTop          0x25A
 
 // gTileset_PalletTown
-#define METATILE_PalletTown_Door         0x2A3
-#define METATILE_PalletTown_OaksLabDoor  0x2AC
+#define METATILE_PalletTown_Door            0x2A3
+#define METATILE_PalletTown_Door_Green_Hns  0x2AC
+#define METATILE_PalletTown_Door_Red_Hns    0x2BD
+#define METATILE_PalletTown_OaksLabDoor     0x2AC
 
 // gTileset_Petalburg
 #define METATILE_Petalburg_Door_BirchsLab   0x249
@@ -476,7 +497,8 @@
 #define METATILE_PetalburgGym_SlidingDoor_Frame4  0x21C
 
 // gTileset_PewterCity
-#define METATILE_PewterCity_Door  0x2CE
+#define METATILE_PewterCity_Door      0x2CE
+#define METATILE_PewterCity_Door_Hns  0x2CE
 
 // gTileset_PokemonCenter
 #define METATILE_PokemonCenter_CounterBarrier            0x25D
@@ -1018,6 +1040,7 @@
 
 // gTileset_VermilionCity
 #define METATILE_VermilionCity_Door        0x29E
+#define METATILE_VermilionCity_Door_Hns    0x29E
 #define METATILE_VermilionCity_SSAnneWarp  0x2E1
 
 // gTileset_VermilionGym
@@ -1052,13 +1075,25 @@
 #define METATILE_VermilionGym_Floor                              0x281
 
 // gTileset_ViridianCity
-#define METATILE_ViridianCity_Door  0x299
+#define METATILE_ViridianCity_Door      0x299
+#define METATILE_ViridianCity_Door_Hns  0x31B
 
 // gTileset_ViridianForest
 #define METATILE_ViridianForest_HugeTreeTopMiddle_Grass  0x284
 #define METATILE_ViridianForest_HugeTreeTopMiddle_Mowed  0x281
 
 // Other
+#define METATILE_Alola_Door_Hns                      0x046
+#define METATILE_Alola_Pokecenter_Door_Hns           0x062
+#define METATILE_AzaleaTown_Door_Hns                 0x2A2
+#define METATILE_BellchimeTrail_Door_Hns             0x333
+#define METATILE_Blackthorn_Door_Hns                 0x291
+#define METATILE_CherrygroveCity_Door_Red_Hns        0x2EB
+#define METATILE_CianwoodCity_Door_Hns               0x29A
+#define METATILE_DragonDen_Shrine_Door_Hns           0x2FF
+#define METATILE_EcruteakCity_Door_Hns               0x333
+#define METATILE_Fuchsia_Door_Hns                    0x2BF
+#define METATILE_Fuchsia_Door_Red_Hns                0x2D2
 #define METATILE_GeneralFrlg_CalmWater               0x12B
 #define METATILE_GeneralFrlg_Door                    0x03D
 #define METATILE_GeneralFrlg_Plain_Grass             0x00D
@@ -1071,6 +1106,26 @@
 #define METATILE_GeneralFrlg_WideTreeTopLeft_Mowed   0x00E
 #define METATILE_GeneralFrlg_WideTreeTopRight_Grass  0x00C
 #define METATILE_GeneralFrlg_WideTreeTopRight_Mowed  0x00F
+#define METATILE_GoldenrodUnderground_Elevator_Hns   0x2AB
+#define METATILE_Goldenrod_Door_Hns                  0x284
+#define METATILE_Goldenrod_Door_Saffron_Hns          0x35C
+#define METATILE_JohtoBuildingHns_PC_Off             0x062
+#define METATILE_JohtoBuildingHns_PC_On              0x063
+#define METATILE_JohtoBuildingHns_TV_Off             0x035
+#define METATILE_JohtoBuildingHns_TV_On              0x061
+#define METATILE_Johto_General_Door_Gym_Hns          0x15B
+#define METATILE_Johto_General_Door_Hns              0x03D
+#define METATILE_Johto_General_Door_Sliding_Hns      0x062
+#define METATILE_MahoganyTown_Door_Hns               0x2A2
+#define METATILE_MtSilverNewSinjoh_Door_Hns          0x32B
+#define METATILE_NewBarkTown_Door_Blue_Hns           0x2CB
+#define METATILE_NewBarkTown_Door_Red_Hns            0x2BD
+#define METATILE_NewBarkTown_Door_Yellow_Hns         0x309
+#define METATILE_OlivineCity_Door_Hns                0x312
+#define METATILE_OlivineCity_Door_Vermilion_Hns      0x29E
+#define METATILE_PlayersHouseHns_PC_Off              0x288
+#define METATILE_PlayersHouseHns_PC_On               0x28A
+#define METATILE_R26_21_Broken_Window                0x32B
 #define METATILE_RSCave_CrackedFloor                 0x22F
 #define METATILE_RSCave_CrackedFloor_Hole            0x206
 #define METATILE_RSMossdeepGym_RedArrow_Down         0x205
@@ -1079,5 +1134,9 @@
 #define METATILE_RSMossdeepGym_RedArrow_Up           0x20D
 #define METATILE_RSMossdeepGym_Switch_Down           0x239
 #define METATILE_RSMossdeepGym_Switch_Up             0x238
+#define METATILE_Route38Farm_Grass                   0x2E4
+#define METATILE_SSAqua_Door_Hns                     0x281
+#define METATILE_SafariZoneJohto_Door_Hns            0x2D2
+#define METATILE_VioletCity_Dojo_Door_Hns            0x32B
 
 #endif // GUARD_METATILE_LABELS_H

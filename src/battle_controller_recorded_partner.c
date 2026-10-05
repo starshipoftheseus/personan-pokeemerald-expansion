@@ -1,5 +1,7 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_ai_main.h"
+#include "battle_ai_util.h"
 #include "battle_anim.h"
 #include "battle_controllers.h"
 #include "battle_message.h"
@@ -25,7 +27,6 @@
 #include "task.h"
 #include "test_runner.h"
 #include "text.h"
-#include "trainer.h"
 #include "util.h"
 #include "window.h"
 #include "constants/battle_anim.h"
@@ -132,7 +133,7 @@ static void Intro_WaitForHealthbox(enum BattlerId battler)
     else
     {
         if (gSprites[gHealthboxSpriteIds[battler]].callback == SpriteCallbackDummy
-            && gSprites[gHealthboxSpriteIds[GetPartnerBattler(battler)]].callback == SpriteCallbackDummy)
+            && gSprites[gHealthboxSpriteIds[BATTLE_PARTNER(battler)]].callback == SpriteCallbackDummy)
         {
             finished = TRUE;
         }
@@ -151,7 +152,7 @@ static void Intro_WaitForHealthbox(enum BattlerId battler)
 void Controller_RecordedPartnerShowIntroHealthbox(enum BattlerId battler)
 {
     if (!gBattleSpritesDataPtr->healthBoxesData[battler].ballAnimActive
-        && !gBattleSpritesDataPtr->healthBoxesData[GetPartnerBattler(battler)].ballAnimActive
+        && !gBattleSpritesDataPtr->healthBoxesData[BATTLE_PARTNER(battler)].ballAnimActive
         && gSprites[gBattleControllerData[battler]].callback == SpriteCallbackDummy
         && gSprites[gBattlerSpriteIds[battler]].callback == SpriteCallbackDummy
         && ++gBattleSpritesDataPtr->healthBoxesData[battler].introEndDelay != 1)
@@ -161,10 +162,10 @@ void Controller_RecordedPartnerShowIntroHealthbox(enum BattlerId battler)
 
         if (IsDoubleBattle() && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
         {
-            DestroySprite(&gSprites[gBattleControllerData[GetPartnerBattler(battler)]]);
-            UpdateHealthboxAttribute(gHealthboxSpriteIds[GetPartnerBattler(battler)], GetBattlerMon(GetPartnerBattler(battler)), HEALTHBOX_ALL);
-            StartHealthboxSlideIn(GetPartnerBattler(battler));
-            SetHealthboxSpriteVisible(gHealthboxSpriteIds[GetPartnerBattler(battler)]);
+            DestroySprite(&gSprites[gBattleControllerData[BATTLE_PARTNER(battler)]]);
+            UpdateHealthboxAttribute(gHealthboxSpriteIds[BATTLE_PARTNER(battler)], GetBattlerMon(BATTLE_PARTNER(battler)), HEALTHBOX_ALL);
+            StartHealthboxSlideIn(BATTLE_PARTNER(battler));
+            SetHealthboxSpriteVisible(gHealthboxSpriteIds[BATTLE_PARTNER(battler)]);
         }
 
         DestroySprite(&gSprites[gBattleControllerData[battler]]);
@@ -199,9 +200,9 @@ static enum TrainerPicID RecordedPartnerGetTrainerBackPicId(enum DifficultyLevel
     enum TrainerPicID trainerPicId;
 
     if (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER)
-        trainerPicId = gBattlePartners[difficulty][gPartnerTrainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerPic;
+        trainerPicId = gBattlePartners[difficulty][gPartnerTrainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerBackPic;
     else
-        trainerPicId = GetPlayerTrainerPic(gSaveBlock2Ptr->playerGender, GAME_VERSION);
+        trainerPicId = gSaveBlock2Ptr->playerGender + TRAINER_BACK_PIC_PLAYER_MALE;
 
     return trainerPicId;
 }
@@ -219,9 +220,9 @@ static void RecordedPartnerHandleDrawTrainerPic(enum BattlerId battler)
 
     if (gPartnerTrainerId > TRAINER_PARTNER(PARTNER_NONE))
     {
-        trainerPicId = gBattlePartners[difficulty][gPartnerTrainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerPic;
+        trainerPicId = gBattlePartners[difficulty][gPartnerTrainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerBackPic;
         xPos = 90;
-        yPos = (8 - GetTrainerBackPicCoords(trainerPicId)->size) * 4 + 80;
+        yPos = (8 - gTrainerBacksprites[trainerPicId].coordinates.size) * 4 + 80;
     }
     else if (IsAiVsAiBattle())
     {
@@ -267,11 +268,6 @@ static void RecordedPartnerHandleChooseMove(enum BattlerId battler)
 {
     u8 moveIndex = RecordedBattle_GetBattlerAction(RECORDED_MOVE_SLOT, battler);
     u8 target = RecordedBattle_GetBattlerAction(RECORDED_MOVE_TARGET, battler);
-    if (target == RECORDED_TARGET_DEFAULT)
-    {
-        struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct *)(&gBattleResources->bufferA[battler][4]);
-        target = GetDefaultSelectionTarget(battler, GetBattlerMoveSelectionTargetType(battler, moveInfo->moves[moveIndex]));
-    }
     BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_EXEC_SCRIPT, moveIndex | (target << 8));
 
     BtlController_Complete(battler);
@@ -291,11 +287,11 @@ static void RecordedPartnerHandleIntroTrainerBallThrow(enum BattlerId battler)
     enum DifficultyLevel difficulty = GetBattlePartnerDifficultyLevel(gPartnerTrainerId);
 
     if (gPartnerTrainerId > TRAINER_PARTNER(PARTNER_NONE))
-        trainerPal = GetTrainerBackPicPalette(gBattlePartners[difficulty][gPartnerTrainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerPic);
+        trainerPal = gTrainerBacksprites[gBattlePartners[difficulty][gPartnerTrainerId - TRAINER_PARTNER(PARTNER_NONE)].trainerBackPic].palette.data;
     else if (IsAiVsAiBattle())
-        trainerPal = GetTrainerFrontPicPalette(GetTrainerPicFromId(gPartnerTrainerId));
+        trainerPal = gTrainerSprites[GetTrainerBackPicFromId(gPartnerTrainerId)].palette.data;
     else
-        trainerPal = GetTrainerFrontPicPalette(GetFrontierTrainerFrontSpriteId(gPartnerTrainerId)); // 2 vs 2 multi battle in Battle Frontier, load front sprite and pal.
+        trainerPal = gTrainerSprites[GetFrontierTrainerFrontSpriteId(gPartnerTrainerId)].palette.data; // 2 vs 2 multi battle in Battle Frontier, load front sprite and pal.
 
     BtlController_HandleIntroTrainerBallThrow(battler, 0xD6F9, trainerPal, 24, Controller_RecordedPartnerShowIntroHealthbox);
 }

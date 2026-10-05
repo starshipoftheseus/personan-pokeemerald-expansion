@@ -55,7 +55,6 @@ static void Task_WeatherMain(u8 taskId);
 static void None_Init(void);
 static void None_Main(void);
 static u8 None_Finish(void);
-static bool32 IsSpritePalTagBlendImmune(u32 palIndex);
 
 EWRAM_DATA struct Weather gWeather = {0};
 EWRAM_DATA static u8 ALIGNED(2) sFieldEffectPaletteColorMapTypes[32] = {0};
@@ -142,6 +141,7 @@ static const struct WeatherCallbacks sWeatherFuncs[] =
     [WEATHER_DROUGHT]            = {Drought_InitVars,       Drought_Main,       Drought_InitAll,       Drought_Finish},
     [WEATHER_DOWNPOUR]           = {Downpour_InitVars,      Thunderstorm_Main,  Downpour_InitAll,      Thunderstorm_Finish},
     [WEATHER_UNDERWATER_BUBBLES] = {Bubbles_InitVars,       Bubbles_Main,       Bubbles_InitAll,       Bubbles_Finish},
+    [WEATHER_LEAVES]             = {Leaves_InitVars,        Leaves_Main,        Leaves_InitAll,        Leaves_Finish},
 };
 
 void (*const gWeatherPalStateFuncs[])(void) =
@@ -170,7 +170,7 @@ static const u8 ALIGNED(2) sBasePaletteColorMapTypes[32] =
     COLOR_MAP_DARK_CONTRAST,
     COLOR_MAP_DARK_CONTRAST,
     COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_NONE,
+    COLOR_MAP_DARK_CONTRAST,
     COLOR_MAP_NONE,
     COLOR_MAP_NONE,
     // sprite palettes
@@ -192,7 +192,7 @@ static const u8 ALIGNED(2) sBasePaletteColorMapTypes[32] =
     COLOR_MAP_DARK_CONTRAST,
 };
 
-const u16 ALIGNED(4) gFogPalette[] = INCGFX_U16("graphics/weather/fog.pal", ".gbapal");
+const u16 ALIGNED(4) gFogPalette[] = INCBIN_U16("graphics/weather/fog.gbapal");
 
 void StartWeather(void)
 {
@@ -215,6 +215,7 @@ void StartWeather(void)
         gWeatherPtr->sandstormSpritesCreated = 0;
         gWeatherPtr->sandstormSwirlSpritesCreated = 0;
         gWeatherPtr->bubblesSpritesCreated = 0;
+        gWeatherPtr->leafSpriteCount = 0;
         gWeatherPtr->lightenedFogSpritePalsCount = 0;
         Weather_SetBlendCoeffs(16, 0);
         gWeatherPtr->currWeather = 0;
@@ -247,9 +248,9 @@ static void UpdateWeatherForms(void)
     s32 i;
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][i];
-        enum Species species = GetMonData(mon, MON_DATA_SPECIES);
-        enum Species targetSpecies = GetOverworldWeatherSpecies(species);
+        struct Pokemon *mon = &gPlayerParty[i];
+        u16 species = GetMonData(mon, MON_DATA_SPECIES);
+        u16 targetSpecies = GetOverworldWeatherSpecies(species);
         if (species != targetSpecies)
         {
             SetMonData(mon, MON_DATA_SPECIES, &targetSpecies);
@@ -446,11 +447,6 @@ static bool8 FadeInScreen_FogHorizontal(void)
 static void DoNothing(void)
 { }
 
-static bool32 IsSpritePalTagBlendImmune(u32 palIndex)
-{
-    return (palIndex >= 16 && IS_BLEND_IMMUNE_TAG(GetSpritePaletteTagByPaletteNum(palIndex - 16)));
-}
-
 static void ApplyColorMap(u8 startPalIndex, u8 numPalettes, s8 colorMapIndex)
 {
     u16 curPalIndex;
@@ -481,7 +477,8 @@ static void ApplyColorMap(u8 startPalIndex, u8 numPalettes, s8 colorMapIndex)
         while (curPalIndex < numPalettes)
         {
             // don't blend special palettes immune to blending
-            if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_NONE || IsSpritePalTagBlendImmune(curPalIndex))
+            if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_NONE ||
+                (curPalIndex >= 16 && IS_BLEND_IMMUNE_TAG(GetSpritePaletteTagByPaletteNum(curPalIndex - 16))))
             {
                 // No palette change.
                 palOffset += 16;
@@ -519,7 +516,7 @@ static void ApplyColorMap(u8 startPalIndex, u8 numPalettes, s8 colorMapIndex)
 
         while (curPalIndex < numPalettes)
         {
-            if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_NONE || IsSpritePalTagBlendImmune(curPalIndex))
+            if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_NONE)
             {
                 // No palette change.
                 CpuFastCopy(&gPlttBufferUnfaded[palOffset], &gPlttBufferFaded[palOffset], PLTT_SIZE_4BPP);
@@ -573,7 +570,7 @@ static void ApplyColorMapWithBlend(u8 startPalIndex, u8 numPalettes, s8 colorMap
         UpdateAltBgPalettes((1 << (palOffset >> 4)) & PALETTES_BG);
         CpuFastCopy(gPlttBufferUnfaded + palOffset, gPlttBufferFaded + palOffset, 16 * sizeof(u16));
         UpdatePalettesWithTime(1 << (palOffset >> 4)); // Apply TOD blend
-        if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_NONE || IsSpritePalTagBlendImmune(curPalIndex))
+        if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_NONE)
         {
             // No color map. Simply blend the colors.
             BlendPalettesFine(1, gPlttBufferFaded + palOffset, gPlttBufferFaded + palOffset, blendCoeff, blendColor);
@@ -625,7 +622,7 @@ static void ApplyDroughtColorMapWithBlend(s8 colorMapIndex, u8 blendCoeff, u32 b
     palOffset = 0;
     for (curPalIndex = 0; curPalIndex < 32; curPalIndex++)
     {
-        if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_NONE|| IsSpritePalTagBlendImmune(curPalIndex))
+        if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_NONE)
         {
             // No color map. Simply blend the colors.
             BlendPalette(palOffset, 16, blendCoeff, blendColor);
@@ -788,14 +785,13 @@ void FadeSelectedPals(u8 mode, s8 delay, u32 selectedPalettes)
         // For cases like that, use fadescreenswapbuffers
         CpuFastCopy(gPlttBufferFaded, gPlttBufferUnfaded, PLTT_BUFFER_SIZE * 2);
 
-        gPaletteFade.simultaneousFade = TRUE;
         BeginNormalPaletteFade(selectedPalettes, delay, 0, 16, fadeColor);
         gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_SCREEN_FADING_OUT;
     }
     else
     {
         gWeatherPtr->fadeDestColor = fadeColor;
-        UpdateTimeOfDay(TRUE);
+        UpdateTimeOfDay();
         if (useWeatherPal)
         {
             gWeatherPtr->fadeScreenCounter = 0; // Triggers gamma-shift-based fade-in
@@ -1218,6 +1214,7 @@ static const u8 sWeatherNames[WEATHER_COUNT][24] = {
     [WEATHER_ROUTE119_CYCLE]     = _("ROUTE119 CYCLE"),
     [WEATHER_ROUTE123_CYCLE]     = _("ROUTE123 CYCLE"),
     [WEATHER_FOG]                = _("FOG"),
+    [WEATHER_LEAVES]             = _("LEAVES"),
 };
 
 static const u8 sDebugText_WeatherNotDefined[] = _("NOT DEFINED!!!");

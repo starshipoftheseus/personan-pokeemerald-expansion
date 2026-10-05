@@ -1,6 +1,7 @@
 {
   "id": "MAP_CINNABAR_ISLAND_GYM",
   "name": "CinnabarIsland_Gym_Frlg",
+  "game_version": "frlg",
   "layout": "LAYOUT_CINNABAR_ISLAND_GYM",
   "music": "MUS_RG_GYM",
   "region": "REGION_KANTO",
@@ -19,7 +20,7 @@
     {
       "local_id": "LOCALID_QUINN",
       "type": "object",
-      "graphics_id": "OBJ_EVENT_GFX_POKE_MANIAC_FRLG",
+      "graphics_id": "OBJ_EVENT_GFX_SUPER_NERD",
       "x": 25,
       "y": 11,
       "elevation": 3,
@@ -63,7 +64,7 @@
     {
       "local_id": "LOCALID_RAMON",
       "type": "object",
-      "graphics_id": "OBJ_EVENT_GFX_POKE_MANIAC_FRLG",
+      "graphics_id": "OBJ_EVENT_GFX_SUPER_NERD",
       "x": 16,
       "y": 11,
       "elevation": 3,
@@ -93,7 +94,7 @@
     {
       "local_id": "LOCALID_DUSTY",
       "type": "object",
-      "graphics_id": "OBJ_EVENT_GFX_POKE_MANIAC_FRLG",
+      "graphics_id": "OBJ_EVENT_GFX_SUPER_NERD",
       "x": 4,
       "y": 19,
       "elevation": 3,

@@ -2,6 +2,9 @@
 .set AMOUNT, VAR_0x8001
 
 Std_ObtainItem::
+#if RANDOMIZER_AVAILABLE
+	callnative ObtainItemRandomize_NativeCall
+#endif
 	copyvar VAR_0x8006, ITEMID
 	additem ITEMID, AMOUNT
 	copyvar VAR_0x8007, VAR_RESULT
@@ -18,11 +21,16 @@ EventScript_ObtainItemMessage::
 
 EventScript_BufferPocketNameAndTryFanfare::
 	switch VAR_RESULT
-	case POCKET_ITEMS,      EventScript_BufferItemsPocket
-	case POCKET_KEY_ITEMS,  EventScript_BufferKeyItemsPocket
-	case POCKET_POKE_BALLS, EventScript_BufferPokeballsPocket
-	case POCKET_TM_HM,      EventScript_BufferTMHMsPocket
-	case POCKET_BERRIES,    EventScript_BufferBerriesPocket
+	case POCKET_MEDICINE EventScript_BufferMedicinePocket,
+    case POCKET_POKE_BALLS EventScript_BufferPokeballsPocket,
+    case POCKET_BERRIES EventScript_BufferBerriesPocket,
+    case POCKET_ITEMS EventScript_BufferItemsPocket,
+    case POCKET_TM_HM EventScript_BufferTMHMsPocket,
+    case POCKET_KEY_ITEMS EventScript_BufferKeyItemsPocket,
+#if I_COMBINE_BAG_POCKETS == FALSE
+    case POCKET_TREASURES EventScript_BufferTreasuresPocket,
+    case POCKET_BATTLE_ITEMS EventScript_BufferBattleItemsPocket,
+#endif
 	end
 
 EventScript_BufferItemsPocket::
@@ -32,7 +40,7 @@ EventScript_BufferItemsPocket::
 
 EventScript_BufferKeyItemsPocket::
 	bufferstdstring STR_VAR_3, STDSTRING_KEYITEMS
-	call_if_eq VAR_0x8007, TRUE, EventScript_PlayFanfareObtainedItem
+	call_if_eq VAR_0x8007, TRUE, EventScript_PlayFanfareObtainedKeyItem
 	return
 
 EventScript_BufferPokeballsPocket::
@@ -47,6 +55,21 @@ EventScript_BufferTMHMsPocket::
 
 EventScript_BufferBerriesPocket::
 	bufferstdstring STR_VAR_3, STDSTRING_BERRIES
+	call_if_eq VAR_0x8007, TRUE, EventScript_PlayFanfareObtainedBerry
+	return
+
+EventScript_BufferMedicinePocket::
+	bufferstdstring STR_VAR_3, STDSTRING_MEDICINE
+	call_if_eq VAR_0x8007, TRUE, EventScript_PlayFanfareObtainedItem
+	return
+
+EventScript_BufferBattleItemsPocket::
+	bufferstdstring STR_VAR_3, STDSTRING_BATTLE_ITEMS
+	call_if_eq VAR_0x8007, TRUE, EventScript_PlayFanfareObtainedItem
+	return
+
+EventScript_BufferTreasuresPocket::
+	bufferstdstring STR_VAR_3, STDSTRING_TREASURES
 	call_if_eq VAR_0x8007, TRUE, EventScript_PlayFanfareObtainedItem
 	return
 
@@ -75,8 +98,27 @@ EventScript_PlayFanfareObtainedItem::
 	playfanfare MUS_OBTAIN_ITEM
 	return
 
+EventScript_PlayFanfareObtainedKeyItem::
+@ Emerald has no distinct key item jingle, so it keeps the plain item fanfare. FR/LG
+@ has one, and in an HnS build FANFARE_RG_OBTAIN_KEY_ITEM resolves to the HG jingle.
+#if IS_HNS || IS_FRLG
+	playfanfare MUS_RG_OBTAIN_KEY_ITEM
+#else
+	playfanfare MUS_OBTAIN_ITEM
+#endif
+	return
+
 EventScript_PlayFanfareObtainedTMHM::
 	playfanfare MUS_OBTAIN_TMHM
+	return
+
+EventScript_PlayFanfareObtainedBerry::
+@ Only HG/SS plays a separate jingle for berries; Emerald and FR/LG use the item one.
+#if IS_HNS
+	playfanfare MUS_OBTAIN_BERRY
+#else
+	playfanfare MUS_OBTAIN_ITEM
+#endif
 	return
 
 Std_ObtainDecoration::
@@ -110,6 +152,11 @@ Std_FindItem::
 	copyvar VAR_0x8006, ITEMID
 	copyvar VAR_0x8004, ITEMID
 	copyvar VAR_0x8005, AMOUNT
+#if RANDOMIZER_AVAILABLE
+	callnative FindItemRandomize_NativeCall
+	copyvar VAR_0x8006, ITEMID
+	copyvar VAR_0x8004, ITEMID
+#endif
 	checkitemspace ITEMID, AMOUNT
 	copyvar VAR_0x8007, VAR_RESULT
 	bufferitemnameplural STR_VAR_2, ITEMID, AMOUNT
@@ -176,6 +223,9 @@ EventScript_HiddenItemScript::
 	lockall
 	waitse
 	goto_if_eq VAR_0x8005, 0, EventScript_TryPickUpHiddenCoins
+#if RANDOMIZER_AVAILABLE
+	callnative FindHiddenItemRandomize_NativeCall
+#endif
 	copyvar VAR_0x8006, VAR_0x8005
 	additem VAR_0x8005, VAR_0x8009
 	copyvar VAR_0x8007, VAR_RESULT
@@ -251,11 +301,16 @@ Std_PutItemAway::
 
 EventScript_BufferPutAwayPocketName::
 	switch VAR_RESULT
-	case POCKET_ITEMS,       EventScript_BufferPutAwayPocketItems
-	case POCKET_KEY_ITEMS,   EventScript_BufferPutAwayPocketKeyItems
-	case POCKET_POKE_BALLS,  EventScript_BufferPutAwayPocketPokeBalls
-	case POCKET_TM_HM,     EventScript_BufferPutAwayPocketTMCase
-	case POCKET_BERRIES, EventScript_BufferPutAwayPocketBerryPouch
+	case POCKET_MEDICINE, 	  EventScript_BufferPutAwayPocketMedicinePouch,
+	case POCKET_ITEMS,        EventScript_BufferPutAwayPocketItems
+	case POCKET_KEY_ITEMS,    EventScript_BufferPutAwayPocketKeyItems
+	case POCKET_POKE_BALLS,   EventScript_BufferPutAwayPocketPokeBalls
+	case POCKET_TM_HM,     	  EventScript_BufferPutAwayPocketTMCase
+	case POCKET_BERRIES, 	  EventScript_BufferPutAwayPocketBerryPouch
+#if I_COMBINE_BAG_POCKETS == FALSE
+	case POCKET_TREASURES, 	  EventScript_BufferPutAwayPocketTreasuresPouch
+	case POCKET_BATTLE_ITEMS, EventScript_BufferPutAwayPocketBattleItemsPouch
+#endif
 	end
 
 EventScript_BufferPutAwayPocketItems::
@@ -276,6 +331,18 @@ EventScript_BufferPutAwayPocketTMCase::
 
 EventScript_BufferPutAwayPocketBerryPouch::
 	bufferstdstring STR_VAR_3, STDSTRING_BERRIES
+	return
+
+EventScript_BufferPutAwayPocketMedicinePouch::
+	bufferstdstring STR_VAR_3, STDSTRING_MEDICINE
+	return
+
+EventScript_BufferPutAwayPocketBattleItemsPouch::
+	bufferstdstring STR_VAR_3, STDSTRING_BATTLE_ITEMS
+	return
+
+EventScript_BufferPutAwayPocketTreasuresPouch::
+	bufferstdstring STR_VAR_3, STDSTRING_TREASURES
 	return
 
 EventScript_TryPickUpHiddenCoins::

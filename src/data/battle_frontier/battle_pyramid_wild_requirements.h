@@ -9,12 +9,12 @@ struct BattlePyramidRequirement {
     u8 nAbilities;
     enum Type type;
     u8 nMoves;
-    const enum Item *evoItems;
+    const u16 *evoItems;
     u8 nEvoItems;
 };
 
 // MOVE_EFFECT_PARALYZE (30% or more)
-static const enum Move sParalyzingMoves[] = {
+static const u16 sParalyzingMoves[] = {
     //MOVE_THUNDER_PUNCH,
     MOVE_BODY_SLAM,
     MOVE_STUN_SPORE,
@@ -58,7 +58,7 @@ static const u16 sPoisoningMoves[] = {
 };
 
 // MOVE_EFFECT_BURN
-static const enum Move sBurningMoves[] = {
+static const u16 sBurningMoves[] = {
     MOVE_WILL_O_WISP,
     //MOVE_EMBER,
     //MOVE_FLAMETHROWER,
@@ -80,7 +80,7 @@ static const enum Move sBurningMoves[] = {
 };
 
 // EFFECT_FREEZE, MOVE_EFFECT_FREEZE_OR_FROSTBITE
-static const enum Move sFrostbiteMoves[] = {
+static const u16 sFrostbiteMoves[] = {
     MOVE_ICE_PUNCH,
     MOVE_ICE_BEAM,
     MOVE_BLIZZARD,
@@ -89,21 +89,21 @@ static const enum Move sFrostbiteMoves[] = {
 };
 
 // EFFECT_GRUDGE, EFFECT_SPITE, EFFECT_EERIE_SPELL
-static const enum Move sPPReducingMoves[] = {
+static const u16 sPPReducingMoves[] = {
     MOVE_GRUDGE,
     MOVE_SPITE,
     MOVE_EERIE_SPELL,
 };
 
 // EFFECT_EXPLOSION
-static const enum Move sExplosionMoves[] = {
+static const u16 sExplosionMoves[] = {
     MOVE_SELF_DESTRUCT,
     MOVE_EXPLOSION,
     MOVE_MISTY_EXPLOSION,
 };
 
 // EFFECT_RAIN_DANCE, EFFECT_SANDSTORM, EFFECT_HAIL, EFFECT_SUNNY_DAY,
-static const enum Move sWeatherChangingMoves[] = {
+static const u16 sWeatherChangingMoves[] = {
     MOVE_RAIN_DANCE,
     MOVE_SANDSTORM,
     MOVE_HAIL,
@@ -111,7 +111,7 @@ static const enum Move sWeatherChangingMoves[] = {
 };
 
 // MOVE_EFFECT_RECHARGE, recoil
-static const enum Move sPowerfulNormalMoves[] = {
+static const u16 sPowerfulNormalMoves[] = {
     MOVE_HYPER_BEAM,
     MOVE_GIGA_IMPACT,
     MOVE_THRASH,
@@ -119,7 +119,7 @@ static const enum Move sPowerfulNormalMoves[] = {
     MOVE_DOUBLE_EDGE,
 };
 
-static const enum Item sEvoItems[] = {ITEM_FIRE_STONE, ITEM_WATER_STONE, ITEM_THUNDER_STONE};
+static const u16 sEvoItems[] = {ITEM_FIRE_STONE, ITEM_WATER_STONE, ITEM_THUNDER_STONE};
 
 static const struct BattlePyramidRequirement sBattlePyramidRequirementsByRound[] = {
     [0] = /* pokemon with moves that paraylze */

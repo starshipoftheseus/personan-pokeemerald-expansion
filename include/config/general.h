@@ -68,13 +68,13 @@
 #define GEN_7 6
 #define GEN_8 7
 #define GEN_9 8
-#define GEN_CHAMPIONS GEN_9 + 1
-#define GEN_COUNT GEN_CHAMPIONS + 1
+#define GEN_COUNT 9
 // Changing GEN_LATEST's value to a different Generation will change every default setting that uses it at once.
 #define GEN_LATEST GEN_9
 
 // General settings
 #define EXPANSION_INTRO              TRUE    // If TRUE, a custom RHH intro will play after the vanilla copyright screen.
+#define HQ_RANDOM                    TRUE    // If TRUE, replaces the default RNG with an implementation of SFC32 RNG. May break code that relies on RNG.
 #define PHONEMES_SHARED              FALSE   // If TRUE, bard phonemes all reference the same sound (sound/direct_sound_samples/phonemes/shared.bin) to save ROM space.
 
 // Measurement system constants to be used for UNITS
@@ -85,6 +85,6 @@
 #define CHAR_DEC_SEPARATOR           CHAR_PERIOD // CHAR_PERIOD is used as a decimal separator only in the UK and the US. The rest of the world uses CHAR_COMMA.
 
 // Naming Screen
-#define AUTO_LOWERCASE_KEYBOARD      GEN_LATEST  // Starting in GEN_6, after entering the first uppercase character, the keyboard switches to lowercase letters.
+#define AUTO_LOWERCASE_KEYBOARD      GEN_3  // Starting in GEN_6, after entering the first uppercase character, the keyboard switches to lowercase letters.
 
 #endif // GUARD_CONFIG_GENERAL_H

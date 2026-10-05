@@ -164,9 +164,9 @@ struct SoundChannel
     u16 xpc;
 };
 
-#define MAX_DIRECTSOUND_CHANNELS 12
+#define MAX_DIRECTSOUND_CHANNELS 15
 
-#define PCM_DMA_BUF_SIZE 1584 // size of Direct Sound buffer
+#define PCM_DMA_BUF_SIZE 2128 // size of Direct Sound buffer
 
 struct MusicPlayerInfo;
 
@@ -273,7 +273,8 @@ struct MusicPlayerTrack
 {
     u8 flags;
     u8 wait;
-    u8 patternLevel;
+    u8 patternLevel:4;
+    u8 gbsIdentifier:4;
     u8 repN;
     u8 gateTime;
     u8 key;
@@ -342,6 +343,7 @@ struct MusicPlayerInfo
     u16 fadeOI;
     u16 fadeOC;
     u16 fadeOV;
+    u16 gbsTempo;
     struct MusicPlayerTrack *tracks;
     struct ToneData *tone;
     u32 ident;
@@ -364,8 +366,17 @@ struct Song
     u16 me;
 };
 
+struct GBSSongItem
+{
+    u32 songID;
+    struct Song song;
+};
+
 extern const struct MusicPlayer gMPlayTable[];
 extern const struct Song gSongTable[];
+
+const struct Song *GetSong(int songID, bool32 gbsEnabled);
+extern const struct GBSSongItem gGBSSongTable[];
 
 
 
@@ -421,6 +432,7 @@ void MPlayStart(struct MusicPlayerInfo *mplayInfo, struct SongHeader *songHeader
 void m4aMPlayStop(struct MusicPlayerInfo *mplayInfo);
 void FadeOutBody(struct MusicPlayerInfo *mplayInfo);
 void TrkVolPitSet(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track);
+void ply_gbs_switch(struct MusicPlayerInfo *mplayInfo, struct MusicPlayerTrack *track);
 void MPlayFadeOut(struct MusicPlayerInfo *mplayInfo, u16 speed);
 void ClearChain(void *x);
 void Clear64byte(void *addr);
@@ -443,6 +455,8 @@ void m4aMPlayVolumeControl(struct MusicPlayerInfo *mplayInfo, u16 trackBits, u16
 void m4aMPlayPitchControl(struct MusicPlayerInfo *mplayInfo, u16 trackBits, s16 pitch);
 void m4aMPlayPanpotControl(struct MusicPlayerInfo *mplayInfo, u16 trackBits, s8 pan);
 void ClearModM(struct MusicPlayerTrack *track);
+void m4aMPlayModDepthSet(struct MusicPlayerInfo *mplayInfo, u16 trackBits, u8 modDepth);
+void m4aMPlayLFOSpeedSet(struct MusicPlayerInfo *mplayInfo, u16 trackBits, u8 lfoSpeed);
 
 struct MusicPlayerInfo *SetPokemonCryTone(struct ToneData *tone);
 void SetPokemonCryVolume(u8 val);

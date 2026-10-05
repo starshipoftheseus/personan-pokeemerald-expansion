@@ -1,7 +1,14 @@
+
+#if IS_HNS
+FallarborTown_BattleTentLobby_Text_WelcomeToBattleTent:
+	.string "I welcome you to the BATTLE TENT!\p"
+	.string "I am your guide to the Set KO Tourney!$"
+#else
 FallarborTown_BattleTentLobby_Text_WelcomeToBattleTent:
 	.string "I welcome you to the BATTLE TENT\n"
 	.string "FALLARBOR SITE!\p"
 	.string "I am your guide to the Set KO Tourney!$"
+#endif
 
 FallarborTown_BattleTentLobby_Text_TakeChallenge:
 	.string "Now, do you wish to take the challenge\n"
@@ -12,7 +19,11 @@ FallarborTown_BattleTentLobby_Text_AwaitAnotherChallenge:
 	.string "another occasion!$"
 
 FallarborTown_BattleTentLobby_Text_ExplainFallarborTent:
+#if IS_HNS
+	.string "In the ARENA BATTLE TENT,\n"
+#else
 	.string "In the FALLARBOR BATTLE TENT,\n"
+#endif
 	.string "we undertake the Set KO Tourney.\p"
 	.string "All participants enter with a team of\n"
 	.string "three POKéMON.\p"
@@ -117,18 +128,32 @@ FallarborTown_BattleTentLobby_Text_LookingForwardToArrival:
 	.string "Before I show you to the BATTLE TENT,\n"
 	.string "I must save the game. Please wait.$"
 
+#if IS_HNS
+VerdanturfTown_BattleTentLobby_Text_WelcomeToBattleTent:
+	.string "I welcome you to the BATTLE TENT!\p"
+	.string "Here, the TRAINER's trust toward\n"
+	.string "POKéMON is tested.$"
+#else
 VerdanturfTown_BattleTentLobby_Text_WelcomeToBattleTent:
 	.string "I welcome you to the BATTLE TENT\n"
 	.string "VERDANTURF SITE!\p"
 	.string "Here, the TRAINER's trust toward\n"
 	.string "POKéMON is tested.$"
-
+#endif
 VerdanturfTown_BattleTentLobby_Text_TakeChallenge:
+#if IS_HNS
+	.string "Do you wish to take the PALACE\n"
+#else
 	.string "Do you wish to take the VERDANTURF\n"
+#endif
 	.string "BATTLE TENT challenge?$"
 
 VerdanturfTown_BattleTentLobby_Text_ExplainVerdanturfTent:
+#if IS_HNS
+	.string "In the PALACE BATTLE TENT,\n"
+#else
 	.string "In the VERDANTURF BATTLE TENT,\n"
+#endif
 	.string "there is one crucial rule that must\l"
 	.string "be obeyed.\p"
 	.string "TRAINERS are permitted only to switch\n"
@@ -212,18 +237,31 @@ VerdanturfTown_BattleTentLobby_Text_PresentYouWithPrize:
 	.string "For the feat of your 3-win streak,\n"
 	.string "we present you with this prize.$"
 
+
+#if IS_HNS
+SlateportCity_BattleTentLobby_Text_WelcomeToBattleTent:
+	.string "Welcome to the BATTLE TENT!\p"
+	.string "I am your guide to the Battle Swap\n"
+	.string "Tournament.$"
+#else
 SlateportCity_BattleTentLobby_Text_WelcomeToBattleTent:
 	.string "Welcome to the BATTLE TENT\n"
 	.string "SLATEPORT SITE!\p"
 	.string "I am your guide to the Battle Swap\n"
 	.string "Tournament.$"
+#endif
+
 
 SlateportCity_BattleTentLobby_Text_TakeChallenge:
 	.string "Would you like to take the Battle\n"
 	.string "Swap challenge?$"
 
 SlateportCity_BattleTentLobby_Text_ExplainSlateportTent:
+#if IS_HNS
+	.string "Here at the FACTORY BATTLE TENT,\n"
+#else
 	.string "Here at the SLATEPORT BATTLE TENT,\n"
+#endif
 	.string "we hold Battle Swap events\l"
 	.string "using rental POKéMON.\p"
 	.string "First, you will be loaned three\n"
@@ -431,3 +469,7 @@ BattleTentLobby_Text_ExplainLevelRules:
 VerdanturfTown_BattleTentLobby_Text_RulesAreListed:
 	.string "The VERDANTURF BATTLE TENT\n"
 	.string "rules are listed.$"
+
+BattleTentLobby_Text_EarnedBattlePoints:
+	.string "You've earned {STR_VAR_1} Battle Points!$"
+

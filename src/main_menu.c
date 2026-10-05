@@ -19,10 +19,10 @@
 #include "mystery_event_menu.h"
 #include "naming_screen.h"
 #include "oak_speech.h"
+#include "oak_speech_hns.h"
 #include "option_menu.h"
 #include "overworld.h"
 #include "palette.h"
-#include "party_menu.h"
 #include "pokeball.h"
 #include "pokedex.h"
 #include "pokemon.h"
@@ -187,7 +187,7 @@ static void ClearMainMenuWindowTilemap(const struct WindowTemplate *);
 static void Task_DisplayMainMenu(u8);
 static void Task_WaitForBatteryDryErrorWindow(u8);
 static void MainMenu_FormatSavegameText(void);
-static void HighlightSelectedMainMenuItem(enum PartyMenuType, u8, s16);
+static void HighlightSelectedMainMenuItem(u8, u8, s16);
 static void Task_HandleMainMenuInput(u8);
 static void Task_HandleMainMenuAPressed(u8);
 static void Task_HandleMainMenuBPressed(u8);
@@ -248,13 +248,13 @@ static void MainMenu_FormatSavegameBadges(void);
 // .rodata
 
 static const u16 sBirchSpeechBgPals[][16] = {
-    INCGFX_U16("graphics/birch_speech/bg0.pal", ".gbapal"),
-    INCGFX_U16("graphics/birch_speech/bg1.pal", ".gbapal")
+    INCBIN_U16("graphics/birch_speech/bg0.gbapal"),
+    INCBIN_U16("graphics/birch_speech/bg1.gbapal")
 };
 
-static const u32 sBirchSpeechShadowGfx[] = INCGFX_U32("graphics/birch_speech/shadow.png", ".4bpp.smol");
-static const u32 sBirchSpeechBgMap[] = INCGFX_U32("graphics/birch_speech/map.bin", ".smolTM");
-static const u16 sBirchSpeechBgGradientPal[] = INCGFX_U16("graphics/birch_speech/bg2.pal", ".gbapal");
+static const u32 sBirchSpeechShadowGfx[] = INCBIN_U32("graphics/birch_speech/shadow.4bpp.smol");
+static const u32 sBirchSpeechBgMap[] = INCBIN_U32("graphics/birch_speech/map.bin.smolTM");
+static const u16 sBirchSpeechBgGradientPal[] = INCBIN_U16("graphics/birch_speech/bg2.gbapal");
 
 static const u8 gText_SaveFileCorrupted[] = _("The save file is corrupted. The\nprevious save file will be loaded.");
 static const u8 gText_SaveFileErased[] = _("The save file has been erased\ndue to corruption or damage.");
@@ -423,8 +423,8 @@ static const struct WindowTemplate sNewGameBirchSpeechTextWindows[] =
     DUMMY_WIN_TEMPLATE
 };
 
-static const u16 sMainMenuBgPal[] = INCGFX_U16("graphics/interface/main_menu_bg.pal", ".gbapal");
-static const u16 sMainMenuTextPal[] = INCGFX_U16("graphics/interface/main_menu_text.pal", ".gbapal");
+static const u16 sMainMenuBgPal[] = INCBIN_U16("graphics/interface/main_menu_bg.gbapal");
+static const u16 sMainMenuTextPal[] = INCBIN_U16("graphics/interface/main_menu_text.gbapal");
 
 static const u8 sTextColor_Headers[] = {TEXT_DYNAMIC_COLOR_1, TEXT_DYNAMIC_COLOR_2, TEXT_DYNAMIC_COLOR_3};
 static const u8 sTextColor_MenuInfo[] = {TEXT_DYNAMIC_COLOR_1, TEXT_COLOR_WHITE, TEXT_DYNAMIC_COLOR_3};
@@ -1088,6 +1088,17 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
                 StartNewGameSceneFrlg();
                 return;
             }
+            else if (IS_HNS)
+            {
+                DestroyTask(taskId);
+                FreeAllWindowBuffers();
+                if (action != ACTION_OPTION)
+                    sCurrItemAndOptionMenuCheck = 0;
+                else
+                    sCurrItemAndOptionMenuCheck |= OPTION_MENU_FLAG;
+                StartNewGameSceneHns();
+                return;
+            }
 
             gPlttBufferUnfaded[0] = RGB_BLACK;
             gPlttBufferFaded[0] = RGB_BLACK;
@@ -1199,7 +1210,7 @@ static void Task_DisplayMainMenuInvalidActionError(u8 taskId)
 
 #undef tArrowTaskIsScrolled
 
-static void HighlightSelectedMainMenuItem(enum PartyMenuType menuType, u8 selectedMenuItem, s16 isScrolled)
+static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 isScrolled)
 {
     SetGpuReg(REG_OFFSET_WIN0H, MENU_WIN_HCOORDS);
 
@@ -1636,7 +1647,7 @@ static void Task_NewGameBirchSpeech_StartNamingScreen(u8 taskId)
         FreeAndDestroyMonPicSprite(gTasks[taskId].tLotadSpriteId);
         NewGameBirchSpeech_SetDefaultPlayerName(Random() % NUM_PRESET_NAMES);
         DestroyTask(taskId);
-        DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_NewGameBirchSpeech_ReturnFromNamingScreen);
+        DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, 0, CB2_NewGameBirchSpeech_ReturnFromNamingScreen);
     }
 }
 
@@ -1823,6 +1834,7 @@ static void CB2_NewGameBirchSpeech_ReturnFromNamingScreen(void)
 {
     u8 taskId;
     u8 spriteId;
+    u16 savedIme;
 
     ResetBgsAndClearDma3BusyFlags(0);
     SetGpuReg(REG_OFFSET_DISPCNT, 0);
@@ -1881,7 +1893,10 @@ static void CB2_NewGameBirchSpeech_ReturnFromNamingScreen(void)
     SetGpuReg(REG_OFFSET_BLDY, 0);
     ShowBg(0);
     ShowBg(1);
-    IntrEnable(INTR_FLAG_VBLANK);
+    savedIme = REG_IME;
+    REG_IME = 0;
+    REG_IE |= 1;
+    REG_IME = savedIme;
     SetVBlankCallback(VBlankCB_MainMenu);
     SetMainCallback2(CB2_MainMenu);
     InitWindows(sNewGameBirchSpeechTextWindows);
@@ -2217,7 +2232,7 @@ static void MainMenu_FormatSavegameBadges(void)
     }
     StringExpandPlaceholders(gStringVar4, gText_ContinueMenuBadges);
     AddTextPrinterParameterized3(2, FONT_NORMAL, 0x6C, 33, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
-    ConvertIntToDecimalStringN(str, badgeCount, STR_CONV_MODE_LEADING_ZEROS, 1);
+    ConvertIntToDecimalStringN(str, badgeCount, STR_CONV_MODE_LEADING_ZEROS, 2);
     AddTextPrinterParameterized3(2, FONT_NORMAL, GetStringRightAlignXOffset(FONT_NORMAL, str, 0xD0), 33, sTextColor_MenuInfo, TEXT_SKIP_DRAW, str);
 }
 

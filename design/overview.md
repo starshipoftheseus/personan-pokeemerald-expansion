@@ -1,7 +1,8 @@
 # Hack overview
 - Working title:
 - Type: multi-region game across Hoenn, Kanto and Johto (story still being worked out)
-- Plan: Hoenn first, Kanto (already in expansion as the `make firered` build) merged in second, Johto built later as its own project
+- Base: Pokémon Heart & Soul 2.0.6 (Johto + GSC-style Kanto, finished and playtested; open source, credit the HnS team). Plan: add Hoenn back in (its maps are still in the tree, excluded from the `hns` build).
+- ROM budget: 32 MB hard limit. HnS uses 29.7 MB; Hoenn region data is ~1.6 MB. Trim Pokémon families / cries to fit.
 - Target: (player level, length, difficulty)
 - Generation of mechanics: (e.g. Gen 9 battle mechanics, physical/special split, etc.)
 - Pokémon available: (Gen 1–9 / regional dex only / custom list)

@@ -8,9 +8,6 @@
 #include "constants/characters.h"
 #include "constants/rgb.h"
 
-enum Mode { MODE_ASSERTF, MODE_FATALF };
-#define MODE_COUNT 2
-
 struct BitUnPackArgs
 {
     u16 compressedSize;
@@ -22,13 +19,8 @@ struct BitUnPackArgs
 
 extern void BitUnPack(const void *src, void *dest, const struct BitUnPackArgs *);
 
-static const u16 sPltts[MODE_COUNT][2] =
-{
-    INCGFX_U16("graphics/crash_screen/assertf.pal", ".gbapal"),
-    INCGFX_U16("graphics/crash_screen/fatalf.pal", ".gbapal"),
-};
-
-static const u32 sGlyphs1BPP[] = INCGFX_U32("graphics/crash_screen/font.png", ".1bpp");
+static const u16 sPltt[2] = INCBIN_U16("graphics/crash_screen/palette.gbapal");
+static const u32 sGlyphs1BPP[] = INCBIN_U32("graphics/crash_screen/font.1bpp");
 
 enum
 {
@@ -153,9 +145,9 @@ static bool32 Putp(u32 *x, u32 *y, const void *p)
     return TRUE;
 }
 
-static bool32 Puts(u32 *x, u32 *y, s32 n, const char *s)
+static bool32 Puts(u32 *x, u32 *y, const char *s)
 {
-    while (n-- > 0 && *s != '\0')
+    while (*s != '\0')
     {
         if (!Putc(x, y, *s++))
             return FALSE;
@@ -163,9 +155,9 @@ static bool32 Puts(u32 *x, u32 *y, s32 n, const char *s)
     return TRUE;
 }
 
-static bool32 PutS(u32 *x, u32 *y, s32 n, const u8 *s)
+static bool32 PutS(u32 *x, u32 *y, const u8 *s)
 {
-    while (n-- > 0 && *s != EOS)
+    while (*s != EOS)
     {
         char c;
         if (CHAR_a <= *s && *s <= CHAR_z)
@@ -220,34 +212,20 @@ static bool32 Putx(u32 *x, u32 *y, unsigned u)
 }
 
 // This printf renders directly into VRAM rather than into a buffer.
-static void Vprintf(enum Mode mode, const void *return1, const void *return0, const char *fmt, va_list va)
+static void Vprintf(const void *return1, const void *return0, const char *fmt, va_list va)
 {
     u32 x, y;
-    s32 n;
 
-    if (mode == MODE_ASSERTF)
-    {
-        x = 3;
-        y = 19;
-        static const char footer[] = "Press START to continue.";
-        for (u32 i = 0; i < sizeof(footer) - 1; i++)
-            Putc(&x, &y, footer[i]);
-    }
+    x = 3;
+    y = 19;
+    static const char footer[] = "Press START to continue.";
+    for (u32 i = 0; i < sizeof(footer) - 1; i++)
+        Putc(&x, &y, footer[i]);
 
     x = 0;
     y = 0;
     while (TRUE)
     {
-        if (fmt[0] == '.' && fmt[1] == '*')
-        {
-            fmt += 2;
-            n = va_arg(va, int);
-        }
-        else
-        {
-            n = INT_MAX;
-        }
-
         char c = *fmt++;
         if (c == '\0')
         {
@@ -258,18 +236,6 @@ static void Vprintf(enum Mode mode, const void *return1, const void *return0, co
             char f = *fmt++;
             switch (f)
             {
-            case '%':
-                if (!Putc(&x, &y, '%'))
-                    return;
-                break;
-            case 'c':
-                if (!Putc(&x, &y, va_arg(va, int)))
-                    return;
-                break;
-            case 'C':
-                if (!PutS(&x, &y, 1, &(u8) { va_arg(va, unsigned) }))
-                    return;
-                break;
             case 'd':
                 if (!Puti(&x, &y, va_arg(va, int)))
                     return;
@@ -279,11 +245,11 @@ static void Vprintf(enum Mode mode, const void *return1, const void *return0, co
                     return;
                 break;
             case 's':
-                if (!Puts(&x, &y, n, va_arg(va, const char *)))
+                if (!Puts(&x, &y, va_arg(va, const char *)))
                     return;
                 break;
             case 'S':
-                if (!PutS(&x, &y, n, va_arg(va, const u8 *)))
+                if (!PutS(&x, &y, va_arg(va, const u8 *)))
                     return;
                 break;
             case 'x':
@@ -299,11 +265,11 @@ static void Vprintf(enum Mode mode, const void *return1, const void *return0, co
         }
     }
 
-    if (!Puts(&x, &y, INT_MAX, "\n  in: "))
+    if (!Puts(&x, &y, "\n  in: "))
         return;
     if (!Putp(&x, &y, return1))
         return;
-    if (!Puts(&x, &y, INT_MAX, "\n  in: "))
+    if (!Puts(&x, &y, "\n  in: "))
         return;
     if (!Putp(&x, &y, return0))
         return;
@@ -331,7 +297,7 @@ struct Backup
 
 /* Blue Screen of Death style screen that displays the error message and
  * hijacks the main loop until the start button is pressed. */
-static void CrashScreen(enum Mode mode, const void *return1, const void *return0, const char *fmt, va_list va)
+void AssertfCrashScreen(const void *return1, const char *fmt, ...)
 {
     // Backup and override hardware state.
     struct Backup *backup = NULL;
@@ -339,7 +305,7 @@ static void CrashScreen(enum Mode mode, const void *return1, const void *return0
     // Allocate on heap if possible.
     if (!backup)
     {
-        backup = AllocUnchecked(sizeof(*backup));
+        backup = Alloc(sizeof(*backup));
         if (backup)
             backup->onHeap = TRUE;
     }
@@ -379,25 +345,19 @@ static void CrashScreen(enum Mode mode, const void *return1, const void *return0
     REG_BG0HOFS = 0; // NOTE: REG_BG0HOFS is write-only.
     REG_BG0VOFS = 0; // NOTE: REG_BG0VOFS is write-only.
     memcpy(backup->bgPltt, (void *)BG_PLTT, sizeof(backup->bgPltt));
-    memcpy((void *)BG_PLTT, sPltts[mode], sizeof(backup->bgPltt));
+    memcpy((void *)BG_PLTT, sPltt, sizeof(backup->bgPltt));
     CpuFastCopy((void *)VRAM, &backup->vram, sizeof(backup->vram));
     for (u32 i = 0; i < 32 * 20; i++)
         ((vu16 *)VRAM)[i] = TILE0_OFFSET;
     BitUnPack(sGlyphs1BPP, (void *)(VRAM + TILE_OFFSET_4BPP(TILE0_OFFSET)), &sBitUnPack1BPP);
 
-    Vprintf(mode, return1, return0, fmt, va);
+    va_list va;
+    va_start(va, fmt);
+    Vprintf(return1, __builtin_return_address(0), fmt, va);
+    va_end(va);
 
     BusyWaitForVBlank();
     REG_DISPCNT = DISPCNT_MODE_0 | DISPCNT_BG0_ON;
-
-    if (mode == MODE_FATALF)
-    {
-        while (TRUE)
-        {
-            gMain.intrCheck &= ~INTR_FLAG_VBLANK;
-            VBlankIntrWait();
-        }
-    }
 
     u16 prevKeyinput = ~REG_KEYINPUT;
     enum { WAIT_FOR_PRESS, WAIT_FOR_RELEASE } state = WAIT_FOR_PRESS;
@@ -439,22 +399,4 @@ static void CrashScreen(enum Mode mode, const void *return1, const void *return0
 
     if (backup->onHeap)
         Free(backup);
-}
-
-void AssertfCrashScreen(const void *return1, const char *fmt, ...)
-{
-    va_list va;
-    va_start(va, fmt);
-    CrashScreen(MODE_ASSERTF, return1, __builtin_return_address(0), fmt, va);
-    va_end(va);
-}
-
-_Noreturn void FatalfCrashScreen(const void *return1, const char *fmt, ...)
-{
-    va_list va;
-    va_start(va, fmt);
-    CrashScreen(MODE_FATALF, return1, __builtin_return_address(0), fmt, va);
-    va_end(va);
-
-    while (TRUE); // Unreachable: infinite loop in 'CrashScreen'.
 }

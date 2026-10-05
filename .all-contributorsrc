@@ -1,6 +1,6 @@
 {
-  "projectName": "pokeemerald-expansion",
-  "projectOwner": "rh-hideout",
+  "projectName": "pokemonHnS-expansion",
+  "projectOwner": "PokemonhnS-Development",
   "repoType": "github",
   "repoHost": "https://github.com",
   "files": [
@@ -169,8 +169,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/35115312?v=4",
       "profile": "https://github.com/LinathanZel",
       "contributions": [
-        "code",
-        "userTesting"
+        "code"
       ]
     },
     {
@@ -228,9 +227,7 @@
       "profile": "https://github.com/RubyRaven6",
       "contributions": [
         "code",
-        "doc",
-        "tool",
-        "tutorial"
+        "doc"
       ]
     },
     {
@@ -313,8 +310,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/118256341?v=4",
       "profile": "https://github.com/fakuzatsu",
       "contributions": [
-        "code",
-        "design"
+        "code"
       ]
     },
     {
@@ -585,10 +581,10 @@
       ]
     },
     {
-      "login": "miriamlefae",
-      "name": "Miriam",
+      "login": "izrofid",
+      "name": "Kildemal",
       "avatar_url": "https://avatars.githubusercontent.com/u/206095739?v=4",
-      "profile": "https://github.com/miriamlefae",
+      "profile": "https://github.com/izrofid",
       "contributions": [
         "code"
       ]
@@ -700,51 +696,6 @@
       "contributions": [
         "bug",
         "code"
-      ]
-    },
-    {
-      "login": "jtebbe",
-      "name": "jtebbe",
-      "avatar_url": "https://avatars.githubusercontent.com/u/15947257?v=4",
-      "profile": "https://github.com/jtebbe",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
-      "login": "Liamjd14",
-      "name": "Liam",
-      "avatar_url": "https://avatars.githubusercontent.com/u/175732139?v=4",
-      "profile": "https://github.com/Liamjd14",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
-      "login": "Gastly92",
-      "name": "Gastly92",
-      "avatar_url": "https://avatars.githubusercontent.com/u/262681076?v=4",
-      "profile": "https://github.com/Gastly92",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
-      "login": "montmoguri",
-      "name": "Montblanc",
-      "avatar_url": "https://avatars.githubusercontent.com/u/202215938?v=4",
-      "profile": "https://github.com/montmoguri",
-      "contributions": [
-        "design"
-      ]
-    },
-    {
-      "login": "Black-Fragrant",
-      "name": "Black-Fragrant",
-      "avatar_url": "https://avatars.githubusercontent.com/u/105663910?v=4",
-      "profile": "https://github.com/Black-Fragrant",
-      "contributions": [
-        "design"
       ]
     }
   ],

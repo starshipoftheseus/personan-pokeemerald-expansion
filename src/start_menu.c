@@ -31,6 +31,7 @@
 #include "party_menu.h"
 #include "pokedex.h"
 #include "pokenav.h"
+#include "bug_contest.h"
 #include "safari_zone.h"
 #include "save.h"
 #include "scanline_effect.h"
@@ -50,6 +51,8 @@
 #include "constants/battle_frontier.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "rtc.h"
+#include "constants/layouts.h"
 
 // Menu actions
 enum
@@ -69,6 +72,7 @@ enum
     MENU_ACTION_PYRAMID_BAG,
     MENU_ACTION_DEBUG,
     MENU_ACTION_DEXNAV,
+    MENU_ACTION_RETIRE_BUG_CONTEST,
 };
 
 // Save status
@@ -85,6 +89,7 @@ COMMON_DATA bool8 (*gMenuCallback)(void) = NULL;
 
 // EWRAM
 EWRAM_DATA static u8 sSafariBallsWindowId = 0;
+EWRAM_DATA static u8 sStartClockWindowId = 0;
 EWRAM_DATA static u8 sBattlePyramidFloorWindowId = 0;
 EWRAM_DATA static u8 sStartMenuCursorPos = 0;
 EWRAM_DATA static u8 sNumStartMenuActions = 0;
@@ -111,6 +116,7 @@ static bool8 StartMenuBattlePyramidRetireCallback(void);
 static bool8 StartMenuBattlePyramidBagCallback(void);
 static bool8 StartMenuDebugCallback(void);
 static bool8 StartMenuDexNavCallback(void);
+static bool8 StartMenuBugContestRetireCallback(void);
 
 // Menu callbacks
 static bool8 SaveStartCallback(void);
@@ -148,11 +154,21 @@ static bool8 FieldCB_ReturnToFieldStartMenu(void);
 static const struct WindowTemplate sWindowTemplate_SafariBalls = {
     .bg = 0,
     .tilemapLeft = 1,
-    .tilemapTop = 1,
+    .tilemapTop = 5,
     .width = 9,
     .height = 4,
     .paletteNum = 15,
     .baseBlock = 0x8
+};
+
+static const struct WindowTemplate sWindowTemplate_StartClock = {
+    .bg = 0,
+    .tilemapLeft = 1,
+    .tilemapTop = 1,
+    .width = 6,
+    .height = 2,
+    .paletteNum = 15,
+    .baseBlock = 0x30
 };
 
 static const u8 *const sPyramidFloorNames[FRONTIER_STAGES_PER_CHALLENGE + 1] =
@@ -206,6 +222,7 @@ static const struct MenuAction sStartMenuItems[] =
     [MENU_ACTION_PYRAMID_BAG]     = {gText_MenuBag,     {.u8_void = StartMenuBattlePyramidBagCallback}},
     [MENU_ACTION_DEBUG]           = {sText_MenuDebug,   {.u8_void = StartMenuDebugCallback}},
     [MENU_ACTION_DEXNAV]          = {gText_MenuDexNav,  {.u8_void = StartMenuDexNavCallback}},
+    [MENU_ACTION_RETIRE_BUG_CONTEST] = {gText_MenuRetire, {.u8_void = StartMenuBugContestRetireCallback}},
 };
 
 static const struct BgTemplate sBgTemplates_LinkBattleSave[] =
@@ -255,6 +272,7 @@ static void BuildLinkModeStartMenu(void);
 static void BuildUnionRoomStartMenu(void);
 static void BuildBattlePikeStartMenu(void);
 static void BuildBattlePyramidStartMenu(void);
+static void BuildBugContestStartMenu(void);
 static void BuildMultiPartnerRoomStartMenu(void);
 static void ShowSafariBallsWindow(void);
 static void ShowPyramidFloorWindow(void);
@@ -279,6 +297,14 @@ static void ShowSaveInfoWindow(void);
 static void RemoveSaveInfoWindow(void);
 static void HideStartMenuWindow(void);
 static void HideStartMenuDebug(void);
+static void ShowTimeWindow(void);
+
+void SetDexPokemonPokenavFlags(void) // unused
+{
+    FlagSet(FLAG_SYS_POKEDEX_GET);
+    FlagSet(FLAG_SYS_POKEMON_GET);
+    FlagSet(FLAG_SYS_POKENAV_GET);
+}
 
 static void BuildStartMenuActions(void)
 {
@@ -295,6 +321,10 @@ static void BuildStartMenuActions(void)
     else if (GetSafariZoneFlag() == TRUE)
     {
         BuildSafariZoneStartMenu();
+    }
+    else if (GetBugContestFlag() == TRUE)
+    {
+        BuildBugContestStartMenu();
     }
     else if (InBattlePike())
     {
@@ -363,7 +393,9 @@ static void BuildSafariZoneStartMenu(void)
 {
     AddStartMenuAction(MENU_ACTION_RETIRE_SAFARI);
     AddStartMenuAction(MENU_ACTION_POKEDEX);
+#if !IS_HNS
     AddStartMenuAction(MENU_ACTION_POKEMON);
+#endif
     AddStartMenuAction(MENU_ACTION_BAG);
     AddStartMenuAction(MENU_ACTION_PLAYER);
     AddStartMenuAction(MENU_ACTION_OPTION);
@@ -436,7 +468,7 @@ static void ShowSafariBallsWindow(void)
     if (IS_FRLG)
     {
         ConvertIntToDecimalStringN(gStringVar1, gSafariZoneStepCounter, STR_CONV_MODE_RIGHT_ALIGN, 3);
-        ConvertIntToDecimalStringN(gStringVar2, 600, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar2, SAFARI_ZONE_STEPS_FRLG, STR_CONV_MODE_RIGHT_ALIGN, 3);
         ConvertIntToDecimalStringN(gStringVar3, gNumSafariBalls, STR_CONV_MODE_RIGHT_ALIGN, 2);
         StringExpandPlaceholders(gStringVar4, gText_MenuSafariStats);
         AddTextPrinterParameterized(sSafariBallsWindowId, FONT_NORMAL, gStringVar4, 4, 3, 0xFF, NULL);
@@ -465,18 +497,61 @@ static void ShowPyramidFloorWindow(void)
     CopyWindowToVram(sBattlePyramidFloorWindowId, COPYWIN_GFX);
 }
 
+#define CLOCK_WINDOW_WIDTH 48
+
+static const u8 sText_AM[] = _("AM");
+static const u8 sText_PM[] = _("PM");
+
+static void ShowTimeWindow(void)
+{
+    const u8 *suffix;
+    u8 *ptr;
+    u8 convertedHours;
+
+    sStartClockWindowId = AddWindow(&sWindowTemplate_StartClock);
+    PutWindowTilemap(sStartClockWindowId);
+    DrawStdWindowFrame(sStartClockWindowId, FALSE);
+
+    if (gLocalTime.hours < 12)
+    {
+        convertedHours = (gLocalTime.hours == 0) ? 12 : gLocalTime.hours;
+        suffix = sText_AM;
+    }
+    else
+    {
+        convertedHours = (gLocalTime.hours == 12) ? 12 : gLocalTime.hours - 12;
+        suffix = sText_PM;
+    }
+
+    ptr = ConvertIntToDecimalStringN(gStringVar4, convertedHours, STR_CONV_MODE_LEFT_ALIGN, 3);
+    *ptr = 0xF0;
+    ConvertIntToDecimalStringN(ptr + 1, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
+    AddTextPrinterParameterized(sStartClockWindowId, FONT_NORMAL, gStringVar4,
+        0, 1, 0xFF, NULL);
+
+    AddTextPrinterParameterized(sStartClockWindowId, FONT_NORMAL, suffix,
+        GetStringWidth(FONT_NORMAL, gStringVar4, 0) + 3, 1, 0xFF, NULL);
+
+    CopyWindowToVram(sStartClockWindowId, COPYWIN_GFX);
+}
+
 static void RemoveExtraStartMenuWindows(void)
 {
     if (GetSafariZoneFlag())
     {
         ClearStdWindowAndFrameToTransparent(sSafariBallsWindowId, FALSE);
-        CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
         RemoveWindow(sSafariBallsWindowId);
     }
-    if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
+    else if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
     {
         ClearStdWindowAndFrameToTransparent(sBattlePyramidFloorWindowId, FALSE);
         RemoveWindow(sBattlePyramidFloorWindowId);
+    }
+
+    if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
+    {
+        ClearStdWindowAndFrameToTransparent(sStartClockWindowId, FALSE);
+        RemoveWindow(sStartClockWindowId);
     }
 }
 
@@ -533,15 +608,20 @@ static bool32 InitStartMenuStep(void)
     case 3:
         if (GetSafariZoneFlag())
             ShowSafariBallsWindow();
-        if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
+        else if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
             ShowPyramidFloorWindow();
         sInitStartMenuData[0]++;
         break;
     case 4:
+        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
+            ShowTimeWindow();
+        sInitStartMenuData[0]++;
+        break;
+    case 5:
         if (PrintStartMenuActions(&sInitStartMenuData[1], 2))
             sInitStartMenuData[0]++;
         break;
-    case 5:
+    case 6:
         sStartMenuCursorPos = InitMenuNormal(GetStartMenuWindowId(), FONT_NORMAL, 0, 9, 16, sNumStartMenuActions, sStartMenuCursorPos);
         CopyWindowToVram(GetStartMenuWindowId(), COPYWIN_MAP);
         return TRUE;
@@ -628,13 +708,13 @@ static bool8 HandleStartMenuInput(void)
 {
     if (JOY_NEW(DPAD_UP))
     {
-        PlaySE(SE_SELECT);
+        PlaySECursorMove(SE_SELECT);
         sStartMenuCursorPos = Menu_MoveCursor(-1);
     }
 
     if (JOY_NEW(DPAD_DOWN))
     {
-        PlaySE(SE_SELECT);
+        PlaySECursorMove(SE_SELECT);
         sStartMenuCursorPos = Menu_MoveCursor(1);
     }
 
@@ -656,6 +736,7 @@ static bool8 HandleStartMenuInput(void)
             && gMenuCallback != StartMenuExitCallback
             && gMenuCallback != StartMenuDebugCallback
             && gMenuCallback != StartMenuSafariZoneRetireCallback
+            && gMenuCallback != StartMenuBugContestRetireCallback
             && gMenuCallback != StartMenuBattlePyramidRetireCallback)
         {
            FadeScreen(FADE_TO_BLACK, 0);
@@ -669,6 +750,12 @@ static bool8 HandleStartMenuInput(void)
         RemoveExtraStartMenuWindows();
         HideStartMenu();
         return TRUE;
+    }
+
+    if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
+    {
+        RemoveExtraStartMenuWindows();
+        ShowTimeWindow();
     }
 
     return FALSE;
@@ -697,9 +784,16 @@ static bool8 StartMenuPokemonCallback(void)
         PlayRainStoppingSoundEffect();
         RemoveExtraStartMenuWindows();
         CleanupOverworldWindowsAndTilemaps();
-        SetMainCallback2(CB2_PartyMenuFromStartMenu); // Display party menu
+        SetMainCallback2(CB2_PartyMenuFromStartMenu);
 
         return TRUE;
+    }
+
+    if (!GetSafariZoneFlag() && CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE
+        && gSaveBlock2Ptr->playTimeSeconds == 0)
+    {
+        RemoveExtraStartMenuWindows();
+        ShowTimeWindow();
     }
 
     return FALSE;
@@ -811,6 +905,24 @@ static bool8 StartMenuSafariZoneRetireCallback(void)
     SafariZoneRetirePrompt();
 
     return TRUE;
+}
+
+static bool8 StartMenuBugContestRetireCallback(void)
+{
+    RemoveExtraStartMenuWindows();
+    HideStartMenu();
+    BugContestRetirePrompt();
+
+    return TRUE;
+}
+
+static void BuildBugContestStartMenu(void)
+{
+    AddStartMenuAction(MENU_ACTION_RETIRE_BUG_CONTEST);
+    AddStartMenuAction(MENU_ACTION_POKEDEX);
+    AddStartMenuAction(MENU_ACTION_PLAYER);
+    AddStartMenuAction(MENU_ACTION_OPTION);
+    AddStartMenuAction(MENU_ACTION_EXIT);
 }
 
 static void HideStartMenuDebug(void)
@@ -926,7 +1038,11 @@ static bool8 BattlePyramidRetireCallback(void)
         ClearDialogWindowAndFrameToTransparent(0, TRUE);
         ScriptUnfreezeObjectEvents();
         UnlockPlayerFieldControls();
+#if IS_HNS
+        ScriptContext_SetupScript(BattlePyramid_Retire_hns);
+#else
         ScriptContext_SetupScript(BattlePyramid_Retire);
+#endif
         return TRUE;
     }
 
@@ -1102,7 +1218,11 @@ static u8 SaveFileExistsCallback(void)
     }
     else
     {
+#if IS_HNS
+        sSaveDialogCallback = SaveSavingMessageCallback;
+#else
         ShowSaveMessage(gText_AlreadySavedFile, SaveConfirmOverwriteCallback);
+#endif
     }
 
     return SAVE_IN_PROGRESS;
@@ -1271,7 +1391,7 @@ static bool32 InitSaveWindowAfterLinkBattle(u8 *state)
         SetVBlankCallback(NULL);
         ScanlineEffect_Stop();
         DmaClear16(3, PLTT, PLTT_SIZE);
-        DmaClearLarge16(3, (void *)VRAM, VRAM_SIZE, 0x1000);
+        DmaFillLarge16(3, 0, (void *)VRAM, VRAM_SIZE, 0x1000);
         break;
     case 1:
         ResetSpriteData();
@@ -1415,7 +1535,11 @@ static void ShowSaveInfoWindow(void)
 
     // Print region name
     yOffset = 1;
+#if IS_HNS
+    BufferSaveMenuText(SAVE_MENU_LOCATION, gStringVar4, TEXT_COLOR_DARK_GRAY);
+#else
     BufferSaveMenuText(SAVE_MENU_LOCATION, gStringVar4, TEXT_COLOR_GREEN);
+#endif
     AddTextPrinterParameterized(sSaveInfoWindowId, FONT_NORMAL, gStringVar4, 0, yOffset, TEXT_SKIP_DRAW, NULL);
 
     // Print player name
@@ -1489,6 +1613,15 @@ static void HideStartMenuWindow(void)
 void HideStartMenu(void)
 {
     PlaySE(SE_SELECT);
+    // Sets VAR_TEMP_MTSILVER_RESUME_BLIZZARD_SE to 0 if the player is in Mt. Silver,
+    // which is used to restart the SE_Blizzard which is stopped after opening the menu.
+    // Ideal fix would be to create a new Background Music file of the Blizzard
+    // music or similar sound effect that doesn't stop when the menu is opened.
+    // WARNING: VAR_TEMP_MTSILVER_RESUME_BLIZZARD_SE should not be used for anything else
+    // in MAPSEC_MT_SILVER, as it will be set to 0 when the start menu is opened and closed.
+    // Check variable aliases in vars_hns.h to ensire temporary variable is not used for anything else.
+    if (gMapHeader.regionMapSectionId == MAPSEC_MT_SILVER && (gMapHeader.mapLayoutId == LAYOUT_MT_SILVER_SUMMIT_DAY_HNS || gMapHeader.mapLayoutId == LAYOUT_MT_SILVER_SUMMIT_NIGHT_HNS))
+        VarSet(VAR_TEMP_MTSILVER_RESUME_BLIZZARD_SE, 0);
     HideStartMenuWindow();
 }
 

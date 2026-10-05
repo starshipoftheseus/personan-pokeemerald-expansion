@@ -13,6 +13,7 @@
 #include "save.h"
 #include "new_game.h"
 #include "m4a.h"
+#include "event_data.h"
 #include "random.h"
 #include "decompress.h"
 #include "constants/songs.h"
@@ -26,9 +27,9 @@
 #include "expansion_intro.h"
 #include "battle_anim.h"
 #include "intro_frlg.h"
+#include "intro_hns.h"
 #include "constants/rgb.h"
 #include "constants/battle_anim.h"
-#include "pokemon.h"
 
 /*
     The intro is grouped into the following scenes
@@ -183,26 +184,26 @@ static EWRAM_DATA u16 sFlygonYOffset = 0;
 COMMON_DATA u32 gIntroFrameCounter = 0;
 COMMON_DATA struct GcmbStruct gMultibootProgramStruct = {0};
 
-static const u16 sIntroDrops_Pal[]            = INCGFX_U16("graphics/intro/scene_1/drops.pal", ".gbapal");
-static const u16 sIntroLogo_Pal[]             = INCGFX_U16("graphics/intro/scene_1/logo.pal", ".gbapal");
-static const u32 sIntroDropsLogo_Gfx[]        = INCGFX_U32("graphics/intro/scene_1/drops_logo.png", ".4bpp.smol");
-static const u16 sIntro1Bg_Pal[]              = INCGFX_U16("graphics/intro/scene_1/bg.png", ".gbapal"); // 16 x 16
-static const u32 sIntro1Bg0_Tilemap[]         = INCGFX_U32("graphics/intro/scene_1/bg0_map.bin", ".smolTM");
-static const u32 sIntro1Bg1_Tilemap[]         = INCGFX_U32("graphics/intro/scene_1/bg1_map.bin", ".smolTM");
-static const u32 sIntro1Bg2_Tilemap[]         = INCGFX_U32("graphics/intro/scene_1/bg2_map.bin", ".smolTM");
-static const u32 sIntro1Bg3_Tilemap[]         = INCGFX_U32("graphics/intro/scene_1/bg3_map.bin", ".smolTM");
-static const u32 sIntro1Bg_Gfx[]              = INCGFX_U32("graphics/intro/scene_1/bg.png", ".4bpp.smol");
-static const u16 sIntroPokeball_Pal[]         = INCGFX_U16("graphics/intro/scene_3/pokeball.png", ".gbapal");
-static const u32 sIntroPokeball_Tilemap[]     = INCGFX_U32("graphics/intro/scene_3/pokeball_map.bin", ".smolTM");
-static const u32 sIntroPokeball_Gfx[]         = INCGFX_U32("graphics/intro/scene_3/pokeball.png", ".8bpp.smol");
-static const u16 sIntroStreaks_Pal[]          = INCGFX_U16("graphics/intro/scene_3/streaks.png", ".gbapal"); // Unused
-static const u32 sIntroStreaks_Gfx[]          = INCGFX_U32("graphics/intro/scene_3/streaks.png", ".4bpp.smol"); // Unused
-static const u32 sIntroStreaks_Tilemap[]      = INCGFX_U32("graphics/intro/scene_3/streaks_map.bin", ".smolTM"); // Unused
-static const u16 sIntroRayquzaOrb_Pal[]       = INCGFX_U16("graphics/intro/scene_3/rayquaza_orb.pal", ".gbapal");
-static const u16 sIntroMisc_Pal[]             = INCGFX_U16("graphics/intro/scene_3/misc.pal", ".gbapal"); // Unused
-static const u32 sIntroMisc_Gfx[]             = INCGFX_U32("graphics/intro/scene_3/misc.png", ".4bpp.smol"); // Rayquza orb, and misc unused gfx
-static const u16 sIntroFlygonSilhouette_Pal[] = INCGFX_U16("graphics/intro/scene_1/flygon.png", ".gbapal");
-static const u32 sIntroLati_Gfx[]             = INCGFX_U32("graphics/intro/scene_1/lati.png", ".4bpp.smol"); // Unused
+static const u16 sIntroDrops_Pal[]            = INCBIN_U16("graphics/intro/scene_1/drops.gbapal");
+static const u16 sIntroLogo_Pal[]             = INCBIN_U16("graphics/intro/scene_1/logo.gbapal");
+static const u32 sIntroDropsLogo_Gfx[]        = INCBIN_U32("graphics/intro/scene_1/drops_logo.4bpp.smol");
+static const u16 sIntro1Bg_Pal[]              = INCBIN_U16("graphics/intro/scene_1/bg.gbapal"); // 16 x 16
+static const u32 sIntro1Bg0_Tilemap[]         = INCBIN_U32("graphics/intro/scene_1/bg0_map.bin.smolTM");
+static const u32 sIntro1Bg1_Tilemap[]         = INCBIN_U32("graphics/intro/scene_1/bg1_map.bin.smolTM");
+static const u32 sIntro1Bg2_Tilemap[]         = INCBIN_U32("graphics/intro/scene_1/bg2_map.bin.smolTM");
+static const u32 sIntro1Bg3_Tilemap[]         = INCBIN_U32("graphics/intro/scene_1/bg3_map.bin.smolTM");
+static const u32 sIntro1Bg_Gfx[]              = INCBIN_U32("graphics/intro/scene_1/bg.4bpp.smol");
+static const u16 sIntroPokeball_Pal[]         = INCBIN_U16("graphics/intro/scene_3/pokeball.gbapal");
+static const u32 sIntroPokeball_Tilemap[]     = INCBIN_U32("graphics/intro/scene_3/pokeball_map.bin.smolTM");
+static const u32 sIntroPokeball_Gfx[]         = INCBIN_U32("graphics/intro/scene_3/pokeball.8bpp.smol");
+static const u16 sIntroStreaks_Pal[]          = INCBIN_U16("graphics/intro/scene_3/streaks.gbapal"); // Unused
+static const u32 sIntroStreaks_Gfx[]          = INCBIN_U32("graphics/intro/scene_3/streaks.4bpp.smol"); // Unused
+static const u32 sIntroStreaks_Tilemap[]      = INCBIN_U32("graphics/intro/scene_3/streaks_map.bin.smolTM"); // Unused
+static const u16 sIntroRayquzaOrb_Pal[]       = INCBIN_U16("graphics/intro/scene_3/rayquaza_orb.gbapal");
+static const u16 sIntroMisc_Pal[]             = INCBIN_U16("graphics/intro/scene_3/misc.gbapal"); // Unused
+static const u32 sIntroMisc_Gfx[]             = INCBIN_U32("graphics/intro/scene_3/misc.4bpp.smol"); // Rayquza orb, and misc unused gfx
+static const u16 sIntroFlygonSilhouette_Pal[] = INCBIN_U16("graphics/intro/scene_1/flygon.gbapal");
+static const u32 sIntroLati_Gfx[]             = INCBIN_U32("graphics/intro/scene_1/lati.4bpp.smol"); // Unused
 static const u8 sUnusedData[] = {
     0x02, 0x03, 0x04, 0x05, 0x01, 0x01, 0x01, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x02, 0x0D,
     0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x02, 0x0D, 0x0E, 0x0F,
@@ -1051,8 +1052,11 @@ static void SerialCB_CopyrightScreen(void)
 
 static u8 SetUpCopyrightScreen(void)
 {
-    if (IS_FRLG)
-        return SetUpCopyrightScreenFrlg();
+#if IS_FRLG
+    return SetUpCopyrightScreenFrlg();
+#elif IS_HNS
+    return SetUpCopyrightScreenHns();
+#endif
 
     switch (gMain.state)
     {
@@ -1145,7 +1149,11 @@ void CB2_InitCopyrightScreenAfterBootup(void)
         Save_ResetSaveCounters();
         LoadGameSave(SAVE_NORMAL);
         if (gSaveFileStatus == SAVE_STATUS_EMPTY || gSaveFileStatus == SAVE_STATUS_CORRUPT)
+        {
             Sav2_ClearSetDefault();
+            ClearSav3();
+            SetDefaultChallengeSettings();
+        }
         SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
         InitHeap(gHeap, HEAP_SIZE);
     }
@@ -1205,7 +1213,7 @@ static void Task_Scene1_FadeIn(u8 taskId)
     SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_MODE_0 | DISPCNT_OBJ_1D_MAP | DISPCNT_BG_ALL_ON | DISPCNT_OBJ_ON);
     gTasks[taskId].func = Task_Scene1_WaterDrops;
     gIntroFrameCounter = 0;
-    m4aSongNumStart(MUS_INTRO);
+    m4aSongNumStart(MUS_INTRO, FlagGet(FLAG_SYS_GBS_ENABLED));
     ResetSerial();
 }
 
@@ -1728,7 +1736,7 @@ static void Task_Scene3_Load(u8 taskId)
     SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_MODE_1 | DISPCNT_OBJ_1D_MAP | DISPCNT_BG2_ON | DISPCNT_OBJ_ON);
     gTasks[taskId].func = Task_Scene3_SpinPokeball;
     gIntroFrameCounter = 0;
-    m4aSongNumStart(MUS_INTRO_BATTLE);
+    m4aSongNumStart(MUS_INTRO_BATTLE, FlagGet(FLAG_SYS_GBS_ENABLED));
 }
 static void Task_Scene3_SpinPokeball(u8 taskId)
 {
@@ -1926,8 +1934,7 @@ static void Task_Scene3_Groudon(u8 taskId)
             tScreenX = 80;
             tScreenY = 41;
             tDelay = 16;
-            if (IsSpeciesEnabled(SPECIES_GROUDON))
-                PlayCryInternal(SPECIES_GROUDON, 0, 100, CRY_PRIORITY_NORMAL, CRY_MODE_NORMAL);
+            PlayCryInternal(SPECIES_GROUDON, 0, 100, CRY_PRIORITY_NORMAL, CRY_MODE_NORMAL);
             tState++;
         }
         break;
@@ -2129,8 +2136,7 @@ static void Task_Scene3_Kyogre(u8 taskId)
             {
                 tDelay = 1;
                 tState++;
-                if (IsSpeciesEnabled(SPECIES_KYOGRE))
-                    PlayCryInternal(SPECIES_KYOGRE, 0, 120, CRY_PRIORITY_NORMAL, CRY_MODE_NORMAL);
+                PlayCryInternal(SPECIES_KYOGRE, 0, 120, CRY_PRIORITY_NORMAL, CRY_MODE_NORMAL);
             }
         }
         break;

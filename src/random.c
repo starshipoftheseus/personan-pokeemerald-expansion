@@ -15,18 +15,6 @@ EWRAM_DATA static volatile bool8 sRngLoopUnlocked;
 #define STREAM1 1
 #define STREAM2 29
 
-// A variant of SFC32 that lets you change the stream.
-// stream can be any odd number.
-static inline u32 _SFC32_Next_Stream(struct Sfc32State *state, const u8 stream)
-{
-    const u32 result = state->a + state->b + state->ctr;
-    state->ctr += stream;
-    state->a = state->b ^ (state->b >> 9);
-    state->b = state->c * 9;
-    state->c = result + ((state->c << 21) | (state->c >> 11));
-    return result;
-}
-
 static void SFC32_Seed(struct Sfc32State *state, u32 seed, u8 stream)
 {
     u32 i;
@@ -225,10 +213,27 @@ u8 RandomWeightedIndex(u8 *weights, u8 length)
     for (i = 0; i < length; i++)
     {
         weightSum += weights[i];
-        if (randomValue < weightSum)
+        if (randomValue <= weightSum)
             return i;
     }
     return 0;
+}
+
+// Returns whole word with just the random bit set; don't call with no set bits
+u32 RandomBit(enum RandomTag tag, u32 bits)
+{
+  u32 setBits[32];
+  u32 n = 0;
+  for (u32 mask = 1; mask != 0; mask <<= 1)
+  {
+    if (bits & mask)
+        setBits[n++] = mask;
+  }
+
+  if (n == 0)
+    return 0; // This is a little awkward, there are no set bits!
+  else
+    return setBits[RandomUniform(tag, 0, n-1)];
 }
 
 // Returns the index instead; don't call with no set bits
@@ -246,24 +251,4 @@ u32 RandomBitIndex(enum RandomTag tag, u32 bits)
     return 0; // This is a little awkward, there are no set bits!
   else
     return setIndexes[RandomUniform(tag, 0, n-1)];
-}
-
-u32 Crc32B (const u8 *data, u32 size)
-{
-   s32 i, j;
-   u32 byte, crc, mask;
-
-   i = 0;
-   crc = 0xFFFFFFFF;
-   for (i = 0; i < size; ++i)
-   {
-        byte = data[i];
-        crc = crc ^ byte;
-        for (j = 7; j >= 0; --j)
-        {
-            mask = -(crc & 1);
-            crc = (crc >> 1) ^ (0xEDB88320 & mask);
-        }
-   }
-   return ~crc;
 }

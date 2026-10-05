@@ -1,8 +1,7 @@
 #include "global.h"
-#include "clock.h"
 #include "new_game.h"
 #include "random.h"
-#include "clock.h"
+#include "config/randomizer.h"
 #include "pokemon.h"
 #include "roamer.h"
 #include "pokemon_size_record.h"
@@ -20,6 +19,7 @@
 #include "easy_chat.h"
 #include "event_data.h"
 #include "money.h"
+#include "mom_savings.h"
 #include "trainer_hill.h"
 #include "trainer_tower.h"
 #include "tv.h"
@@ -43,6 +43,7 @@
 #include "decoration_inventory.h"
 #include "secret_base.h"
 #include "string_util.h"
+#include "strings.h"
 #include "player_pc.h"
 #include "field_specials.h"
 #include "berry_powder.h"
@@ -54,7 +55,12 @@
 #include "follower_npc.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
+#if IS_FRLG
 extern const u8 EventScript_ResetAllMapFlagsFrlg[];
+#endif
+#if IS_HNS
+extern const u8 EventScript_ResetAllMapFlagsHnS[];
+#endif
 
 static void ClearFrontierRecord(void);
 static void WarpToTruck(void);
@@ -100,7 +106,7 @@ static void InitPlayerTrainerId(void)
 // L=A isnt set here for some reason.
 static void SetDefaultOptions(void)
 {
-    gSaveBlock2Ptr->optionsTextSpeed = OPTIONS_TEXT_SPEED_MID;
+    gSaveBlock2Ptr->optionsTextSpeed = OPTIONS_TEXT_SPEED_FAST;
     gSaveBlock2Ptr->optionsWindowFrameType = 0;
     gSaveBlock2Ptr->optionsSound = OPTIONS_SOUND_MONO;
     gSaveBlock2Ptr->optionsBattleStyle = OPTIONS_BATTLE_STYLE_SHIFT;
@@ -108,8 +114,55 @@ static void SetDefaultOptions(void)
     gSaveBlock2Ptr->regionMapZoom = FALSE;
 }
 
+void SetDefaultChallengeSettings(void)
+{
+    gSaveblock3.challengeSettings.followerEnable = 0;
+    gSaveblock3.challengeSettings.followerLargeEnable = 0;
+    gSaveblock3.challengeSettings.autoRun = 1;
+    gSaveblock3.challengeSettings.autorunSurf = 1;
+    gSaveblock3.challengeSettings.autorunDive = 1;
+    gSaveblock3.challengeSettings.fishing = 0;
+    gSaveblock3.challengeSettings.evenFasterJoy = 1;
+    gSaveblock3.challengeSettings.fastIntro = 1;
+    gSaveblock3.challengeSettings.fastBattle = 0;
+    gSaveblock3.challengeSettings.optionStyle = 0;
+    gSaveblock3.challengeSettings.genOneRecharge = 0;
+    gSaveblock3.challengeSettings.unitSystem = 0;
+    gSaveblock3.challengeSettings.disableMatchCall = 0;
+    gSaveblock3.challengeSettings.bikeMusic = 0;
+    gSaveblock3.challengeSettings.surfMusic = 0;
+    gSaveblock3.challengeSettings.lrToRun = 0;
+    gSaveblock3.challengeSettings.ballPrompt = 0;
+    gSaveblock3.challengeSettings.newBackgrounds = 1;
+    gSaveblock3.challengeSettings.newBattleUI = 0;
+    gSaveblock3.challengeSettings.musicOnOff = 0;
+    gSaveblock3.challengeSettings.runType = 0;
+
+    // Challenge menu — "RECOMMENDED" defaults
+    gSaveblock3.challengeSettings.tx_Mode_Modern_Moves       = 1;
+    gSaveblock3.challengeSettings.tx_Mode_Synchronize        = 1;
+    gSaveblock3.challengeSettings.tx_Mode_Sturdy             = 1;
+    gSaveblock3.challengeSettings.tx_Mode_New_Citrus         = 1;
+    gSaveblock3.challengeSettings.tx_Mode_Fairy_Types        = 1;
+    gSaveblock3.challengeSettings.tx_Mode_Legendary_Abilities = 1;
+    gSaveblock3.challengeSettings.tx_Mode_InfiniteTMs        = 1;
+    gSaveblock3.challengeSettings.tx_Mode_Mints              = 1;
+    gSaveblock3.challengeSettings.tx_Mode_PoisonSurvive      = 1;
+
+    // Randomizer defaults (shown when Randomizer is ON)
+    gSaveblock3.challengeSettings.tx_Random_Similar          = 1;
+    gSaveblock3.challengeSettings.tx_Random_MapBased         = 1;
+    gSaveblock3.challengeSettings.tx_Random_GenScope         = RANDOMIZER_DEFAULT_GEN_SCOPE_1_3;
+
+    // Nuzlocke clause defaults (shown when Nuzlocke is NORMAL/HARD)
+    gSaveblock3.challengeSettings.tx_Nuzlocke_SpeciesClause  = 1;
+    gSaveblock3.challengeSettings.tx_Nuzlocke_ShinyClause    = 1;
+    gSaveblock3.challengeSettings.tx_Nuzlocke_Nicknaming     = 1;
+}
+
 static void ClearPokedexFlags(void)
 {
+    gUnusedPokedexU8 = 0;
     memset(&gSaveBlock1Ptr->dexCaught, 0, sizeof(gSaveBlock1Ptr->dexCaught));
     memset(&gSaveBlock1Ptr->dexSeen, 0, sizeof(gSaveBlock1Ptr->dexSeen));
 }
@@ -137,6 +190,8 @@ static void WarpToTruck(void)
 {
     if (IS_FRLG)
         SetWarpDestination(MAP_GROUP(MAP_PALLET_TOWN_PLAYERS_HOUSE_2F), MAP_NUM(MAP_PALLET_TOWN_PLAYERS_HOUSE_2F), WARP_ID_NONE, 6, 6);
+    else if (IS_HNS)
+        SetWarpDestination(MAP_GROUP(MAP_NEW_BARK_TOWN_PLAYERS_HOUSE_2F_HNS), MAP_NUM(MAP_NEW_BARK_TOWN_PLAYERS_HOUSE_2F_HNS), 1, 0, 0);
     else
         SetWarpDestination(MAP_GROUP(MAP_INSIDE_OF_TRUCK), MAP_NUM(MAP_INSIDE_OF_TRUCK), WARP_ID_NONE, -1, -1);
     WarpIntoMap();
@@ -163,6 +218,7 @@ void NewGameInitData(void)
 #if IS_FRLG
     u8 rivalName[PLAYER_NAME_LENGTH + 1];
 #endif
+    struct ChallengeSettings savedChallenge = gSaveBlock3Ptr->challengeSettings;
     if (gSaveFileStatus == SAVE_STATUS_EMPTY || gSaveFileStatus == SAVE_STATUS_CORRUPT)
         RtcReset();
 
@@ -177,6 +233,10 @@ void NewGameInitData(void)
     ClearFrontierRecord();
     ClearSav1();
     ClearSav3();
+    gSaveBlock1Ptr->saveVersionMagic = SAVE_VERSION_MAGIC;
+    gSaveBlock1Ptr->saveVersion = SAVE_VERSION;
+    SetDefaultChallengeSettings();
+    gSaveBlock3Ptr->challengeSettings = savedChallenge;
     ClearAllMail();
     gSaveBlock2Ptr->specialSaveWarpFlags = 0;
     gSaveBlock2Ptr->gcnLinkFlags = 0;
@@ -196,11 +256,12 @@ void NewGameInitData(void)
     ClearPlayerLinkBattleRecords();
     InitSeedotSizeRecord();
     InitLotadSizeRecord();
-    gPartiesCount[B_TRAINER_PLAYER] = 0;
+    gPlayerPartyCount = 0;
     ZeroPlayerPartyMons();
     ResetPokemonStorageSystem();
     DeactivateAllRoamers();
     gSaveBlock1Ptr->registeredItem = ITEM_NONE;
+    gSaveBlock3Ptr->registeredItemHold = ITEM_NONE;
     ClearBag();
     NewGameInitPCItems();
     ClearPokeblocks();
@@ -210,12 +271,14 @@ void NewGameInitData(void)
     InitDewfordTrend();
     ResetFanClub();
     ResetLotteryCorner();
-    UpdateDailySeed();
     WarpToTruck();
-    if (IS_FRLG)
-        RunScriptImmediately(EventScript_ResetAllMapFlagsFrlg);
-    else
-        RunScriptImmediately(EventScript_ResetAllMapFlags);
+#if IS_FRLG
+    RunScriptImmediately(EventScript_ResetAllMapFlagsFrlg);
+#elif IS_HNS
+    RunScriptImmediately(EventScript_ResetAllMapFlagsHnS);
+#else
+    RunScriptImmediately(EventScript_ResetAllMapFlags);
+#endif
 #if IS_FRLG
         StringCopy(gSaveBlock1Ptr->rivalName, rivalName);
 #endif
@@ -234,6 +297,17 @@ void NewGameInitData(void)
     ResetItemFlags();
     ResetDexNav();
     ClearFollowerNPCData();
+
+    // Sync engine flags from restored challenge settings
+    if (!gSaveBlock3Ptr->challengeSettings.tx_Mode_Mints)
+        FlagSet(FLAG_MINTS_DISABLED);
+    if (gSaveBlock3Ptr->challengeSettings.evenFasterJoy == 0)
+        FlagSet(FLAG_EVEN_FASTER_JOY);
+
+#if IS_HNS
+    StringCopy(gSaveBlock2Ptr->rivalName, gText_ExpandedPlaceholder_Silver);
+    InitMomSavings();
+#endif
 }
 
 static void ResetMiniGamesRecords(void)

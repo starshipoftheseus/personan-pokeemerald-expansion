@@ -18,7 +18,7 @@ SINGLE_BATTLE_TEST("Toxic Spikes inflicts poison on switch in")
         TURN {}
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_TOXIC_SPIKES, player);
-        MESSAGE("Toxic spikes were scattered on the ground all around the opposing side!");
+        MESSAGE("Poison spikes were scattered on the ground all around the opposing team!");
         MESSAGE("2 sent out Wynaut!");
         ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_PSN, opponent);
         STATUS_ICON(opponent, poison: TRUE);
@@ -38,9 +38,9 @@ SINGLE_BATTLE_TEST("Toxic Spikes inflicts bad poison on switch in")
         TURN {}
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_TOXIC_SPIKES, player);
-        MESSAGE("Toxic spikes were scattered on the ground all around the opposing side!");
+        MESSAGE("Poison spikes were scattered on the ground all around the opposing team!");
         ANIMATION(ANIM_TYPE_MOVE, MOVE_TOXIC_SPIKES, player);
-        MESSAGE("Toxic spikes were scattered on the ground all around the opposing side!");
+        MESSAGE("Poison spikes were scattered on the ground all around the opposing team!");
         MESSAGE("2 sent out Wynaut!");
         ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_PSN, opponent);
         STATUS_ICON(opponent, badPoison: TRUE);
@@ -61,9 +61,9 @@ SINGLE_BATTLE_TEST("Toxic Spikes fails after 2 layers")
         TURN {}
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_TOXIC_SPIKES, player);
-        MESSAGE("Toxic spikes were scattered on the ground all around the opposing side!");
+        MESSAGE("Poison spikes were scattered on the ground all around the opposing team!");
         ANIMATION(ANIM_TYPE_MOVE, MOVE_TOXIC_SPIKES, player);
-        MESSAGE("Toxic spikes were scattered on the ground all around the opposing side!");
+        MESSAGE("Poison spikes were scattered on the ground all around the opposing team!");
         MESSAGE("Wobbuffet used Toxic Spikes!");
         MESSAGE("But it failed!");
         MESSAGE("2 sent out Wynaut!");
@@ -91,7 +91,7 @@ SINGLE_BATTLE_TEST("Toxic Spikes inflicts poison on subsequent switch ins")
 
 SINGLE_BATTLE_TEST("Toxic Spikes do not poison airborne Pokemon")
 {
-    enum Species species = SPECIES_WOBBUFFET;
+    u32 species = SPECIES_WOBBUFFET;
     enum Item item = ITEM_NONE;
     enum Move move1 = MOVE_CELEBRATE;
     enum Move move2 = MOVE_CELEBRATE;
@@ -153,7 +153,7 @@ SINGLE_BATTLE_TEST("Toxic Spikes do not affect Steel-types")
 
 SINGLE_BATTLE_TEST("Toxic Spikes are removed by grounded Poison-type Pokémon on switch in")
 {
-    enum Species species;
+    u32 species;
     enum Item item = ITEM_NONE;
     enum Move move = MOVE_CELEBRATE;
     bool32 grounded;
@@ -176,7 +176,7 @@ SINGLE_BATTLE_TEST("Toxic Spikes are removed by grounded Poison-type Pokémon on
     } SCENE {
         if (grounded) {
             NOT STATUS_ICON(opponent, poison: TRUE);
-            MESSAGE("The toxic spikes disappeared from the ground around the opposing side!");
+            MESSAGE("The poison spikes disappeared from the ground around the opposing team!");
             NOT STATUS_ICON(opponent, poison: TRUE);
         } else {
             NOT STATUS_ICON(opponent, poison: TRUE);
@@ -199,7 +199,7 @@ SINGLE_BATTLE_TEST("Toxic Spikes are not removed by Poison-type Pokémon affecte
         TURN { MOVE(player, MOVE_TOXIC_SPIKES); MOVE(opponent, MOVE_BATON_PASS); SEND_OUT(opponent, 1); }
         TURN { SWITCH(opponent, 0); }
     } SCENE {
-        NOT MESSAGE("The toxic spikes disappeared from the ground around the opposing side!");
+        NOT MESSAGE("The poison spikes disappeared from the ground around the opposing team!");
         STATUS_ICON(opponent, poison: TRUE);
     }
 }
@@ -219,7 +219,7 @@ SINGLE_BATTLE_TEST("Toxic Spikes inflicts poison on switch in after Primal Rever
     } SCENE {
         MESSAGE("The opposing Wobbuffet used Toxic Spikes!");
         ANIMATION(ANIM_TYPE_MOVE, MOVE_TOXIC_SPIKES, opponent);
-        MESSAGE("Toxic spikes were scattered on the ground all around your side!");
+        MESSAGE("Poison spikes were scattered on the ground all around your team!");
         // Switch in
         SEND_IN_MESSAGE("Groudon");
         ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_PSN, player);

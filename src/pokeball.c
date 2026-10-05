@@ -45,7 +45,7 @@ static void SpriteCB_TradePokeballEnd(struct Sprite *sprite);
 static void SpriteCB_HealthboxSlideInDelayed(struct Sprite *sprite);
 static void SpriteCB_HealthboxSlideIn(struct Sprite *sprite);
 static void SpriteCB_HitAnimHealthoxEffect(struct Sprite *sprite);
-static enum PokeBall GetBattlerPokeballItemId(enum BattlerId battler);
+static u16 GetBattlerPokeballItemId(enum BattlerId battler);
 
 // rom const data
 
@@ -77,6 +77,7 @@ static enum PokeBall GetBattlerPokeballItemId(enum BattlerId battler);
 #define GFX_TAG_PARK_BALL    55025
 #define GFX_TAG_BEAST_BALL   55026
 #define GFX_TAG_CHERISH_BALL 55027
+#define GFX_TAG_GS_BALL      55028
 
 static const struct OamData sBallOamData =
 {
@@ -379,6 +380,12 @@ const struct PokeBallSprite gPokeBalls[POKEBALL_COUNT] =
         POKE_BALL_SPRITE(GFX_TAG_CHERISH_BALL, gBallGfx_Cherish, gBallPal_Cherish),
         .itemId = ITEM_CHERISH_BALL,
     },
+
+    [BALL_GS]      =
+    {
+        POKE_BALL_SPRITE(GFX_TAG_GS_BALL, gBallGfx_GS, gBallPal_GS),
+        .itemId = ITEM_GS_BALL,
+    },
 };
 
 u8 DoPokeballSendOutAnimation(enum BattlerId battler, s16 pan, u8 kindOfThrow)
@@ -400,8 +407,7 @@ u8 DoPokeballSendOutAnimation(enum BattlerId battler, s16 pan, u8 kindOfThrow)
 
 static void Task_DoPokeballSendOutAnim(u8 taskId)
 {
-    u32 throwCaseId, ballSpriteId;
-    enum PokeBall ballId;
+    u32 throwCaseId, ballId, ballSpriteId;
     enum BattlerId battler;
     bool32 notSendOut = FALSE;
     u32 throwXoffset = (B_ENEMY_THROW_BALLS >= GEN_6 && !gTestRunnerHeadless) ? 24 : 0;
@@ -492,7 +498,7 @@ static void SpriteCB_BallThrow(struct Sprite *sprite)
 {
     if (TranslateAnimHorizontalArc(sprite))
     {
-        enum PokeBall ballId;
+        u16 ballId;
         u8 taskId = sprite->oam.affineParam;
         u8 opponentBattler = gTasks[taskId].tOpponentBattler;
         u8 noOfShakes = gTasks[taskId].tThrowId;
@@ -733,7 +739,7 @@ static void Task_PlayCryWhenReleasedFromBall(u8 taskId)
 {
     u8 wantedCry = gTasks[taskId].tCryTaskWantedCry;
     s8 pan = gTasks[taskId].tCryTaskPan;
-    enum Species species = gTasks[taskId].tCryTaskSpecies;
+    u16 species = gTasks[taskId].tCryTaskSpecies;
     enum BattlerId battler = gTasks[taskId].tCryTaskBattler;
     u8 monSpriteId = gTasks[taskId].tCryTaskMonSpriteId;
     struct Pokemon *mon = (void *)(u32)((gTasks[taskId].tCryTaskMonPtr1 << 16) | (u16)(gTasks[taskId].tCryTaskMonPtr2));
@@ -817,7 +823,7 @@ static void Task_PlayCryWhenReleasedFromBall(u8 taskId)
 static void SpriteCB_ReleaseMonFromBall(struct Sprite *sprite)
 {
     enum BattlerId battler = sprite->sBattler;
-    enum PokeBall ballId;
+    u32 ballId;
 
     StartSpriteAnim(sprite, 1);
     ballId = GetBattlerPokeballItemId(battler);
@@ -1118,7 +1124,7 @@ static u8 LaunchBallFadeMonTaskForPokeball(bool8 unFadeLater, u8 spritePalNum, u
 #define sTrigIdx     data[7]
 
 // Poké Ball in Birch intro, and when receiving via trade
-void CreatePokeballSpriteToReleaseMon(u8 monSpriteId, u8 monPalNum, u8 x, u8 y, u8 oamPriority, u8 subpriority, u8 delay, u32 fadePalettes, enum Species species)
+void CreatePokeballSpriteToReleaseMon(u8 monSpriteId, u8 monPalNum, u8 x, u8 y, u8 oamPriority, u8 subpriority, u8 delay, u32 fadePalettes, u16 species)
 {
     u8 spriteId;
 
@@ -1317,6 +1323,12 @@ static void SpriteCB_TradePokeballEnd(struct Sprite *sprite)
 #undef sFadePalsHi
 #undef sTimer
 
+// Unreferenced here and in RS, but used in FRLG, possibly by mistake.
+static void UNUSED DestroySpriteAndFreeResources_Ball(struct Sprite *sprite)
+{
+    DestroySpriteAndFreeResources(sprite);
+}
+
 #define sSpeedX data[0]
 #define sSpeedY data[1]
 
@@ -1390,7 +1402,7 @@ static void SpriteCB_HitAnimHealthoxEffect(struct Sprite *sprite)
     }
 }
 
-void LoadBallGfx(enum PokeBall ballId)
+void LoadBallGfx(u8 ballId)
 {
     u16 var;
 
@@ -1409,18 +1421,16 @@ void LoadBallGfx(enum PokeBall ballId)
         var = GetSpriteTileStartByTag(gPokeBalls[ballId].pic.tag);
         DecompressDataWithHeaderVram(gOpenPokeballGfx, (void *)(OBJ_VRAM0 + 0x100 + var * 32));
         break;
-    default:
-        break;
     }
 }
 
-void FreeBallGfx(enum PokeBall ballId)
+void FreeBallGfx(u8 ballId)
 {
     FreeSpriteTilesByTag(gPokeBalls[ballId].pic.tag);
     FreeSpritePaletteByTag(gPokeBalls[ballId].palette.tag);
 }
 
-static enum PokeBall GetBattlerPokeballItemId(enum BattlerId battler)
+static u16 GetBattlerPokeballItemId(enum BattlerId battler)
 {
     struct Pokemon *illusionMon;
     struct Pokemon *mon = GetBattlerMon(battler);
@@ -1432,7 +1442,7 @@ static enum PokeBall GetBattlerPokeballItemId(enum BattlerId battler)
     return GetMonData(mon, MON_DATA_POKEBALL);
 }
 
-enum PokeBall ItemIdToBallId(enum Item ballItem)
+enum PokeBall ItemIdToBallId(u32 ballItem)
 {
     enum PokeBall secondaryId = GetItemSecondaryId(ballItem);
 

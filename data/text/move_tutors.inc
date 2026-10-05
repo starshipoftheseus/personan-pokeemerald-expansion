@@ -167,7 +167,7 @@ MoveTutor_Text_DynamicPunchTeach:
 	.string "I can't do this anymore!\p"
 	.string "It's utterly hopeless!\p"
 	.string "I'm a FIGHTING-type TRAINER,\n"
-	.string "so I can't win at the MOSSDEEP GYM\l"
+	.string "so I can't win at the GYM\l"
 	.string "no matter how hard I try!\p"
 	.string "Argh! Punch! Punch! Punch!\n"
 	.string "Punch! Punch! Punch!\p"
@@ -185,12 +185,12 @@ MoveTutor_Text_DynamicPunchWhichMon:
 	.string "Which POKéMON should I teach?$"
 
 MoveTutor_Text_DynamicPunchTaught:
-	.string "I want you to win at the MOSSDEEP GYM\n"
+	.string "I want you to win at the CERULEAN GYM\n"
 	.string "using that DYNAMICPUNCH!$"
 
 MoveTutor_Text_DoubleEdgeTeach:
 	.string "Sigh…\p"
-	.string "SOOTOPOLIS's GYM LEADER is really\n"
+	.string "The GYM LEADER is really\n"
 	.string "lovably admirable.\p"
 	.string "But that also means I have many\n"
 	.string "rivals for his attention.\p"
@@ -235,3 +235,23 @@ MoveTutor_Text_ExplosionTaught:
 	.string "to ignite my own EXPLOSION…\p"
 	.string "Maybe it's because deep down,\n"
 	.string "I would rather stay here…$"
+
+MoveTutor_Text_HeadbuttTeach:
+	.string "What am I doing?\p"
+	.string "I'm shaking trees using HEADBUTT.\p"
+	.string "Do you think your POKéMON will\n"
+	.string "want to HEADBUTT, too?\p"
+	.string "I can teach one the move HEADBUTT\n"
+	.string "if you'd like. It's fun!$"
+	
+MoveTutor_Text_HeadbuttWhichMon:
+	.string "Ehehe, sure thing! It'd be great if\n"
+	.string "the POKéMON looked like me.$"
+
+MoveTutor_Text_HeadbuttDeclined:
+	.string "You don't need to be shy about it.\n"
+	.string "Let's butt heads!$"
+
+MoveTutor_Text_HeadbuttTaught:
+	.string "Rattle trees with HEADBUTT.\n"
+	.string "Sometimes, sleeping POKéMON fall out.$"

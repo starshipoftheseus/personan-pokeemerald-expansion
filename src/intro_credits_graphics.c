@@ -22,6 +22,7 @@
 #define TAG_MAY     1003
 #define TAG_FLYGON_LATIOS  1004
 #define TAG_FLYGON_LATIAS  1005
+#define TAG_SUICUNE        1006
 
 // Used for the Clouds/Trees/Houses sprites that pass by in the background
 #define TAG_MOVING_SCENERY 2000
@@ -37,39 +38,43 @@ struct IntroCreditsSpriteMetadata
     u16 xOff;
 };
 
-static const u16 sGrass_Pal[]             = INCGFX_U16("graphics/intro/scene_2/grass.png", ".gbapal");
-static const u16 sGrassSunset_Pal[]       = INCGFX_U16("graphics/intro/scene_2/grass_sunset.pal", ".gbapal");
-static const u16 sGrassNight_Pal[]        = INCGFX_U16("graphics/intro/scene_2/grass_night.pal", ".gbapal");
-static const u32 sGrass_Gfx[]             = INCGFX_U32("graphics/intro/scene_2/grass.png", ".4bpp.smol");
-static const u32 sGrass_Tilemap[]         = INCGFX_U32("graphics/intro/scene_2/grass_map.bin", ".smolTM");
-static const u16 sCloudsBg_Pal[]          = INCGFX_U16("graphics/intro/scene_2/clouds_bg.pal", ".gbapal");
-static const u16 sCloudsBgSunset_Pal[]    = INCGFX_U16("graphics/intro/scene_2/clouds_bg_sunset.pal", ".gbapal");
-static const u32 sCloudsBg_Gfx[]          = INCGFX_U32("graphics/intro/scene_2/clouds_bg.png", ".4bpp.smol");
-static const u32 sCloudsBg_Tilemap[]      = INCGFX_U32("graphics/intro/scene_2/clouds_bg_map.bin", ".smolTM");
-static const u16 sClouds_Pal[]            = INCGFX_U16("graphics/intro/scene_2/clouds.png", ".gbapal");
-static const u16 sCloudsSunset_Pal[]      = INCGFX_U16("graphics/intro/scene_2/clouds_sunset.pal", ".gbapal");
-static const u32 sClouds_Gfx[]            = INCGFX_U32("graphics/intro/scene_2/clouds.png", ".4bpp.smol");
-static const u16 sTrees_Pal[]             = INCGFX_U16("graphics/intro/scene_2/trees.png", ".gbapal");
-static const u16 sTreesSunset_Pal[]       = INCGFX_U16("graphics/intro/scene_2/trees_sunset.pal", ".gbapal");
-static const u32 sTrees_Gfx[]             = INCGFX_U32("graphics/intro/scene_2/trees.png", ".4bpp.smol");
-static const u32 sTrees_Tilemap[]         = INCGFX_U32("graphics/intro/scene_2/trees_map.bin", ".smolTM");
-static const u16 sTreesSmall_Pal[]        = INCGFX_U16("graphics/intro/scene_2/trees_small.png", ".gbapal");
-static const u32 sTreesSmall_Gfx[]        = INCGFX_U32("graphics/intro/scene_2/trees_small.png", ".4bpp.smol");
-static const u16 sHouses_Pal[]            = INCGFX_U16("graphics/intro/scene_2/houses.pal", ".gbapal");
-static const u32 sHouses_Gfx[]            = INCGFX_U32("graphics/intro/scene_2/houses.png", ".4bpp.smol");
-static const u16 sHouseSilhouette_Pal[]   = INCGFX_U16("graphics/intro/scene_2/house_silhouette.png", ".gbapal");
-static const u32 sHouses_Tilemap[]        = INCGFX_U32("graphics/intro/scene_2/houses_map.bin", ".smolTM");
-static const u32 sHouseSilhouette_Gfx[]   = INCGFX_U32("graphics/intro/scene_2/house_silhouette.png", ".4bpp.smol");
-static const u16 sBrendanCredits_Pal[]    = INCGFX_U16("graphics/intro/scene_2/brendan_credits.png", ".gbapal");
-static const u32 sBrendanCredits_Gfx[]    = INCGFX_U32("graphics/intro/scene_2/brendan_credits.png", ".4bpp.smol");
-static const u16 sMayCredits_Pal[]        = INCGFX_U16("graphics/intro/scene_2/may_credits.png", ".gbapal");
+static const u16 sGrass_Pal[]             = INCBIN_U16("graphics/intro/scene_2/grass.gbapal");
+static const u16 sGrassSunset_Pal[]       = INCBIN_U16("graphics/intro/scene_2/grass_sunset.gbapal");
+static const u16 sGrassNight_Pal[]        = INCBIN_U16("graphics/intro/scene_2/grass_night.gbapal");
+static const u32 sGrass_Gfx[]             = INCBIN_U32("graphics/intro/scene_2/grass.4bpp.smol");
+static const u32 sGrass_Tilemap[]         = INCBIN_U32("graphics/intro/scene_2/grass_map.bin.smolTM");
+static const u16 sCloudsBg_Pal[]          = INCBIN_U16("graphics/intro/scene_2/clouds_bg.gbapal");
+static const u16 sCloudsBgSunset_Pal[]    = INCBIN_U16("graphics/intro/scene_2/clouds_bg_sunset.gbapal");
+static const u32 sCloudsBg_Gfx[]          = INCBIN_U32("graphics/intro/scene_2/clouds_bg.4bpp.smol");
+static const u32 sCloudsBg_Tilemap[]      = INCBIN_U32("graphics/intro/scene_2/clouds_bg_map.bin.smolTM");
+static const u16 sClouds_Pal[]            = INCBIN_U16("graphics/intro/scene_2/clouds.gbapal");
+static const u16 sCloudsSunset_Pal[]      = INCBIN_U16("graphics/intro/scene_2/clouds_sunset.gbapal");
+static const u32 sClouds_Gfx[]            = INCBIN_U32("graphics/intro/scene_2/clouds.4bpp.smol");
+static const u16 sTrees_Pal[]             = INCBIN_U16("graphics/intro/scene_2/trees.gbapal");
+static const u16 sTreesSunset_Pal[]       = INCBIN_U16("graphics/intro/scene_2/trees_sunset.gbapal");
+static const u32 sTrees_Gfx[]             = INCBIN_U32("graphics/intro/scene_2/trees.4bpp.smol");
+static const u32 sTrees_Tilemap[]         = INCBIN_U32("graphics/intro/scene_2/trees_map.bin.smolTM");
+static const u16 sTreesSmall_Pal[]        = INCBIN_U16("graphics/intro/scene_2/trees_small.gbapal");
+static const u32 sTreesSmall_Gfx[]        = INCBIN_U32("graphics/intro/scene_2/trees_small.4bpp.smol");
+static const u16 sHouses_Pal[]            = INCBIN_U16("graphics/intro/scene_2/houses.gbapal");
+static const u32 sHouses_Gfx[]            = INCBIN_U32("graphics/intro/scene_2/houses.4bpp.smol");
+static const u16 sHouseSilhouette_Pal[]   = INCBIN_U16("graphics/intro/scene_2/house_silhouette.gbapal");
+static const u32 sHouses_Tilemap[]        = INCBIN_U32("graphics/intro/scene_2/houses_map.bin.smolTM");
+static const u32 sHouseSilhouette_Gfx[]   = INCBIN_U32("graphics/intro/scene_2/house_silhouette.4bpp.smol");
+static const u16 sBrendanCredits_Pal[]    = INCBIN_U16("graphics/intro/scene_2/brendan_credits.gbapal");
+static const u32 sBrendanCredits_Gfx[]    = INCBIN_U32("graphics/intro/scene_2/brendan_credits.4bpp.smol");
+static const u16 sMayCredits_Pal[]        = INCBIN_U16("graphics/intro/scene_2/may_credits.gbapal");
+#if IS_HNS
+static const u16 sSuicuneCredits_Pal[]    = INCBIN_U16("graphics/intro/scene_2/suicune_credits.gbapal");
+static const u32 sSuicuneCredits_Gfx[]    = INCBIN_U32("graphics/intro/scene_2/suicune_credits.4bpp.smol");
+#endif
 static const u16 sUnused[0xF0]            = {0};
-static const u32 sMayCredits_Gfx[]        = INCGFX_U32("graphics/intro/scene_2/may_credits.png", ".4bpp.smol");
-static const u32 sBicycle_Gfx[]           = INCGFX_U32("graphics/intro/scene_2/bicycle.png", ".4bpp.smol");
-static const u16 sLatios_Pal[]            = INCGFX_U16("graphics/intro/scene_2/latios.png", ".gbapal");
-static const u32 sLatios_Gfx[]            = INCGFX_U32("graphics/intro/scene_2/latios.png", ".4bpp.smol");
-static const u16 sLatias_Pal[]            = INCGFX_U16("graphics/intro/scene_2/latias.png", ".gbapal");
-static const u32 sLatias_Gfx[]            = INCGFX_U32("graphics/intro/scene_2/latias.png", ".4bpp.smol");
+static const u32 sMayCredits_Gfx[]        = INCBIN_U32("graphics/intro/scene_2/may_credits.4bpp.smol");
+static const u32 sBicycle_Gfx[]           = INCBIN_U32("graphics/intro/scene_2/bicycle.4bpp.smol");
+static const u16 sLatios_Pal[]            = INCBIN_U16("graphics/intro/scene_2/latios.gbapal");
+static const u32 sLatios_Gfx[]            = INCBIN_U32("graphics/intro/scene_2/latios.4bpp.smol");
+static const u16 sLatias_Pal[]            = INCBIN_U16("graphics/intro/scene_2/latias.gbapal");
+static const u32 sLatias_Gfx[]            = INCBIN_U32("graphics/intro/scene_2/latias.4bpp.smol");
 
 static void SpriteCB_MovingScenery(struct Sprite *sprite);
 static void SpriteCB_Player(struct Sprite *sprite);
@@ -499,6 +504,17 @@ static const union AnimCmd *const sAnims_Bicycle[] =
     sAnim_Bicycle
 };
 
+#if IS_HNS
+static const struct SpriteTemplate sSpriteTemplate_Suicune =
+{
+    .tileTag = TAG_SUICUNE,
+    .paletteTag = TAG_SUICUNE,
+    .oam = &sOamData_Player,
+    .anims = sAnims_Player,
+    .callback = SpriteCB_Player
+};
+#endif
+
 static const struct SpriteTemplate sSpriteTemplate_BrendanBicycle =
 {
     .tileTag = TAG_BICYCLE,
@@ -701,6 +717,25 @@ const struct CompressedSpriteSheet gSpriteSheet_CreditsRivalMay[] =
     },
     {}
 };
+
+#if IS_HNS
+const struct CompressedSpriteSheet gSpriteSheet_CreditsSuicune[] =
+{
+    {
+        .data = sSuicuneCredits_Gfx,
+        .size = 0x3800,
+        .tag = TAG_SUICUNE
+    },
+    {}
+};
+
+const struct SpritePalette gSpritePalettes_CreditsHnS[] =
+{
+    { .data = sSuicuneCredits_Pal, .tag = TAG_SUICUNE },
+    { .data = sMayCredits_Pal,     .tag = TAG_MAY },
+    {}
+};
+#endif
 
 EWRAM_DATA u16 gIntroCredits_MovingSceneryVBase = 0;
 EWRAM_DATA s16 gIntroCredits_MovingSceneryVOffset = 0;
@@ -1115,6 +1150,13 @@ u8 CreateIntroMaySprite(s16 x, s16 y)
     gSprites[bicycleSpriteId].sPlayerSpriteId = playerSpriteId;
     return playerSpriteId;
 }
+
+#if IS_HNS
+u8 CreateCreditsSuicuneSprite(s16 x, s16 y)
+{
+    return CreateSprite(&sSpriteTemplate_Suicune, x, y, 2);
+}
+#endif
 
 #undef sPlayerSpriteId
 

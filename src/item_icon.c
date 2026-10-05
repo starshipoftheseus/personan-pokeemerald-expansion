@@ -13,6 +13,9 @@
 EWRAM_DATA u8 *gItemIconDecompressionBuffer = NULL;
 EWRAM_DATA u8 *gItemIcon4x4Buffer = NULL;
 
+// const rom data
+#include "data/item_icon_table.h"
+
 static const struct OamData sOamData_ItemIcon =
 {
     .y = 0,
@@ -108,7 +111,7 @@ u8 AddItemIconSprite(u16 tilesTag, u16 paletteTag, enum Item itemId)
         CpuCopy16(&gItemIconSpriteTemplate, spriteTemplate, sizeof(*spriteTemplate));
         spriteTemplate->tileTag = tilesTag;
         spriteTemplate->paletteTag = paletteTag;
-        spriteId = CreateSpriteUnchecked(spriteTemplate, 0, 0, 0);
+        spriteId = CreateSprite(spriteTemplate, 0, 0, 0);
 
         FreeItemIconTemporaryBuffers();
         Free(spriteTemplate);

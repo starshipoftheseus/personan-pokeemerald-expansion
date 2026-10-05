@@ -6,7 +6,7 @@ ASSUMPTIONS
     ASSUME(GetMoveEffect(MOVE_ENCORE) == EFFECT_ENCORE);
 }
 
-SINGLE_BATTLE_TEST("Encore forces consecutive move uses for 3 turns: Encore used before move (Gen5+)")
+SINGLE_BATTLE_TEST("Encore forces consecutive move uses for 3 turns: Encore used before move")
 {
     struct BattlePokemon *encoreUser = NULL;
     struct BattlePokemon *encoreTarget = NULL;
@@ -14,14 +14,14 @@ SINGLE_BATTLE_TEST("Encore forces consecutive move uses for 3 turns: Encore used
     PARAMETRIZE { encoreUser = opponent; encoreTarget = player; speedPlayer = 10; speedOpponent = 20; }
     PARAMETRIZE { encoreUser = player; encoreTarget = opponent; speedPlayer = 20; speedOpponent = 10; }
     GIVEN {
-        WITH_CONFIG(B_ENCORE_TURNS, GEN_5);
+        WITH_CONFIG(B_ENCORE_TARGET, GEN_3);
         PLAYER(SPECIES_WOBBUFFET) { Speed(speedPlayer); }
         OPPONENT(SPECIES_WOBBUFFET) { Speed(speedOpponent); }
     } WHEN {
         TURN { MOVE(encoreUser, MOVE_CELEBRATE); MOVE(encoreTarget, MOVE_CELEBRATE); }
         TURN { MOVE(encoreUser, MOVE_ENCORE); MOVE(encoreTarget, MOVE_CELEBRATE); }
-        TURN { MOVE(encoreTarget, MOVE_CELEBRATE); }
-        TURN { MOVE(encoreTarget, MOVE_CELEBRATE); }
+        TURN { FORCED_MOVE(encoreTarget); }
+        TURN { FORCED_MOVE(encoreTarget); }
         TURN { MOVE(encoreTarget, MOVE_SPLASH); }
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, encoreUser);
@@ -34,7 +34,7 @@ SINGLE_BATTLE_TEST("Encore forces consecutive move uses for 3 turns: Encore used
     }
 }
 
-SINGLE_BATTLE_TEST("Encore forces consecutive move uses for 4 turns: Encore used after move (Gen5+)")
+SINGLE_BATTLE_TEST("Encore forces consecutive move uses for 3 turns for player: Encore used after move")
 {
     struct BattlePokemon *encoreUser = NULL;
     struct BattlePokemon *encoreTarget = NULL;
@@ -42,14 +42,14 @@ SINGLE_BATTLE_TEST("Encore forces consecutive move uses for 4 turns: Encore used
     PARAMETRIZE { encoreUser = opponent; encoreTarget = player; speedPlayer = 20; speedOpponent = 10; }
     PARAMETRIZE { encoreUser = player; encoreTarget = opponent; speedPlayer = 10; speedOpponent = 20; }
     GIVEN {
-        WITH_CONFIG(B_ENCORE_TURNS, GEN_5);
+        WITH_CONFIG(B_ENCORE_TARGET, GEN_3);
         PLAYER(SPECIES_WOBBUFFET) { Speed(speedPlayer); }
         OPPONENT(SPECIES_WOBBUFFET) { Speed(speedOpponent); }
     } WHEN {
         TURN { MOVE(encoreTarget, MOVE_CELEBRATE); MOVE(encoreUser, MOVE_ENCORE); }
-        TURN { MOVE(encoreTarget, MOVE_CELEBRATE); }
-        TURN { MOVE(encoreTarget, MOVE_CELEBRATE); }
-        TURN { MOVE(encoreTarget, MOVE_CELEBRATE); }
+        TURN { FORCED_MOVE(encoreTarget); }
+        TURN { FORCED_MOVE(encoreTarget); }
+        TURN { FORCED_MOVE(encoreTarget); }
         TURN { MOVE(encoreTarget, MOVE_SPLASH); }
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, encoreTarget);
@@ -170,6 +170,12 @@ SINGLE_BATTLE_TEST("(DYNAMAX) Dynamaxed Pokemon can be encored immediately after
     }
 }
 
+TO_DO_BATTLE_TEST("Encore's effect ends if the encored move runs out of PP");
+TO_DO_BATTLE_TEST("Encore lasts for 2-6 turns (Gen 2-3)");
+TO_DO_BATTLE_TEST("Encore lasts for 3-7 turns (Gen 4)");
+TO_DO_BATTLE_TEST("Encore lasts for 3 turns (Gen 5+)");
+TO_DO_BATTLE_TEST("Encore randomly chooses an opponent target");
+
 DOUBLE_BATTLE_TEST("Encore works even if the target's last move failed")
 {
     GIVEN {
@@ -207,211 +213,5 @@ SINGLE_BATTLE_TEST("Encore fails if target has not used any move yet")
             ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, player);
             ANIMATION(ANIM_TYPE_MOVE, MOVE_ENCORE, opponent);
         }
-    }
-}
-
-SINGLE_BATTLE_TEST("Encore's effect ends if the encored move runs out of PP")
-{
-    GIVEN {
-        WITH_CONFIG(B_ENCORE_TURNS, GEN_5);
-        PLAYER(SPECIES_WOBBUFFET) { Speed(1); MovesWithPP({MOVE_SCRATCH, 2}, {MOVE_CELEBRATE, 10}); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); Moves(MOVE_ENCORE, MOVE_CELEBRATE); }
-    } WHEN {
-        TURN { MOVE(player, MOVE_SCRATCH); MOVE(opponent, MOVE_CELEBRATE); }
-        TURN { MOVE(opponent, MOVE_ENCORE); MOVE(player, MOVE_CELEBRATE); }
-        TURN { MOVE(player, MOVE_CELEBRATE); MOVE(opponent, MOVE_CELEBRATE); }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_ENCORE, opponent);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SCRATCH, player);
-        MESSAGE("Wobbuffet ended its encore!");
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, player);
-    }
-}
-
-// NOTE: AI test is required to validate RNG range without MOVE/FORCED_MOVE invalids; there may be a better approach.
-AI_SINGLE_BATTLE_TEST("Encore lasts for 2-6 turns (Gen 2-3)")
-{
-    u32 count, turns;
-
-    PARAMETRIZE { turns = 2; }
-    PARAMETRIZE { turns = 3; }
-    PARAMETRIZE { turns = 4; }
-    PARAMETRIZE { turns = 5; }
-    PARAMETRIZE { turns = 6; }
-    PASSES_RANDOMLY(1, 5, RNG_ENCORE_TURNS);
-    GIVEN {
-        WITH_CONFIG(B_ENCORE_TURNS, GEN_3);
-        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
-        PLAYER(SPECIES_WOBBUFFET) { Speed(1); Moves(MOVE_ENCORE, MOVE_CELEBRATE); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); Moves(MOVE_CELEBRATE); }
-    } WHEN {
-        TURN { EXPECT_MOVE(opponent, MOVE_CELEBRATE); MOVE(player, MOVE_ENCORE); }
-        for (count = 0; count < turns - 1; ++count)
-            TURN { MOVE(player, MOVE_CELEBRATE); }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_ENCORE, player);
-        for (count = 0; count < turns - 1; ++count)
-            ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
-        NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
-        MESSAGE("The opposing Wobbuffet ended its encore!");
-    }
-}
-
-AI_SINGLE_BATTLE_TEST("Encore lasts for 3-7 turns (Gen 4)")
-{
-    u32 count, turns;
-
-    PARAMETRIZE { turns = 3; }
-    PARAMETRIZE { turns = 4; }
-    PARAMETRIZE { turns = 5; }
-    PARAMETRIZE { turns = 6; }
-    PARAMETRIZE { turns = 7; }
-    PASSES_RANDOMLY(1, 5, RNG_ENCORE_TURNS);
-    GIVEN {
-        WITH_CONFIG(B_ENCORE_TURNS, GEN_4);
-        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
-        PLAYER(SPECIES_WOBBUFFET) { Speed(1); Moves(MOVE_ENCORE, MOVE_CELEBRATE); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); Moves(MOVE_CELEBRATE); }
-    } WHEN {
-        TURN { EXPECT_MOVE(opponent, MOVE_CELEBRATE); MOVE(player, MOVE_ENCORE); }
-        for (count = 0; count < turns - 1; ++count)
-            TURN { MOVE(player, MOVE_CELEBRATE); }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_ENCORE, player);
-        for (count = 0; count < turns - 1; ++count)
-            ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
-        NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponent);
-        MESSAGE("The opposing Wobbuffet ended its encore!");
-    }
-}
-
-DOUBLE_BATTLE_TEST("Encore randomly chooses an opponent target (Gen 2-4)")
-{
-    GIVEN {
-        WITH_CONFIG(B_ENCORE_TARGET, GEN_4);
-        PLAYER(SPECIES_WOBBUFFET) { Speed(3); Moves(MOVE_TACKLE, MOVE_CELEBRATE); }
-        PLAYER(SPECIES_WOBBUFFET) { Speed(1); Moves(MOVE_CELEBRATE); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(4); Moves(MOVE_ENCORE, MOVE_CELEBRATE); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); Moves(MOVE_CELEBRATE); }
-    } WHEN {
-        TURN {
-            MOVE(opponentLeft, MOVE_CELEBRATE);
-            MOVE(playerLeft, MOVE_TACKLE, target: opponentLeft);
-        }
-        TURN {
-            MOVE(opponentLeft, MOVE_ENCORE, target: playerLeft, WITH_RNG(RNG_RANDOM_TARGET, 1));
-            MOVE(playerLeft, MOVE_CELEBRATE);
-        }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_ENCORE, opponentLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, playerLeft, target: opponentRight);
-        HP_BAR(opponentRight);
-    }
-}
-
-DOUBLE_BATTLE_TEST("Encore allows choosing an opponent target (Gen 5+)")
-{
-    GIVEN {
-        WITH_CONFIG(B_ENCORE_TARGET, GEN_5);
-        PLAYER(SPECIES_WOBBUFFET) { Speed(3); Moves(MOVE_TACKLE, MOVE_CELEBRATE); }
-        PLAYER(SPECIES_WOBBUFFET) { Speed(1); Moves(MOVE_CELEBRATE); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(4); Moves(MOVE_ENCORE, MOVE_CELEBRATE); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); Moves(MOVE_CELEBRATE); }
-    } WHEN {
-        TURN {
-            MOVE(opponentLeft, MOVE_CELEBRATE);
-            MOVE(playerLeft, MOVE_TACKLE, target: opponentLeft);
-        }
-        TURN {
-            MOVE(opponentLeft, MOVE_ENCORE, target: playerLeft);
-            MOVE(playerLeft, MOVE_TACKLE, target: opponentRight);
-        }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_ENCORE, opponentLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_TACKLE, playerLeft, target: opponentRight);
-        HP_BAR(opponentRight);
-    }
-}
-
-SINGLE_BATTLE_TEST("Encore into Fake Out/First Impression results in Struggle (Champions)")
-{
-    u32 move;
-
-    PARAMETRIZE { move = MOVE_FAKE_OUT; }
-    PARAMETRIZE { move = MOVE_FIRST_IMPRESSION; }
-
-    GIVEN {
-        WITH_CONFIG(B_FIRST_TURN_MOVE, GEN_CHAMPIONS);
-        ASSUME(gMovesInfo[move].effect == EFFECT_FIRST_TURN_ONLY);
-        PLAYER(SPECIES_WOBBUFFET);
-        OPPONENT(SPECIES_WOBBUFFET) { Item(ITEM_COVERT_CLOAK); }
-    } WHEN {
-        TURN { MOVE(player, move); MOVE(opponent, MOVE_ENCORE); }
-        TURN { FORCED_MOVE(player); };
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, move, player);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_STRUGGLE, player);
-    }
-}
-
-DOUBLE_BATTLE_TEST("Encore uses the priority of the selected move on the turn the target is Encored (Gen9)")
-{
-    GIVEN {
-        WITH_CONFIG(B_ENCORE_PRIORITY, GEN_9);
-        PLAYER(SPECIES_WHIMSICOTT) { Ability(ABILITY_PRANKSTER); Speed(500); }
-        PLAYER(SPECIES_WOBBUFFET) { Speed(200); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); };
-        OPPONENT(SPECIES_WYNAUT) { Speed(1); };
-    } WHEN {
-        TURN {
-            MOVE(opponentLeft, MOVE_SCRATCH, target: playerRight);
-        }
-        TURN {
-            MOVE(playerLeft, MOVE_ENCORE, target: opponentLeft);
-            MOVE(opponentLeft, MOVE_QUICK_ATTACK, target: playerRight);
-        }
-    } SCENE {
-        // Turn 1
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, playerLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, playerRight);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SCRATCH, opponentLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponentRight);
-        // Turn 1
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_ENCORE, playerLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SCRATCH, opponentLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, playerRight);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponentRight);
-    }
-}
-
-DOUBLE_BATTLE_TEST("Encore uses the priority of the Encored move on the turn the target is Encored instead of the selected move (Champions)")
-{
-    GIVEN {
-        WITH_CONFIG(B_ENCORE_PRIORITY, GEN_CHAMPIONS);
-        PLAYER(SPECIES_WHIMSICOTT) { Ability(ABILITY_PRANKSTER); Speed(500); }
-        PLAYER(SPECIES_WOBBUFFET) { Speed(200); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); };
-        OPPONENT(SPECIES_WYNAUT) { Speed(1); };
-    } WHEN {
-        TURN {
-            MOVE(opponentLeft, MOVE_SCRATCH, target: playerRight);
-        }
-        TURN {
-            MOVE(playerLeft, MOVE_ENCORE, target: opponentLeft);
-            MOVE(opponentLeft, MOVE_QUICK_ATTACK, target: playerRight);
-        }
-    } SCENE {
-        // Turn 1
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, playerLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, playerRight);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SCRATCH, opponentLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponentRight);
-        // Turn 1
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_ENCORE, playerLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, playerRight);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SCRATCH, opponentLeft);
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_CELEBRATE, opponentRight);
     }
 }

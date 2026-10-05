@@ -23,7 +23,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_OVERGROW, ABILITY_NONE, ABILITY_BULLETPROOF },
         .bodyColor = BODY_COLOR_GREEN,
-        .speciesName = _("Chespin"),
+        .speciesName = _("CHESPIN"),
         .cryId = CRY_CHESPIN,
         .natDexNum = NATIONAL_DEX_CHESPIN,
         .categoryName = _("Spiny Nut"),
@@ -94,7 +94,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_OVERGROW, ABILITY_NONE, ABILITY_BULLETPROOF },
         .bodyColor = BODY_COLOR_GREEN,
-        .speciesName = _("Quilladin"),
+        .speciesName = _("QUILLADIN"),
         .cryId = CRY_QUILLADIN,
         .natDexNum = NATIONAL_DEX_QUILLADIN,
         .categoryName = _("Spiny Armor"),
@@ -164,7 +164,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_OVERGROW, ABILITY_NONE, ABILITY_BULLETPROOF },
         .bodyColor = BODY_COLOR_GREEN,
-        .speciesName = _("Chesnaught"),
+        .speciesName = _("CHESNAUGHT"),
         .cryId = CRY_CHESNAUGHT,
         .natDexNum = NATIONAL_DEX_CHESNAUGHT,
         .categoryName = _("Spiny Armor"),
@@ -232,9 +232,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_SLOW,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
-        .abilities = { ABILITY_BULLETPROOF, ABILITY_BULLETPROOF, ABILITY_BULLETPROOF },
-        .bodyColor = BODY_COLOR_WHITE,
-        .speciesName = _("Chesnaught"),
+        .abilities = { ABILITY_OVERGROW, ABILITY_NONE, ABILITY_BULLETPROOF },
+        .bodyColor = BODY_COLOR_GREEN,
+        .speciesName = _("CHESNAUGHT"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_CHESNAUGHT_MEGA,
     #else
@@ -269,6 +269,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sChesnaughtTeachableLearnset,
         .formSpeciesIdTable = sChesnaughtFormSpeciesIdTable,
         .formChangeTable = sChesnaughtFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_GEN_9_MEGA_EVOLUTIONS
 #endif //P_FAMILY_CHESPIN
@@ -293,7 +294,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_BLAZE, ABILITY_NONE, ABILITY_MAGICIAN },
         .bodyColor = BODY_COLOR_RED,
-        .speciesName = _("Fennekin"),
+        .speciesName = _("FENNEKIN"),
         .cryId = CRY_FENNEKIN,
         .natDexNum = NATIONAL_DEX_FENNEKIN,
         .categoryName = _("Fox"),
@@ -366,7 +367,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_BLAZE, ABILITY_NONE, ABILITY_MAGICIAN },
         .bodyColor = BODY_COLOR_RED,
-        .speciesName = _("Braixen"),
+        .speciesName = _("BRAIXEN"),
         .cryId = CRY_BRAIXEN,
         .natDexNum = NATIONAL_DEX_BRAIXEN,
         .categoryName = _("Fox"),
@@ -434,7 +435,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_BLAZE, ABILITY_NONE, ABILITY_MAGICIAN },
         .bodyColor = BODY_COLOR_RED,
-        .speciesName = _("Delphox"),
+        .speciesName = _("DELPHOX"),
         .cryId = CRY_DELPHOX,
         .natDexNum = NATIONAL_DEX_DELPHOX,
         .categoryName = _("Fox"),
@@ -506,9 +507,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_SLOW,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
-        .abilities = { ABILITY_LEVITATE, ABILITY_LEVITATE, ABILITY_LEVITATE },
+        .abilities = { ABILITY_BLAZE, ABILITY_NONE, ABILITY_MAGICIAN },
         .bodyColor = BODY_COLOR_RED,
-        .speciesName = _("Delphox"),
+        .speciesName = _("DELPHOX"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_DELPHOX_MEGA,
     #else
@@ -545,6 +546,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sDelphoxTeachableLearnset,
         .formSpeciesIdTable = sDelphoxFormSpeciesIdTable,
         .formChangeTable = sDelphoxFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_GEN_9_MEGA_EVOLUTIONS
 #endif //P_FAMILY_FENNEKIN
@@ -569,7 +571,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_1),
         .abilities = { ABILITY_TORRENT, ABILITY_NONE, ABILITY_PROTEAN },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Froakie"),
+        .speciesName = _("FROAKIE"),
         .cryId = CRY_FROAKIE,
         .natDexNum = NATIONAL_DEX_FROAKIE,
         .categoryName = _("Bubble Frog"),
@@ -642,7 +644,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_1),
         .abilities = { ABILITY_TORRENT, ABILITY_NONE, ABILITY_PROTEAN },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Frogadier"),
+        .speciesName = _("FROGADIER"),
         .cryId = CRY_FROGADIER,
         .natDexNum = NATIONAL_DEX_FROGADIER,
         .categoryName = _("Bubble Frog"),
@@ -710,7 +712,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_TORRENT, ABILITY_NONE, ABILITY_PROTEAN },
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = TRUE,
-        .speciesName = _("Greninja"),
+        .speciesName = _("GRENINJA"),
         .cryId = CRY_GRENINJA,
         .natDexNum = NATIONAL_DEX_GRENINJA,
         .categoryName = _("Ninja"),
@@ -772,7 +774,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_BATTLE_BOND, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = TRUE,
-        .speciesName = _("Greninja"),
+        .speciesName = _("GRENINJA"),
         .cryId = CRY_GRENINJA,
         .natDexNum = NATIONAL_DEX_GRENINJA,
         .categoryName = _("Ninja"),
@@ -812,6 +814,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sGreninjaTeachableLearnset,
         .formSpeciesIdTable = sGreninjaFormSpeciesIdTable,
         .formChangeTable = sGreninjaBattleBondFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_GRENINJA_ASH] =
@@ -834,7 +837,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_BATTLE_BOND, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = TRUE,
-        .speciesName = _("Greninja"),
+        .speciesName = _("GRENINJA"),
         .cryId = CRY_GRENINJA,
         .natDexNum = NATIONAL_DEX_GRENINJA,
         .categoryName = _("Ninja"),
@@ -882,6 +885,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sGreninjaTeachableLearnset,
         .formSpeciesIdTable = sGreninjaFormSpeciesIdTable,
         .formChangeTable = sGreninjaBattleBondFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
 #if P_GEN_9_MEGA_EVOLUTIONS
@@ -902,10 +906,10 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_SLOW,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_1),
-        .abilities = { ABILITY_PROTEAN, ABILITY_PROTEAN, ABILITY_PROTEAN },
-        .bodyColor = BODY_COLOR_BLACK,
+        .abilities = { ABILITY_TORRENT, ABILITY_NONE, ABILITY_PROTEAN },
+        .bodyColor = BODY_COLOR_BLUE,
         .noFlip = TRUE,
-        .speciesName = _("Greninja"),
+        .speciesName = _("GRENINJA"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_GRENINJA_MEGA,
     #else
@@ -942,6 +946,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sGreninjaTeachableLearnset,
         .formSpeciesIdTable = sGreninjaFormSpeciesIdTable,
         .formChangeTable = sGreninjaFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_GEN_9_MEGA_EVOLUTIONS
 #endif //P_FAMILY_FROAKIE
@@ -966,7 +971,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_PICKUP, ABILITY_CHEEK_POUCH, ABILITY_HUGE_POWER },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Bunnelby"),
+        .speciesName = _("BUNNELBY"),
         .cryId = CRY_BUNNELBY,
         .natDexNum = NATIONAL_DEX_BUNNELBY,
         .categoryName = _("Digging"),
@@ -1034,7 +1039,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_PICKUP, ABILITY_CHEEK_POUCH, ABILITY_HUGE_POWER },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Diggersby"),
+        .speciesName = _("DIGGERSBY"),
         .cryId = CRY_DIGGERSBY,
         .natDexNum = NATIONAL_DEX_DIGGERSBY,
         .categoryName = _("Digging"),
@@ -1102,7 +1107,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FLYING),
         .abilities = { ABILITY_BIG_PECKS, ABILITY_NONE, ABILITY_GALE_WINGS },
         .bodyColor = BODY_COLOR_RED,
-        .speciesName = _("Fletchling"),
+        .speciesName = _("FLETCHLING"),
         .cryId = CRY_FLETCHLING,
         .natDexNum = NATIONAL_DEX_FLETCHLING,
         .categoryName = _("Tiny Robin"),
@@ -1175,7 +1180,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FLYING),
         .abilities = { ABILITY_FLAME_BODY, ABILITY_NONE, ABILITY_GALE_WINGS },
         .bodyColor = BODY_COLOR_RED,
-        .speciesName = _("Fletchinder"),
+        .speciesName = _("FLETCHINDER"),
         .cryId = CRY_FLETCHINDER,
         .natDexNum = NATIONAL_DEX_FLETCHINDER,
         .categoryName = _("Ember"),
@@ -1249,7 +1254,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FLYING),
         .abilities = { ABILITY_FLAME_BODY, ABILITY_NONE, ABILITY_GALE_WINGS },
         .bodyColor = BODY_COLOR_RED,
-        .speciesName = _("Talonflame"),
+        .speciesName = _("TALONFLAME"),
         .cryId = CRY_TALONFLAME,
         .natDexNum = NATIONAL_DEX_TALONFLAME,
         .categoryName = _("Scorching"),
@@ -1299,7 +1304,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
 #endif //P_FAMILY_FLETCHLING
 
 #if P_FAMILY_SCATTERBUG
-#define SCATTERBUG_SPECIES_INFO(evolution)                                                  \
+#define SCATTERBUG_SPECIES_INFO(evolution, rzMode)                                          \
     {                                                                                       \
         .baseHP        = 38,                                                                \
         .baseAttack    = 35,                                                                \
@@ -1318,7 +1323,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_BUG),                                         \
         .abilities = { ABILITY_SHIELD_DUST, ABILITY_COMPOUND_EYES, ABILITY_FRIEND_GUARD },  \
         .bodyColor = BODY_COLOR_BLACK,                                                      \
-        .speciesName = _("Scatterbug"),                                                     \
+        .speciesName = _("SCATTERBUG"),                                                     \
         .cryId = CRY_SCATTERBUG,                                                            \
         .natDexNum = NATIONAL_DEX_SCATTERBUG,                                               \
         .categoryName = _("Scatterdust"),                                                   \
@@ -1360,30 +1365,31 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggMoveLearnset = sScatterbugEggMoveLearnset,                                      \
         .formSpeciesIdTable = sScatterbugFormSpeciesIdTable,                                \
         .evolutions = EVOLUTION({EVO_LEVEL, 9, SPECIES_SPEWPA_##evolution}),                \
+        .randomizerMode = rzMode,                                                           \
     }                                                                                       \
 
-    [SPECIES_SCATTERBUG_ICY_SNOW]    = SCATTERBUG_SPECIES_INFO(ICY_SNOW),
-    [SPECIES_SCATTERBUG_POLAR]       = SCATTERBUG_SPECIES_INFO(POLAR),
-    [SPECIES_SCATTERBUG_TUNDRA]      = SCATTERBUG_SPECIES_INFO(TUNDRA),
-    [SPECIES_SCATTERBUG_CONTINENTAL] = SCATTERBUG_SPECIES_INFO(CONTINENTAL),
-    [SPECIES_SCATTERBUG_GARDEN]      = SCATTERBUG_SPECIES_INFO(GARDEN),
-    [SPECIES_SCATTERBUG_ELEGANT]     = SCATTERBUG_SPECIES_INFO(ELEGANT),
-    [SPECIES_SCATTERBUG_MEADOW]      = SCATTERBUG_SPECIES_INFO(MEADOW),
-    [SPECIES_SCATTERBUG_MODERN]      = SCATTERBUG_SPECIES_INFO(MODERN),
-    [SPECIES_SCATTERBUG_MARINE]      = SCATTERBUG_SPECIES_INFO(MARINE),
-    [SPECIES_SCATTERBUG_ARCHIPELAGO] = SCATTERBUG_SPECIES_INFO(ARCHIPELAGO),
-    [SPECIES_SCATTERBUG_HIGH_PLAINS] = SCATTERBUG_SPECIES_INFO(HIGH_PLAINS),
-    [SPECIES_SCATTERBUG_SANDSTORM]   = SCATTERBUG_SPECIES_INFO(SANDSTORM),
-    [SPECIES_SCATTERBUG_RIVER]       = SCATTERBUG_SPECIES_INFO(RIVER),
-    [SPECIES_SCATTERBUG_MONSOON]     = SCATTERBUG_SPECIES_INFO(MONSOON),
-    [SPECIES_SCATTERBUG_SAVANNA]     = SCATTERBUG_SPECIES_INFO(SAVANNA),
-    [SPECIES_SCATTERBUG_SUN]         = SCATTERBUG_SPECIES_INFO(SUN),
-    [SPECIES_SCATTERBUG_OCEAN]       = SCATTERBUG_SPECIES_INFO(OCEAN),
-    [SPECIES_SCATTERBUG_JUNGLE]      = SCATTERBUG_SPECIES_INFO(JUNGLE),
-    [SPECIES_SCATTERBUG_FANCY]       = SCATTERBUG_SPECIES_INFO(FANCY),
-    [SPECIES_SCATTERBUG_POKEBALL]    = SCATTERBUG_SPECIES_INFO(POKEBALL),
+    [SPECIES_SCATTERBUG_ICY_SNOW]    = SCATTERBUG_SPECIES_INFO(ICY_SNOW, MON_RANDOMIZER_RANDOM_FORM),
+    [SPECIES_SCATTERBUG_POLAR]       = SCATTERBUG_SPECIES_INFO(POLAR, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_TUNDRA]      = SCATTERBUG_SPECIES_INFO(TUNDRA, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_CONTINENTAL] = SCATTERBUG_SPECIES_INFO(CONTINENTAL, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_GARDEN]      = SCATTERBUG_SPECIES_INFO(GARDEN, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_ELEGANT]     = SCATTERBUG_SPECIES_INFO(ELEGANT, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_MEADOW]      = SCATTERBUG_SPECIES_INFO(MEADOW, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_MODERN]      = SCATTERBUG_SPECIES_INFO(MODERN, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_MARINE]      = SCATTERBUG_SPECIES_INFO(MARINE, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_ARCHIPELAGO] = SCATTERBUG_SPECIES_INFO(ARCHIPELAGO, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_HIGH_PLAINS] = SCATTERBUG_SPECIES_INFO(HIGH_PLAINS, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_SANDSTORM]   = SCATTERBUG_SPECIES_INFO(SANDSTORM, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_RIVER]       = SCATTERBUG_SPECIES_INFO(RIVER, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_MONSOON]     = SCATTERBUG_SPECIES_INFO(MONSOON, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_SAVANNA]     = SCATTERBUG_SPECIES_INFO(SAVANNA, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_SUN]         = SCATTERBUG_SPECIES_INFO(SUN, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_OCEAN]       = SCATTERBUG_SPECIES_INFO(OCEAN, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_JUNGLE]      = SCATTERBUG_SPECIES_INFO(JUNGLE, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_FANCY]       = SCATTERBUG_SPECIES_INFO(FANCY, MON_RANDOMIZER_INVALID),
+    [SPECIES_SCATTERBUG_POKEBALL]    = SCATTERBUG_SPECIES_INFO(POKEBALL, MON_RANDOMIZER_INVALID),
 
-#define SPEWPA_SPECIES_INFO(evolution)                                          \
+#define SPEWPA_SPECIES_INFO(evolution, rzMode)                                  \
     {                                                                           \
         .baseHP        = 45,                                                    \
         .baseAttack    = 22,                                                    \
@@ -1402,7 +1408,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_BUG),                             \
         .abilities = { ABILITY_SHED_SKIN, ABILITY_NONE, ABILITY_FRIEND_GUARD }, \
         .bodyColor = BODY_COLOR_BLACK,                                          \
-        .speciesName = _("Spewpa"),                                             \
+        .speciesName = _("SPEWPA"),                                             \
         .cryId = CRY_SPEWPA,                                                    \
         .natDexNum = NATIONAL_DEX_SPEWPA,                                       \
         .categoryName = _("Scatterdust"),                                       \
@@ -1443,28 +1449,29 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sSpewpaTeachableLearnset,                          \
         .formSpeciesIdTable = sSpewpaFormSpeciesIdTable,                        \
         .evolutions = EVOLUTION({EVO_LEVEL, 12, SPECIES_VIVILLON_##evolution}), \
+        .randomizerMode = rzMode,                                               \
     }
 
-    [SPECIES_SPEWPA_ICY_SNOW]    = SPEWPA_SPECIES_INFO(ICY_SNOW),
-    [SPECIES_SPEWPA_POLAR]       = SPEWPA_SPECIES_INFO(POLAR),
-    [SPECIES_SPEWPA_TUNDRA]      = SPEWPA_SPECIES_INFO(TUNDRA),
-    [SPECIES_SPEWPA_CONTINENTAL] = SPEWPA_SPECIES_INFO(CONTINENTAL),
-    [SPECIES_SPEWPA_GARDEN]      = SPEWPA_SPECIES_INFO(GARDEN),
-    [SPECIES_SPEWPA_ELEGANT]     = SPEWPA_SPECIES_INFO(ELEGANT),
-    [SPECIES_SPEWPA_MEADOW]      = SPEWPA_SPECIES_INFO(MEADOW),
-    [SPECIES_SPEWPA_MODERN]      = SPEWPA_SPECIES_INFO(MODERN),
-    [SPECIES_SPEWPA_MARINE]      = SPEWPA_SPECIES_INFO(MARINE),
-    [SPECIES_SPEWPA_ARCHIPELAGO] = SPEWPA_SPECIES_INFO(ARCHIPELAGO),
-    [SPECIES_SPEWPA_HIGH_PLAINS] = SPEWPA_SPECIES_INFO(HIGH_PLAINS),
-    [SPECIES_SPEWPA_SANDSTORM]   = SPEWPA_SPECIES_INFO(SANDSTORM),
-    [SPECIES_SPEWPA_RIVER]       = SPEWPA_SPECIES_INFO(RIVER),
-    [SPECIES_SPEWPA_MONSOON]     = SPEWPA_SPECIES_INFO(MONSOON),
-    [SPECIES_SPEWPA_SAVANNA]     = SPEWPA_SPECIES_INFO(SAVANNA),
-    [SPECIES_SPEWPA_SUN]         = SPEWPA_SPECIES_INFO(SUN),
-    [SPECIES_SPEWPA_OCEAN]       = SPEWPA_SPECIES_INFO(OCEAN),
-    [SPECIES_SPEWPA_JUNGLE]      = SPEWPA_SPECIES_INFO(JUNGLE),
-    [SPECIES_SPEWPA_FANCY]       = SPEWPA_SPECIES_INFO(FANCY),
-    [SPECIES_SPEWPA_POKEBALL]   = SPEWPA_SPECIES_INFO(POKEBALL),
+    [SPECIES_SPEWPA_ICY_SNOW]    = SPEWPA_SPECIES_INFO(ICY_SNOW, MON_RANDOMIZER_RANDOM_FORM),
+    [SPECIES_SPEWPA_POLAR]       = SPEWPA_SPECIES_INFO(POLAR, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_TUNDRA]      = SPEWPA_SPECIES_INFO(TUNDRA, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_CONTINENTAL] = SPEWPA_SPECIES_INFO(CONTINENTAL, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_GARDEN]      = SPEWPA_SPECIES_INFO(GARDEN, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_ELEGANT]     = SPEWPA_SPECIES_INFO(ELEGANT, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_MEADOW]      = SPEWPA_SPECIES_INFO(MEADOW, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_MODERN]      = SPEWPA_SPECIES_INFO(MODERN, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_MARINE]      = SPEWPA_SPECIES_INFO(MARINE, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_ARCHIPELAGO] = SPEWPA_SPECIES_INFO(ARCHIPELAGO, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_HIGH_PLAINS] = SPEWPA_SPECIES_INFO(HIGH_PLAINS, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_SANDSTORM]   = SPEWPA_SPECIES_INFO(SANDSTORM, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_RIVER]       = SPEWPA_SPECIES_INFO(RIVER, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_MONSOON]     = SPEWPA_SPECIES_INFO(MONSOON, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_SAVANNA]     = SPEWPA_SPECIES_INFO(SAVANNA, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_SUN]         = SPEWPA_SPECIES_INFO(SUN, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_OCEAN]       = SPEWPA_SPECIES_INFO(OCEAN, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_JUNGLE]      = SPEWPA_SPECIES_INFO(JUNGLE, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_FANCY]       = SPEWPA_SPECIES_INFO(FANCY, MON_RANDOMIZER_INVALID),
+    [SPECIES_SPEWPA_POKEBALL]    = SPEWPA_SPECIES_INFO(POKEBALL, MON_RANDOMIZER_INVALID),
 
 #define VIVILLON_MISC_INFO(form, color, iconPal)                                            \
         .baseHP        = 80,                                                                \
@@ -1486,7 +1493,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_BUG),                                         \
         .abilities = { ABILITY_SHIELD_DUST, ABILITY_COMPOUND_EYES, ABILITY_FRIEND_GUARD },  \
         .bodyColor = color,                                                                 \
-        .speciesName = _("Vivillon"),                                                       \
+        .speciesName = _("VIVILLON"),                                                       \
         .cryId = CRY_VIVILLON,                                                              \
         .natDexNum = NATIONAL_DEX_VIVILLON,                                                 \
         .categoryName = _("Scale"),                                                         \
@@ -1534,6 +1541,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from frigid lands.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_RANDOM_FORM,
     },
 
     [SPECIES_VIVILLON_POLAR] =
@@ -1544,6 +1552,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from snowy lands.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_TUNDRA] =
@@ -1554,6 +1563,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from lands of severe cold.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_CONTINENTAL] =
@@ -1564,6 +1574,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from lands of vast space.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_GARDEN] =
@@ -1574,6 +1585,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from verdant lands.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_ELEGANT] =
@@ -1584,6 +1596,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in. This\n"
             "form is from lands with distinct seasons.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_MEADOW] =
@@ -1594,6 +1607,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in. This\n"
             "form is from lands where flowers bloom.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_MODERN] =
@@ -1604,6 +1618,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from sun-drenched lands.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_MARINE] =
@@ -1614,6 +1629,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in. This\n"
             "form is from lands with ocean breezes.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_ARCHIPELAGO] =
@@ -1624,6 +1640,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from places with many islands.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_HIGH_PLAINS] =
@@ -1634,6 +1651,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from lands with little rain.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_SANDSTORM] =
@@ -1644,6 +1662,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from parched lands.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_RIVER] =
@@ -1654,6 +1673,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in. This\n"
             "form is from lands where large rivers flow.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_MONSOON] =
@@ -1664,6 +1684,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in. This\n"
             "form is from lands with intense rainfall.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_SAVANNA] =
@@ -1674,6 +1695,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in. This\n"
             "form is from lands with a tropical climate.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_SUN] =
@@ -1684,6 +1706,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from lands bathed in light.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_OCEAN] =
@@ -1694,6 +1717,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in. This\n"
             "form is from lands of perpetual summer.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_JUNGLE] =
@@ -1704,6 +1728,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in. This\n"
             "form is from lands of tropical rainforests.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_FANCY] =
@@ -1714,6 +1739,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from a mysterious land.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_VIVILLON_POKEBALL] =
@@ -1724,6 +1750,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "topography of the land it was born in.\n"
             "This form is from a special land.\n"
             "It scatters toxic color scales in battle."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_FAMILY_SCATTERBUG
 
@@ -1747,7 +1774,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_RIVALRY, ABILITY_UNNERVE, ABILITY_MOXIE },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Litleo"),
+        .speciesName = _("LITLEO"),
         .cryId = CRY_LITLEO,
         .natDexNum = NATIONAL_DEX_LITLEO,
         .categoryName = _("Lion Cub"),
@@ -1816,7 +1843,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_RIVALRY, ABILITY_UNNERVE, ABILITY_MOXIE },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Pyroar"),
+        .speciesName = _("PYROAR"),
         .cryId = CRY_PYROAR,
         .natDexNum = NATIONAL_DEX_PYROAR,
         .categoryName = _("Royal"),
@@ -1898,9 +1925,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_SLOW,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
-        .abilities = { ABILITY_FIRE_MANE, ABILITY_FIRE_MANE, ABILITY_FIRE_MANE },
+        .abilities = { ABILITY_RIVALRY, ABILITY_UNNERVE, ABILITY_MOXIE },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Pyroar"),
+        .speciesName = _("PYROAR"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_PYROAR_MEGA,
     #else
@@ -1936,6 +1963,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sPyroarTeachableLearnset,
         .formSpeciesIdTable = sPyroarFormSpeciesIdTable,
         .formChangeTable = sPyroarFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_GEN_9_MEGA_EVOLUTIONS
 #endif //P_FAMILY_LITLEO
@@ -1959,7 +1987,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FAIRY),                           \
         .abilities = { ABILITY_FLOWER_VEIL, ABILITY_NONE, ABILITY_SYMBIOSIS },  \
         .bodyColor = BODY_COLOR_WHITE,                                          \
-        .speciesName = _("Flabébé"),                                            \
+        .speciesName = _("FLABéBé"),                                            \
         .cryId = CRY_FLABEBE,                                                   \
         .natDexNum = NATIONAL_DEX_FLABEBE,                                      \
         .categoryName = _("Single Bloom"),                                      \
@@ -2009,6 +2037,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "Immediately after birth, this Pokémon\n"
             "begins flying around in search of a\n"
             "flower it likes."),
+        .randomizerMode = MON_RANDOMIZER_RANDOM_FORM,
     },
 
     [SPECIES_FLABEBE_YELLOW] =
@@ -2019,6 +2048,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "drawing forth the power hidden\n"
             "within flowers. This Pokémon is\n"
             "particularly fond of yellow flowers."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLABEBE_ORANGE] =
@@ -2029,6 +2059,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "and gives them some of its energy in\n"
             "return. This Pokémon likes orange\n"
             "flowers best of all."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLABEBE_BLUE]   =
@@ -2039,6 +2070,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "best of all. It floats upward using the\n"
             "power emanating from its flower\n"
             "and bobs along lightly through the air."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLABEBE_WHITE]  =
@@ -2049,6 +2081,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "a place blooming with flowers of\n"
             "the same white color as itself, and\n"
             "then it goes to sleep."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
 #define FLOETTE_MISC_INFO(form, FORM, iconPal)                                  \
@@ -2061,7 +2094,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .growthRate = GROWTH_MEDIUM_FAST,                                       \
         .abilities = { ABILITY_FLOWER_VEIL, ABILITY_NONE, ABILITY_SYMBIOSIS },  \
         .bodyColor = BODY_COLOR_WHITE,                                          \
-        .speciesName = _("Floette"),                                            \
+        .speciesName = _("FLOETTE"),                                            \
         .natDexNum = NATIONAL_DEX_FLOETTE,                                      \
         .categoryName = _("Single Bloom"),                                      \
         .height = 2,                                                            \
@@ -2121,6 +2154,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "of light to pour its own energy\n"
             "into flowers and draw forth their\n"
             "latent potential."),
+        .randomizerMode = MON_RANDOMIZER_SPECIAL_FORM,
     },
 
     [SPECIES_FLOETTE_YELLOW] =
@@ -2131,6 +2165,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "power hidden within yellow flowers.\n"
             "This power then becomes the moves\n"
             "Floette uses to protect itself."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLOETTE_ORANGE] =
@@ -2141,6 +2176,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "most power when in sync with orange\n"
             "flowers, compared to flowers of other\n"
             "colors."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLOETTE_BLUE] =
@@ -2151,6 +2187,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "flowering plants that are withering, it\n"
             "will bring them back to its territory\n"
             "and care for them."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLOETTE_WHITE] =
@@ -2161,6 +2198,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "flower bed, it will attack them\n"
             "without mercy. This Floette takes\n"
             "particularly good care of white flowers."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLOETTE_ETERNAL] =
@@ -2190,6 +2228,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .levelUpLearnset = sFloetteEternalLevelUpLearnset,
         .teachableLearnset = sFloetteEternalTeachableLearnset,
         .formChangeTable = sFloetteEternalFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
 #define FLORGES_MISC_INFO(Form, iconPal)                                        \
@@ -2210,7 +2249,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FAIRY),                           \
         .abilities = { ABILITY_FLOWER_VEIL, ABILITY_NONE, ABILITY_SYMBIOSIS },  \
         .bodyColor = BODY_COLOR_WHITE,                                          \
-        .speciesName = _("Florges"),                                            \
+        .speciesName = _("FLORGES"),                                            \
         .cryId = CRY_FLORGES,                                                   \
         .natDexNum = NATIONAL_DEX_FLORGES,                                      \
         .categoryName = _("Garden"),                                            \
@@ -2257,6 +2296,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "flower garden in its territory. It\n"
             "draws forth the power of the red\n"
             "flowers around its neck."),
+        .randomizerMode = MON_RANDOMIZER_RANDOM_FORM,
     },
 
     [SPECIES_FLORGES_YELLOW] =
@@ -2267,6 +2307,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "forth the power of yellow flowers. It\n"
             "ruthlessly punishes anyone who\n"
             "tramples on flowering plants."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLORGES_ORANGE] =
@@ -2277,6 +2318,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "governors would lovingly raise Florges to\n"
             "care for their castles' exquisite\n"
             "gardens."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLORGES_BLUE] =
@@ -2286,6 +2328,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "Blue pigments were tremendously\n"
             "expensive in the past, so paintings\n"
             "of blue Florges are highly valuable."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_FLORGES_WHITE] =
@@ -2296,6 +2339,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             "flowered Florges will be beautifully\n"
             "decorated with flowering plants of\n"
             "many different colors."),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
 #if P_GEN_9_MEGA_EVOLUTIONS
@@ -2316,9 +2360,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_FAST,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
-        .abilities = { ABILITY_FAIRY_AURA, ABILITY_FAIRY_AURA, ABILITY_FAIRY_AURA },
+        .abilities = { ABILITY_FLOWER_VEIL, ABILITY_NONE, ABILITY_SYMBIOSIS },
         .bodyColor = BODY_COLOR_WHITE,
-        .speciesName = _("Floette"),
+        .speciesName = _("FLOETTE"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_FLOETTE_MEGA,
     #else
@@ -2354,6 +2398,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sFloetteEternalTeachableLearnset,
         .formSpeciesIdTable = sFloetteFormSpeciesIdTable,
         .formChangeTable = sFloetteEternalFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_GEN_9_MEGA_EVOLUTIONS
 #endif //P_FAMILY_FLABEBE
@@ -2378,7 +2423,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_SAP_SIPPER, ABILITY_NONE, ABILITY_GRASS_PELT },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Skiddo"),
+        .speciesName = _("SKIDDO"),
         .cryId = CRY_SKIDDO,
         .natDexNum = NATIONAL_DEX_SKIDDO,
         .categoryName = _("Mount"),
@@ -2446,7 +2491,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_SAP_SIPPER, ABILITY_NONE, ABILITY_GRASS_PELT },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Gogoat"),
+        .speciesName = _("GOGOAT"),
         .cryId = CRY_GOGOAT,
         .natDexNum = NATIONAL_DEX_GOGOAT,
         .categoryName = _("Mount"),
@@ -2516,7 +2561,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD, EGG_GROUP_HUMAN_LIKE),
         .abilities = { ABILITY_IRON_FIST, ABILITY_MOLD_BREAKER, ABILITY_SCRAPPY },
         .bodyColor = BODY_COLOR_WHITE,
-        .speciesName = _("Pancham"),
+        .speciesName = _("PANCHAM"),
         .cryId = CRY_PANCHAM,
         .natDexNum = NATIONAL_DEX_PANCHAM,
         .categoryName = _("Playful"),
@@ -2589,7 +2634,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD, EGG_GROUP_HUMAN_LIKE),
         .abilities = { ABILITY_IRON_FIST, ABILITY_MOLD_BREAKER, ABILITY_SCRAPPY },
         .bodyColor = BODY_COLOR_WHITE,
-        .speciesName = _("Pangoro"),
+        .speciesName = _("PANGORO"),
         .cryId = CRY_PANGORO,
         .natDexNum = NATIONAL_DEX_PANGORO,
         .categoryName = _("Daunting"),
@@ -2662,7 +2707,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_FUR_COAT, ABILITY_NONE, ABILITY_NONE },                                                  \
         .bodyColor = BODY_COLOR_WHITE,                                                                                  \
         .noFlip = _noFlip,                                                                                              \
-        .speciesName = _("Furfrou"),                                                                                    \
+        .speciesName = _("FURFROU"),                                                                                    \
         .cryId = CRY_FURFROU,                                                                                           \
         .natDexNum = NATIONAL_DEX_FURFROU,                                                                              \
         .categoryName = _("Poodle"),                                                                                    \
@@ -2737,7 +2782,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_KEEN_EYE, ABILITY_INFILTRATOR, ABILITY_OWN_TEMPO },
         .bodyColor = BODY_COLOR_GRAY,
-        .speciesName = _("Espurr"),
+        .speciesName = _("ESPURR"),
         .cryId = CRY_ESPURR,
         .natDexNum = NATIONAL_DEX_ESPURR,
         .categoryName = _("Restraint"),
@@ -2811,7 +2856,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_KEEN_EYE, ABILITY_INFILTRATOR, ABILITY_PRANKSTER },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Meowstic"),
+        .speciesName = _("MEOWSTIC"),
         .cryId = CRY_MEOWSTIC,
         .natDexNum = NATIONAL_DEX_MEOWSTIC,
         .categoryName = _("Constraint"),
@@ -2876,7 +2921,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
         .abilities = { ABILITY_KEEN_EYE, ABILITY_INFILTRATOR, ABILITY_COMPETITIVE },
         .bodyColor = BODY_COLOR_WHITE,
-        .speciesName = _("Meowstic"),
+        .speciesName = _("MEOWSTIC"),
         .cryId = CRY_MEOWSTIC,
         .natDexNum = NATIONAL_DEX_MEOWSTIC,
         .categoryName = _("Constraint"),
@@ -2940,9 +2985,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_FAST,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
-        .abilities = { ABILITY_TRACE, ABILITY_TRACE, ABILITY_TRACE },
-        .bodyColor = BODY_COLOR_WHITE,
-        .speciesName = _("Meowstic"),
+        .abilities = { ABILITY_KEEN_EYE, ABILITY_INFILTRATOR, ABILITY_PRANKSTER },
+        .bodyColor = BODY_COLOR_BLUE,
+        .speciesName = _("MEOWSTIC"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_MEOWSTIC_MEGA,
     #else
@@ -2998,9 +3043,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_FAST,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD),
-        .abilities = { ABILITY_TRACE, ABILITY_TRACE, ABILITY_TRACE },
+        .abilities = { ABILITY_KEEN_EYE, ABILITY_INFILTRATOR, ABILITY_COMPETITIVE },
         .bodyColor = BODY_COLOR_WHITE,
-        .speciesName = _("Meowstic"),
+        .speciesName = _("MEOWSTIC"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_MEOWSTIC_MEGA,
     #else
@@ -3061,7 +3106,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MINERAL),
         .abilities = { ABILITY_NO_GUARD, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Honedge"),
+        .speciesName = _("HONEDGE"),
         .cryId = CRY_HONEDGE,
         .natDexNum = NATIONAL_DEX_HONEDGE,
         .categoryName = _("Sword"),
@@ -3131,7 +3176,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MINERAL),
         .abilities = { ABILITY_NO_GUARD, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Doublade"),
+        .speciesName = _("DOUBLADE"),
         .cryId = CRY_DOUBLADE,
         .natDexNum = NATIONAL_DEX_DOUBLADE,
         .categoryName = _("Sword"),
@@ -3205,7 +3250,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MINERAL),
         .abilities = { ABILITY_STANCE_CHANGE, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Aegislash"),
+        .speciesName = _("AEGISLASH"),
         .cryId = CRY_AEGISLASH,
         .natDexNum = NATIONAL_DEX_AEGISLASH,
         .categoryName = _("Royal Sword"),
@@ -3283,7 +3328,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MINERAL),
         .abilities = { ABILITY_STANCE_CHANGE, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Aegislash"),
+        .speciesName = _("AEGISLASH"),
         .cryId = CRY_AEGISLASH,
         .natDexNum = NATIONAL_DEX_AEGISLASH,
         .categoryName = _("Royal Sword"),
@@ -3325,6 +3370,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sAegislashTeachableLearnset,
         .formSpeciesIdTable = sAegislashFormSpeciesIdTable,
         .formChangeTable = sAegislashFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_FAMILY_HONEDGE
 
@@ -3348,7 +3394,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FAIRY),
         .abilities = { ABILITY_HEALER, ABILITY_NONE, ABILITY_AROMA_VEIL },
         .bodyColor = BODY_COLOR_PINK,
-        .speciesName = _("Spritzee"),
+        .speciesName = _("SPRITZEE"),
         .cryId = CRY_SPRITZEE,
         .natDexNum = NATIONAL_DEX_SPRITZEE,
         .categoryName = _("Perfume"),
@@ -3399,7 +3445,8 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .levelUpLearnset = sSpritzeeLevelUpLearnset,
         .teachableLearnset = sSpritzeeTeachableLearnset,
         .eggMoveLearnset = sSpritzeeEggMoveLearnset,
-        .evolutions = EVOLUTION({EVO_TRADE, 0, SPECIES_AROMATISSE, CONDITIONS({IF_HOLD_ITEM, ITEM_SACHET})},
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_SHINY_STONE, SPECIES_AROMATISSE},
+                                {EVO_TRADE, 0, SPECIES_AROMATISSE, CONDITIONS({IF_HOLD_ITEM, ITEM_SACHET})},
                                 {EVO_ITEM, ITEM_SACHET, SPECIES_AROMATISSE}),
     },
 
@@ -3422,7 +3469,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FAIRY),
         .abilities = { ABILITY_HEALER, ABILITY_NONE, ABILITY_AROMA_VEIL },
         .bodyColor = BODY_COLOR_PINK,
-        .speciesName = _("Aromatisse"),
+        .speciesName = _("AROMATISSE"),
         .cryId = CRY_AROMATISSE,
         .natDexNum = NATIONAL_DEX_AROMATISSE,
         .categoryName = _("Fragrance"),
@@ -3490,7 +3537,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FAIRY),
         .abilities = { ABILITY_SWEET_VEIL, ABILITY_NONE, ABILITY_UNBURDEN },
         .bodyColor = BODY_COLOR_WHITE,
-        .speciesName = _("Swirlix"),
+        .speciesName = _("SWIRLIX"),
         .cryId = CRY_SWIRLIX,
         .natDexNum = NATIONAL_DEX_SWIRLIX,
         .categoryName = _("Cotton Candy"),
@@ -3541,7 +3588,8 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .levelUpLearnset = sSwirlixLevelUpLearnset,
         .teachableLearnset = sSwirlixTeachableLearnset,
         .eggMoveLearnset = sSwirlixEggMoveLearnset,
-        .evolutions = EVOLUTION({EVO_TRADE, 0, SPECIES_SLURPUFF, CONDITIONS({IF_HOLD_ITEM, ITEM_WHIPPED_DREAM})},
+        .evolutions = EVOLUTION({EVO_ITEM, ITEM_MOON_STONE, SPECIES_SLURPUFF},
+                                {EVO_TRADE, 0, SPECIES_SLURPUFF, CONDITIONS({IF_HOLD_ITEM, ITEM_WHIPPED_DREAM})},
                                 {EVO_ITEM, ITEM_WHIPPED_DREAM, SPECIES_SLURPUFF}),
     },
 
@@ -3564,7 +3612,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FAIRY),
         .abilities = { ABILITY_SWEET_VEIL, ABILITY_NONE, ABILITY_UNBURDEN },
         .bodyColor = BODY_COLOR_WHITE,
-        .speciesName = _("Slurpuff"),
+        .speciesName = _("SLURPUFF"),
         .cryId = CRY_SLURPUFF,
         .natDexNum = NATIONAL_DEX_SLURPUFF,
         .categoryName = _("Meringue"),
@@ -3635,7 +3683,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_1, EGG_GROUP_WATER_2),
         .abilities = { ABILITY_CONTRARY, ABILITY_SUCTION_CUPS, ABILITY_INFILTRATOR },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Inkay"),
+        .speciesName = _("INKAY"),
         .cryId = CRY_INKAY,
         .natDexNum = NATIONAL_DEX_INKAY,
         .categoryName = _("Revolving"),
@@ -3706,7 +3754,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_1, EGG_GROUP_WATER_2),
         .abilities = { ABILITY_CONTRARY, ABILITY_SUCTION_CUPS, ABILITY_INFILTRATOR },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Malamar"),
+        .speciesName = _("MALAMAR"),
         .cryId = CRY_MALAMAR,
         .natDexNum = NATIONAL_DEX_MALAMAR,
         .categoryName = _("Overturning"),
@@ -3775,9 +3823,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_FAST,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_1, EGG_GROUP_WATER_2),
-        .abilities = { ABILITY_CONTRARY, ABILITY_CONTRARY, ABILITY_CONTRARY },
+        .abilities = { ABILITY_CONTRARY, ABILITY_SUCTION_CUPS, ABILITY_INFILTRATOR },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Malamar"),
+        .speciesName = _("MALAMAR"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_MALAMAR_MEGA,
     #else
@@ -3837,7 +3885,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_3),
         .abilities = { ABILITY_TOUGH_CLAWS, ABILITY_SNIPER, ABILITY_PICKPOCKET },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Binacle"),
+        .speciesName = _("BINACLE"),
         .cryId = CRY_BINACLE,
         .natDexNum = NATIONAL_DEX_BINACLE,
         .categoryName = _("Two-Handed"),
@@ -3910,7 +3958,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_TOUGH_CLAWS, ABILITY_SNIPER, ABILITY_PICKPOCKET },
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = TRUE,
-        .speciesName = _("Barbaracle"),
+        .speciesName = _("BARBARACLE"),
         .cryId = CRY_BARBARACLE,
         .natDexNum = NATIONAL_DEX_BARBARACLE,
         .categoryName = _("Collective"),
@@ -3977,10 +4025,10 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_FAST,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_3),
-        .abilities = { ABILITY_TOUGH_CLAWS, ABILITY_TOUGH_CLAWS, ABILITY_TOUGH_CLAWS },
+        .abilities = { ABILITY_TOUGH_CLAWS, ABILITY_SNIPER, ABILITY_PICKPOCKET },
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = TRUE,
-        .speciesName = _("Barbaracle"),
+        .speciesName = _("BARBARACLE"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_BARBARACLE_MEGA,
     #else
@@ -4039,7 +4087,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_1, EGG_GROUP_DRAGON),
         .abilities = { ABILITY_POISON_POINT, ABILITY_POISON_TOUCH, ABILITY_ADAPTABILITY },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Skrelp"),
+        .speciesName = _("SKRELP"),
         .cryId = CRY_SKRELP,
         .natDexNum = NATIONAL_DEX_SKRELP,
         .categoryName = _("Mock Kelp"),
@@ -4113,7 +4161,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_1, EGG_GROUP_DRAGON),
         .abilities = { ABILITY_POISON_POINT, ABILITY_POISON_TOUCH, ABILITY_ADAPTABILITY },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Dragalge"),
+        .speciesName = _("DRAGALGE"),
         .cryId = CRY_DRAGALGE,
         .natDexNum = NATIONAL_DEX_DRAGALGE,
         .categoryName = _("Mock Kelp"),
@@ -4182,9 +4230,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_FAST,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_WATER_1, EGG_GROUP_DRAGON),
-        .abilities = { ABILITY_REGENERATOR, ABILITY_REGENERATOR, ABILITY_REGENERATOR },
+        .abilities = { ABILITY_POISON_POINT, ABILITY_POISON_TOUCH, ABILITY_ADAPTABILITY },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Dragalge"),
+        .speciesName = _("DRAGALGE"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_DRAGALGE_MEGA,
     #else
@@ -4245,7 +4293,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_MEGA_LAUNCHER, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = TRUE,
-        .speciesName = _("Clauncher"),
+        .speciesName = _("CLAUNCHER"),
         .cryId = CRY_CLAUNCHER,
         .natDexNum = NATIONAL_DEX_CLAUNCHER,
         .categoryName = _("Water Gun"),
@@ -4317,7 +4365,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_MEGA_LAUNCHER, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = TRUE,
-        .speciesName = _("Clawitzer"),
+        .speciesName = _("CLAWITZER"),
         .cryId = CRY_CLAWITZER,
         .natDexNum = NATIONAL_DEX_CLAWITZER,
         .categoryName = _("Howitzer"),
@@ -4391,7 +4439,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MONSTER, EGG_GROUP_DRAGON),
         .abilities = { ABILITY_DRY_SKIN, ABILITY_SAND_VEIL, ABILITY_SOLAR_POWER },
         .bodyColor = BODY_COLOR_YELLOW,
-        .speciesName = _("Helioptile"),
+        .speciesName = _("HELIOPTILE"),
         .cryId = CRY_HELIOPTILE,
         .natDexNum = NATIONAL_DEX_HELIOPTILE,
         .categoryName = _("Generator"),
@@ -4461,7 +4509,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MONSTER, EGG_GROUP_DRAGON),
         .abilities = { ABILITY_DRY_SKIN, ABILITY_SAND_VEIL, ABILITY_SOLAR_POWER },
         .bodyColor = BODY_COLOR_YELLOW,
-        .speciesName = _("Heliolisk"),
+        .speciesName = _("HELIOLISK"),
         .cryId = CRY_HELIOLISK,
         .natDexNum = NATIONAL_DEX_HELIOLISK,
         .categoryName = _("Generator"),
@@ -4530,7 +4578,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MONSTER, EGG_GROUP_DRAGON),
         .abilities = { ABILITY_STRONG_JAW, ABILITY_NONE, ABILITY_STURDY },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Tyrunt"),
+        .speciesName = _("TYRUNT"),
         .cryId = CRY_TYRUNT,
         .natDexNum = NATIONAL_DEX_TYRUNT,
         .categoryName = _("Royal Heir"),
@@ -4600,7 +4648,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MONSTER, EGG_GROUP_DRAGON),
         .abilities = { ABILITY_STRONG_JAW, ABILITY_NONE, ABILITY_ROCK_HEAD },
         .bodyColor = BODY_COLOR_RED,
-        .speciesName = _("Tyrantrum"),
+        .speciesName = _("TYRANTRUM"),
         .cryId = CRY_TYRANTRUM,
         .natDexNum = NATIONAL_DEX_TYRANTRUM,
         .categoryName = _("Despot"),
@@ -4668,7 +4716,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MONSTER),
         .abilities = { ABILITY_REFRIGERATE, ABILITY_NONE, ABILITY_SNOW_WARNING },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Amaura"),
+        .speciesName = _("AMAURA"),
         .cryId = CRY_AMAURA,
         .natDexNum = NATIONAL_DEX_AMAURA,
         .categoryName = _("Tundra"),
@@ -4744,7 +4792,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_MONSTER),
         .abilities = { ABILITY_REFRIGERATE, ABILITY_NONE, ABILITY_SNOW_WARNING },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Aurorus"),
+        .speciesName = _("AURORUS"),
         .cryId = CRY_AURORUS,
         .natDexNum = NATIONAL_DEX_AURORUS,
         .categoryName = _("Tundra"),
@@ -4817,7 +4865,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
     #endif
         .abilities = { ABILITY_LIMBER, ABILITY_UNBURDEN, ABILITY_MOLD_BREAKER },
         .bodyColor = BODY_COLOR_GREEN,
-        .speciesName = _("Hawlucha"),
+        .speciesName = _("HAWLUCHA"),
         .cryId = CRY_HAWLUCHA,
         .natDexNum = NATIONAL_DEX_HAWLUCHA,
         .categoryName = _("Wrestling"),
@@ -4888,9 +4936,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .friendship = STANDARD_FRIENDSHIP,
         .growthRate = GROWTH_MEDIUM_FAST,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FLYING, EGG_GROUP_HUMAN_LIKE),
-        .abilities = { ABILITY_NO_GUARD, ABILITY_NO_GUARD, ABILITY_NO_GUARD },
-        .bodyColor = BODY_COLOR_YELLOW,
-        .speciesName = _("Hawlucha"),
+        .abilities = { ABILITY_LIMBER, ABILITY_UNBURDEN, ABILITY_MOLD_BREAKER },
+        .bodyColor = BODY_COLOR_GREEN,
+        .speciesName = _("HAWLUCHA"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_HAWLUCHA_MEGA,
     #else
@@ -4949,7 +4997,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FIELD, EGG_GROUP_FAIRY),
         .abilities = { ABILITY_CHEEK_POUCH, ABILITY_PICKUP, ABILITY_PLUS },
         .bodyColor = BODY_COLOR_YELLOW,
-        .speciesName = _("Dedenne"),
+        .speciesName = _("DEDENNE"),
         .cryId = CRY_DEDENNE,
         .natDexNum = NATIONAL_DEX_DEDENNE,
         .categoryName = _("Antenna"),
@@ -5020,7 +5068,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_FAIRY, EGG_GROUP_MINERAL),
         .abilities = { ABILITY_CLEAR_BODY, ABILITY_NONE, ABILITY_STURDY },
         .bodyColor = BODY_COLOR_GRAY,
-        .speciesName = _("Carbink"),
+        .speciesName = _("CARBINK"),
         .cryId = CRY_CARBINK,
         .natDexNum = NATIONAL_DEX_CARBINK,
         .categoryName = _("Jewel"),
@@ -5097,7 +5145,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_DRAGON),
         .abilities = { ABILITY_SAP_SIPPER, ABILITY_HYDRATION, ABILITY_GOOEY },
         .bodyColor = BODY_COLOR_PURPLE,
-        .speciesName = _("Goomy"),
+        .speciesName = _("GOOMY"),
         .cryId = CRY_GOOMY,
         .natDexNum = NATIONAL_DEX_GOOMY,
         .categoryName = _("Soft Tissue"),
@@ -5171,7 +5219,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_DRAGON),
         .abilities = { ABILITY_SAP_SIPPER, ABILITY_HYDRATION, ABILITY_GOOEY },
         .bodyColor = BODY_COLOR_PURPLE,
-        .speciesName = _("Sliggoo"),
+        .speciesName = _("SLIGGOO"),
         .cryId = CRY_SLIGGOO,
         .natDexNum = NATIONAL_DEX_SLIGGOO,
         .categoryName = _("Soft Tissue"),
@@ -5241,7 +5289,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_DRAGON),
         .abilities = { ABILITY_SAP_SIPPER, ABILITY_HYDRATION, ABILITY_GOOEY },
         .bodyColor = BODY_COLOR_PURPLE,
-        .speciesName = _("Goodra"),
+        .speciesName = _("GOODRA"),
         .cryId = CRY_GOODRA,
         .natDexNum = NATIONAL_DEX_GOODRA,
         .categoryName = _("Dragon"),
@@ -5314,9 +5362,17 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_SAP_SIPPER, ABILITY_SHELL_ARMOR, ABILITY_GOOEY },
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = TRUE,
-        .speciesName = _("Sliggoo"),
+#if P_SEPARATE_REGIONAL_FORMS
+        .speciesName = _("SLIGGOO-H"),
+#else
+        .speciesName = _("SLIGGOO"),
+#endif
         .cryId = CRY_SLIGGOO,
+#if P_SEPARATE_REGIONAL_FORMS
+        .natDexNum = NATIONAL_DEX_SLIGGOO_HISUI,
+#else
         .natDexNum = NATIONAL_DEX_SLIGGOO,
+#endif
         .categoryName = _("Snail"),
         .height = 7,
         .weight = 685,
@@ -5355,9 +5411,14 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             gShinyOverworldPalette_SliggooHisui
         )
         .isHisuianForm = TRUE,
+        .dexNotRequired = TRUE,
         .levelUpLearnset = sSliggooHisuiLevelUpLearnset,
         .teachableLearnset = sSliggooHisuiTeachableLearnset,
+#if P_SEPARATE_REGIONAL_FORMS
+        .formSpeciesIdTable = sSliggooHisuiFormSpeciesIdTable,
+#else
         .formSpeciesIdTable = sSliggooFormSpeciesIdTable,
+#endif
         .evolutions = EVOLUTION({EVO_LEVEL, 50, SPECIES_GOODRA_HISUI, CONDITIONS({IF_WEATHER, WEATHER_RAIN})},
                                 {EVO_LEVEL, 50, SPECIES_GOODRA_HISUI, CONDITIONS({IF_WEATHER, WEATHER_FOG})}),
 
@@ -5382,9 +5443,17 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_DRAGON),
         .abilities = { ABILITY_SAP_SIPPER, ABILITY_SHELL_ARMOR, ABILITY_GOOEY },
         .bodyColor = BODY_COLOR_PURPLE,
-        .speciesName = _("Goodra"),
+#if P_SEPARATE_REGIONAL_FORMS
+        .speciesName = _("GOODRA-H"),
+#else
+        .speciesName = _("GOODRA"),
+#endif
         .cryId = CRY_GOODRA,
+#if P_SEPARATE_REGIONAL_FORMS
+        .natDexNum = NATIONAL_DEX_GOODRA_HISUI,
+#else
         .natDexNum = NATIONAL_DEX_GOODRA,
+#endif
         .categoryName = _("Shell Bunker"),
         .height = 17,
         .weight = 3341,
@@ -5423,9 +5492,14 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             gShinyOverworldPalette_GoodraHisui
         )
         .isHisuianForm = TRUE,
+        .dexNotRequired = TRUE,
         .levelUpLearnset = sGoodraHisuiLevelUpLearnset,
         .teachableLearnset = sGoodraHisuiTeachableLearnset,
+#if P_SEPARATE_REGIONAL_FORMS
+        .formSpeciesIdTable = sGoodraHisuiFormSpeciesIdTable,
+#else
         .formSpeciesIdTable = sGoodraFormSpeciesIdTable,
+#endif
     },
 #endif //P_HISUIAN_FORMS
 #endif //P_FAMILY_GOOMY
@@ -5451,7 +5525,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_PRANKSTER, ABILITY_NONE, ABILITY_MAGICIAN },
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = TRUE,
-        .speciesName = _("Klefki"),
+        .speciesName = _("KLEFKI"),
         .cryId = CRY_KLEFKI,
         .natDexNum = NATIONAL_DEX_KLEFKI,
         .categoryName = _("Key Ring"),
@@ -5528,7 +5602,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_GRASS, EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_NATURAL_CURE, ABILITY_FRISK, ABILITY_HARVEST },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Phantump"),
+        .speciesName = _("PHANTUMP"),
         .cryId = CRY_PHANTUMP,
         .natDexNum = NATIONAL_DEX_PHANTUMP,
         .categoryName = _("Stump"),
@@ -5577,7 +5651,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sPhantumpTeachableLearnset,
         .eggMoveLearnset = sPhantumpEggMoveLearnset,
         .evolutions = EVOLUTION({EVO_TRADE, 0, SPECIES_TREVENANT},
-                                {EVO_ITEM, ITEM_LINKING_CORD, SPECIES_TREVENANT}),
+                                {EVO_LEVEL, 38, SPECIES_TREVENANT}),
     },
 
     [SPECIES_TREVENANT] =
@@ -5599,7 +5673,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_GRASS, EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_NATURAL_CURE, ABILITY_FRISK, ABILITY_HARVEST },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Trevenant"),
+        .speciesName = _("TREVENANT"),
         .cryId = CRY_TREVENANT,
         .natDexNum = NATIONAL_DEX_TREVENANT,
         .categoryName = _("Elder Tree"),
@@ -5671,7 +5745,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_PICKUP, ABILITY_FRISK, ABILITY_INSOMNIA },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Pumpkaboo"),
+        .speciesName = _("PUMPKABOO"),
         .cryId = CRY_PUMPKABOO,
         .natDexNum = NATIONAL_DEX_PUMPKABOO,
         .categoryName = _("Pumpkin"),
@@ -5716,7 +5790,8 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggMoveLearnset = sPumpkabooEggMoveLearnset,
         .formSpeciesIdTable = sPumpkabooFormSpeciesIdTable,
         .evolutions = EVOLUTION({EVO_TRADE, 0, SPECIES_GOURGEIST_AVERAGE},
-                                {EVO_ITEM, ITEM_LINKING_CORD, SPECIES_GOURGEIST_AVERAGE}),
+                                {EVO_LEVEL, 38, SPECIES_GOURGEIST_AVERAGE}),
+        .randomizerMode = MON_RANDOMIZER_RANDOM_FORM,
     },
 
     [SPECIES_PUMPKABOO_SMALL] =
@@ -5738,7 +5813,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_PICKUP, ABILITY_FRISK, ABILITY_INSOMNIA },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Pumpkaboo"),
+        .speciesName = _("PUMPKABOO"),
         .cryId = CRY_PUMPKABOO,
         .natDexNum = NATIONAL_DEX_PUMPKABOO,
         .categoryName = _("Pumpkin"),
@@ -5782,7 +5857,8 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggMoveLearnset = sPumpkabooEggMoveLearnset,
         .formSpeciesIdTable = sPumpkabooFormSpeciesIdTable,
         .evolutions = EVOLUTION({EVO_TRADE, 0, SPECIES_GOURGEIST_SMALL},
-                                {EVO_ITEM, ITEM_LINKING_CORD, SPECIES_GOURGEIST_SMALL}),
+                                {EVO_LEVEL, 38, SPECIES_GOURGEIST_SMALL}),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_PUMPKABOO_LARGE] =
@@ -5804,7 +5880,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_PICKUP, ABILITY_FRISK, ABILITY_INSOMNIA },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Pumpkaboo"),
+        .speciesName = _("PUMPKABOO"),
         .cryId = CRY_PUMPKABOO,
         .natDexNum = NATIONAL_DEX_PUMPKABOO,
         .categoryName = _("Pumpkin"),
@@ -5848,7 +5924,8 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggMoveLearnset = sPumpkabooEggMoveLearnset,
         .formSpeciesIdTable = sPumpkabooFormSpeciesIdTable,
         .evolutions = EVOLUTION({EVO_TRADE, 0, SPECIES_GOURGEIST_LARGE},
-                                {EVO_ITEM, ITEM_LINKING_CORD, SPECIES_GOURGEIST_LARGE}),
+                                {EVO_LEVEL, 38, SPECIES_GOURGEIST_LARGE}),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_PUMPKABOO_SUPER] =
@@ -5872,7 +5949,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_PICKUP, ABILITY_FRISK, ABILITY_INSOMNIA },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Pumpkaboo"),
+        .speciesName = _("PUMPKABOO"),
         .cryId = CRY_PUMPKABOO_SUPER,
         .natDexNum = NATIONAL_DEX_PUMPKABOO,
         .categoryName = _("Pumpkin"),
@@ -5916,7 +5993,8 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggMoveLearnset = sPumpkabooEggMoveLearnset,
         .formSpeciesIdTable = sPumpkabooFormSpeciesIdTable,
         .evolutions = EVOLUTION({EVO_TRADE, 0, SPECIES_GOURGEIST_SUPER},
-                                {EVO_ITEM, ITEM_LINKING_CORD, SPECIES_GOURGEIST_SUPER}),
+                                {EVO_LEVEL, 38, SPECIES_GOURGEIST_SUPER}),
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_GOURGEIST_AVERAGE] =
@@ -5938,7 +6016,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_PICKUP, ABILITY_FRISK, ABILITY_INSOMNIA },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Gourgeist"),
+        .speciesName = _("GOURGEIST"),
         .cryId = CRY_GOURGEIST,
         .natDexNum = NATIONAL_DEX_GOURGEIST,
         .categoryName = _("Pumpkin"),
@@ -5981,6 +6059,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .levelUpLearnset = sGourgeistLevelUpLearnset,
         .teachableLearnset = sGourgeistTeachableLearnset,
         .formSpeciesIdTable = sGourgeistFormSpeciesIdTable,
+        .randomizerMode = MON_RANDOMIZER_RANDOM_FORM,
     },
 
     [SPECIES_GOURGEIST_SMALL] =
@@ -6002,7 +6081,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_PICKUP, ABILITY_FRISK, ABILITY_INSOMNIA },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Gourgeist"),
+        .speciesName = _("GOURGEIST"),
         .cryId = CRY_GOURGEIST,
         .natDexNum = NATIONAL_DEX_GOURGEIST,
         .categoryName = _("Pumpkin"),
@@ -6045,6 +6124,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .levelUpLearnset = sGourgeistLevelUpLearnset,
         .teachableLearnset = sGourgeistTeachableLearnset,
         .formSpeciesIdTable = sGourgeistFormSpeciesIdTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_GOURGEIST_LARGE] =
@@ -6066,7 +6146,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_PICKUP, ABILITY_FRISK, ABILITY_INSOMNIA },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Gourgeist"),
+        .speciesName = _("GOURGEIST"),
         .cryId = CRY_GOURGEIST,
         .natDexNum = NATIONAL_DEX_GOURGEIST,
         .categoryName = _("Pumpkin"),
@@ -6109,6 +6189,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .levelUpLearnset = sGourgeistLevelUpLearnset,
         .teachableLearnset = sGourgeistTeachableLearnset,
         .formSpeciesIdTable = sGourgeistFormSpeciesIdTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     [SPECIES_GOURGEIST_SUPER] =
@@ -6132,7 +6213,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_AMORPHOUS),
         .abilities = { ABILITY_PICKUP, ABILITY_FRISK, ABILITY_INSOMNIA },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Gourgeist"),
+        .speciesName = _("GOURGEIST"),
         .cryId = CRY_GOURGEIST_SUPER,
         .natDexNum = NATIONAL_DEX_GOURGEIST,
         .categoryName = _("Pumpkin"),
@@ -6175,6 +6256,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .levelUpLearnset = sGourgeistLevelUpLearnset,
         .teachableLearnset = sGourgeistTeachableLearnset,
         .formSpeciesIdTable = sGourgeistFormSpeciesIdTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_FAMILY_PUMPKABOO
 
@@ -6204,7 +6286,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = BERGMITE_EGG_GROUPS,
         .abilities = { ABILITY_OWN_TEMPO, ABILITY_ICE_BODY, ABILITY_STURDY },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Bergmite"),
+        .speciesName = _("BERGMITE"),
         .cryId = CRY_BERGMITE,
         .natDexNum = NATIONAL_DEX_BERGMITE,
         .categoryName = _("Ice Chunk"),
@@ -6279,7 +6361,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = BERGMITE_EGG_GROUPS,
         .abilities = { ABILITY_OWN_TEMPO, ABILITY_ICE_BODY, ABILITY_STURDY },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Avalugg"),
+        .speciesName = _("AVALUGG"),
         .cryId = CRY_AVALUGG,
         .natDexNum = NATIONAL_DEX_AVALUGG,
         .categoryName = _("Iceberg"),
@@ -6349,9 +6431,17 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = BERGMITE_EGG_GROUPS,
         .abilities = { ABILITY_STRONG_JAW, ABILITY_ICE_BODY, ABILITY_STURDY },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Avalugg"),
+#if P_SEPARATE_REGIONAL_FORMS
+        .speciesName = _("AVALUGG-H"),
+#else
+        .speciesName = _("AVALUGG"),
+#endif
         .cryId = CRY_AVALUGG,
+#if P_SEPARATE_REGIONAL_FORMS
+        .natDexNum = NATIONAL_DEX_AVALUGG_HISUI,
+#else
         .natDexNum = NATIONAL_DEX_AVALUGG,
+#endif
         .categoryName = _("Iceberg"),
         .height = 14,
         .weight = 2624,
@@ -6389,9 +6479,14 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
             gShinyOverworldPalette_AvaluggHisui
         )
         .isHisuianForm = TRUE,
+        .dexNotRequired = TRUE,
         .levelUpLearnset = sAvaluggHisuiLevelUpLearnset,
         .teachableLearnset = sAvaluggHisuiTeachableLearnset,
+#if P_SEPARATE_REGIONAL_FORMS
+        .formSpeciesIdTable = sAvaluggHisuiFormSpeciesIdTable,
+#else
         .formSpeciesIdTable = sAvaluggFormSpeciesIdTable,
+#endif
     },
 #endif //P_HISUIAN_FORMS
 #endif //P_FAMILY_BERGMITE
@@ -6405,6 +6500,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
 
     [SPECIES_NOIBAT] =
     {
+        .dexNotRequired = TRUE,
         .baseHP        = 40,
         .baseAttack    = 30,
         .baseDefense   = 35,
@@ -6422,7 +6518,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = NOIBAT_EGG_GROUPS,
         .abilities = { ABILITY_FRISK, ABILITY_INFILTRATOR, ABILITY_TELEPATHY },
         .bodyColor = BODY_COLOR_PURPLE,
-        .speciesName = _("Noibat"),
+        .speciesName = _("NOIBAT"),
         .cryId = CRY_NOIBAT,
         .natDexNum = NATIONAL_DEX_NOIBAT,
         .categoryName = _("Sound Wave"),
@@ -6480,6 +6576,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
 
     [SPECIES_NOIVERN] =
     {
+        .dexNotRequired = TRUE,
         .baseHP        = 85,
         .baseAttack    = 70,
         .baseDefense   = 80,
@@ -6497,7 +6594,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = NOIBAT_EGG_GROUPS,
         .abilities = { ABILITY_FRISK, ABILITY_INFILTRATOR, ABILITY_TELEPATHY },
         .bodyColor = BODY_COLOR_PURPLE,
-        .speciesName = _("Noivern"),
+        .speciesName = _("NOIVERN"),
         .cryId = CRY_NOIVERN,
         .natDexNum = NATIONAL_DEX_NOIVERN,
         .categoryName = _("Sound Wave"),
@@ -6565,7 +6662,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
         .abilities = { ABILITY_FAIRY_AURA, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Xerneas"),
+        .speciesName = _("XERNEAS"),
         .cryId = CRY_XERNEAS,
         .natDexNum = NATIONAL_DEX_XERNEAS,
         .categoryName = _("Life"),
@@ -6629,7 +6726,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
         .abilities = { ABILITY_FAIRY_AURA, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BLUE,
-        .speciesName = _("Xerneas"),
+        .speciesName = _("XERNEAS"),
         .cryId = CRY_XERNEAS,
         .natDexNum = NATIONAL_DEX_XERNEAS,
         .categoryName = _("Life"),
@@ -6695,7 +6792,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
         .abilities = { ABILITY_DARK_AURA, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_RED,
-        .speciesName = _("Yveltal"),
+        .speciesName = _("YVELTAL"),
         .cryId = CRY_YVELTAL,
         .natDexNum = NATIONAL_DEX_YVELTAL,
         .categoryName = _("Destruction"),
@@ -6770,7 +6867,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_AURA_BREAK, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_GREEN,
         .noFlip = TRUE,
-        .speciesName = _("Zygarde"),
+        .speciesName = _("ZYGARDE"),
         .cryId = CRY_ZYGARDE_50,
         .natDexNum = NATIONAL_DEX_ZYGARDE,
         .categoryName = _("Order"),
@@ -6835,7 +6932,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_POWER_CONSTRUCT, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_GREEN,
         .noFlip = TRUE,
-        .speciesName = _("Zygarde"),
+        .speciesName = _("ZYGARDE"),
         .cryId = CRY_ZYGARDE_50,
         .natDexNum = NATIONAL_DEX_ZYGARDE,
         .categoryName = _("Order"),
@@ -6900,7 +6997,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_AURA_BREAK, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BLACK,
         .noFlip = TRUE,
-        .speciesName = _("Zygarde"),
+        .speciesName = _("ZYGARDE"),
         .cryId = CRY_ZYGARDE_10,
         .natDexNum = NATIONAL_DEX_ZYGARDE,
         .categoryName = _("Order"),
@@ -6965,7 +7062,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_POWER_CONSTRUCT, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BLACK,
         .noFlip = TRUE,
-        .speciesName = _("Zygarde"),
+        .speciesName = _("ZYGARDE"),
         .cryId = CRY_ZYGARDE_10,
         .natDexNum = NATIONAL_DEX_ZYGARDE,
         .categoryName = _("Order"),
@@ -7030,7 +7127,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .abilities = { ABILITY_POWER_CONSTRUCT, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BLACK,
         .noFlip = TRUE,
-        .speciesName = _("Zygarde"),
+        .speciesName = _("ZYGARDE"),
         .cryId = CRY_ZYGARDE_COMPLETE,
         .natDexNum = NATIONAL_DEX_ZYGARDE,
         .categoryName = _("Order"),
@@ -7081,6 +7178,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sZygardeTeachableLearnset,
         .formSpeciesIdTable = sZygardeFormSpeciesIdTable,
         .formChangeTable = sZygardeCompleteFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
 #if P_GEN_9_MEGA_EVOLUTIONS
@@ -7102,9 +7200,9 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .growthRate = GROWTH_SLOW,
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
         .abilities = { ABILITY_AURA_BREAK, ABILITY_NONE, ABILITY_NONE },
-        .bodyColor = BODY_COLOR_GREEN,
+        .bodyColor = BODY_COLOR_BLACK,
         .noFlip = TRUE,
-        .speciesName = _("Zygarde"),
+        .speciesName = _("ZYGARDE"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_ZYGARDE_MEGA,
     #else
@@ -7142,6 +7240,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sZygardeTeachableLearnset,
         .formSpeciesIdTable = sZygardeFormSpeciesIdTable,
         .formChangeTable = sZygardeCompleteFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_GEN_9_MEGA_EVOLUTIONS
 #endif //P_FAMILY_ZYGARDE
@@ -7167,7 +7266,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
         .abilities = { ABILITY_CLEAR_BODY, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_PINK,
-        .speciesName = _("Diancie"),
+        .speciesName = _("DIANCIE"),
         .cryId = CRY_DIANCIE,
         .natDexNum = NATIONAL_DEX_DIANCIE,
         .categoryName = _("Jewel"),
@@ -7241,7 +7340,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
         .abilities = { ABILITY_MAGIC_BOUNCE, ABILITY_MAGIC_BOUNCE, ABILITY_MAGIC_BOUNCE },
         .bodyColor = BODY_COLOR_PINK,
-        .speciesName = _("Diancie"),
+        .speciesName = _("DIANCIE"),
     #if P_MODIFIED_MEGA_CRIES
         .cryId = CRY_DIANCIE_MEGA,
     #else
@@ -7295,6 +7394,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sDiancieTeachableLearnset,
         .formSpeciesIdTable = sDiancieFormSpeciesIdTable,
         .formChangeTable = sDiancieFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_MEGA_EVOLUTIONS
 #endif //P_FAMILY_DIANCIE
@@ -7319,7 +7419,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
         .abilities = { ABILITY_MAGICIAN, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_PURPLE,
-        .speciesName = _("Hoopa"),
+        .speciesName = _("HOOPA"),
         .cryId = CRY_HOOPA_CONFINED,
         .natDexNum = NATIONAL_DEX_HOOPA,
         .categoryName = _("Mischief"),
@@ -7398,7 +7498,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
         .abilities = { ABILITY_MAGICIAN, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_PURPLE,
-        .speciesName = _("Hoopa"),
+        .speciesName = _("HOOPA"),
         .cryId = CRY_HOOPA_UNBOUND,
         .natDexNum = NATIONAL_DEX_HOOPA,
         .categoryName = _("Djinn"),
@@ -7449,6 +7549,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .teachableLearnset = sHoopaUnboundTeachableLearnset,
         .formSpeciesIdTable = sHoopaFormSpeciesIdTable,
         .formChangeTable = sHoopaFormChangeTable,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 #endif //P_FAMILY_HOOPA
 
@@ -7472,7 +7573,7 @@ const struct SpeciesInfo gSpeciesInfoGen6[] =
         .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
         .abilities = { ABILITY_WATER_ABSORB, ABILITY_NONE, ABILITY_NONE },
         .bodyColor = BODY_COLOR_BROWN,
-        .speciesName = _("Volcanion"),
+        .speciesName = _("VOLCANION"),
         .cryId = CRY_VOLCANION,
         .natDexNum = NATIONAL_DEX_VOLCANION,
         .categoryName = _("Steam"),

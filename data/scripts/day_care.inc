@@ -16,6 +16,7 @@ Route117_EventScript_DaycareEggWaiting::
 	msgbox Route117_Text_IWillKeepDoYouWantIt, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, Route117_EventScript_DaycareAcceptEgg
 	msgbox Route117_Text_IllKeepIt, MSGBOX_DEFAULT
+	clearflag FLAG_PENDING_DAYCARE_EGG
 	special RejectEggFromDayCare
 	release
 	end
@@ -34,6 +35,7 @@ Route117_EventScript_DaycareReceiveEgg::
 	waitbuttonpress
 	msgbox Route117_Text_TakeGoodCareOfIt, MSGBOX_DEFAULT
 	special GiveEggFromDaycare
+	clearflag FLAG_PENDING_DAYCARE_EGG
 	release
 	end
 
@@ -163,13 +165,14 @@ Route117_PokemonDayCare_EventScript_TryRetrieveMon::
 	setvar VAR_0x8004, 0
 	goto_if_eq VAR_RESULT, DAYCARE_ONE_MON, Route117_PokemonDayCare_EventScript_CostPrompt
 	special ShowDaycareLevelMenu
+	waitstate
 	copyvar VAR_0x8004, VAR_RESULT
 	goto_if_eq VAR_RESULT, DAYCARE_EXITED_LEVEL_MENU, Route117_PokemonDayCare_EventScript_ComeAgain
 	goto Route117_PokemonDayCare_EventScript_CostPrompt
 	end
 
 Route117_PokemonDayCare_EventScript_CostPrompt::
-	special GetDaycareCostAndPrepareString
+	special GetDaycareCost
 	msgbox Route117_PokemonDayCare_Text_ItWillCostX, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, Route117_PokemonDayCare_EventScript_CheckEnoughMoney
 	goto Route117_PokemonDayCare_EventScript_ComeAgain
@@ -250,6 +253,7 @@ Route117_PokemonDayCare_EventScript_TwoMonsInDaycare::
 @ Unused
 Route117_PokemonDayCare_EventScript_UnusedRetrieveMon::
 	special ShowDaycareLevelMenu
+	waitstate
 	goto_if_eq VAR_RESULT, 2, Route117_PokemonDayCare_EventScript_ComeAgain
 	copyvar VAR_0x8004, VAR_RESULT
 	specialvar VAR_RESULT, TakePokemonFromDaycare
@@ -262,6 +266,7 @@ EventScript_EggHatch::
 	lockall
 	msgbox Text_EggHatchHuh, MSGBOX_DEFAULT
 	special EggHatch
+	waitstate
 	releaseall
 	end
 

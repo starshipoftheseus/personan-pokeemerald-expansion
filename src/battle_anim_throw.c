@@ -14,7 +14,6 @@
 #include "sound.h"
 #include "sprite.h"
 #include "task.h"
-#include "test/battle.h"
 #include "test_runner.h"
 #include "trig.h"
 #include "util.h"
@@ -51,6 +50,7 @@ enum {
     SHINY_STAR_DIAGONAL,
 };
 
+static void AnimTask_UnusedLevelUpHealthBox_Step(u8);
 static void AnimTask_FlashHealthboxOnLevelUp_Step(u8);
 static void AnimTask_ThrowBall_Step(u8);
 static void SpriteCB_Ball_Throw(struct Sprite *);
@@ -71,7 +71,7 @@ static void SpriteCB_Ball_Capture_Step(struct Sprite *);
 static void MakeCaptureStars(struct Sprite *);
 static void SpriteCB_Ball_FadeOut(struct Sprite *);
 static void DestroySpriteAfterOneFrame(struct Sprite *);
-static void LoadBallParticleGfx(enum PokeBall);
+static void LoadBallParticleGfx(u8);
 static void SpriteCB_CaptureStar_Flicker(struct Sprite *);
 static void SpriteCB_Ball_Release_Wait(struct Sprite *);
 static void SpriteCB_Ball_Block_Step(struct Sprite *);
@@ -159,6 +159,7 @@ static const struct CaptureStar sCaptureStars[] =
 #define TAG_PARTICLES_PARK_BALL    65055
 #define TAG_PARTICLES_BEAST_BALL   65056
 #define TAG_PARTICLES_CHERISH_BALL 65057
+#define TAG_PARTICLES_GS_BALL      65058
 
 static const union AnimCmd sAnim_RegularBall[] =
 {
@@ -458,6 +459,14 @@ static const struct PokeBallParticles sBallParticles[POKEBALL_COUNT] =
         .animNums = 0,
         .particleAnimationFunc = MasterBallOpenParticleAnimation,
     },
+
+    [BALL_GS] =
+    {
+        POKE_BALL_ANIMATION(TAG_PARTICLES_GS_BALL, gBattleAnimSpriteGfx_Particles, gBattleAnimSpritePal_CircleImpact),
+        .openFadeColor = RGB(31, 22, 30),
+        .animNums = 0,
+        .particleAnimationFunc = MasterBallOpenParticleAnimation,
+    },
 };
 
 const struct SpriteTemplate gPokeblockSpriteTemplate =
@@ -489,6 +498,115 @@ const struct SpriteTemplate sSafariRockSpriteTemplate =
 
 extern const struct SpriteTemplate gWishStarSpriteTemplate;
 extern const struct SpriteTemplate gMiniTwinklingStarSpriteTemplate;
+
+// This is an unused function, but it seems likely that it was
+// intended to be an additional effect during the level-up animation.
+// It is an upward blue gradient effect on the mon's healthbox.
+void AnimTask_UnusedLevelUpHealthBox(u8 taskId)
+{
+    struct BattleAnimBgData animBgData;
+    u8 healthBoxSpriteId;
+    enum BattlerId battler;
+    u8 spriteId1, spriteId2, spriteId3, spriteId4;
+
+    battler = gBattleAnimAttacker;
+    gBattle_WIN0H = 0;
+    gBattle_WIN0V = 0;
+    SetGpuReg(REG_OFFSET_WININ, WININ_WIN0_BG_ALL | WININ_WIN0_OBJ | WININ_WIN0_CLR | WININ_WIN1_BG_ALL | WININ_WIN1_OBJ | WININ_WIN1_CLR);
+    SetGpuReg(REG_OFFSET_WINOUT, WINOUT_WIN01_BG0 | WINOUT_WIN01_BG2 | WINOUT_WIN01_BG3 | WINOUT_WIN01_OBJ | WINOUT_WIN01_CLR | WINOUT_WINOBJ_BG_ALL | WINOUT_WINOBJ_OBJ | WINOUT_WINOBJ_CLR);
+    SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_OBJWIN_ON);
+    SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG1 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_ALL);
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(0, 16));
+    SetAnimBgAttribute(1, BG_ANIM_PRIORITY, 0);
+    SetAnimBgAttribute(1, BG_ANIM_SCREEN_SIZE, 0);
+    SetAnimBgAttribute(1, BG_ANIM_AREA_OVERFLOW_MODE, 1);
+    SetAnimBgAttribute(1, BG_ANIM_CHAR_BASE_BLOCK, 1);
+
+    healthBoxSpriteId = gHealthboxSpriteIds[battler];
+    spriteId1 = gSprites[healthBoxSpriteId].oam.affineParam;
+    spriteId2 = gSprites[healthBoxSpriteId].data[5];
+    spriteId3 = CreateInvisibleSpriteWithCallback(SpriteCallbackDummy);
+    spriteId4 = CreateInvisibleSpriteWithCallback(SpriteCallbackDummy);
+    gSprites[healthBoxSpriteId].oam.priority = 1;
+    gSprites[spriteId1].oam.priority = 1;
+    gSprites[spriteId2].oam.priority = 1;
+    gSprites[spriteId3] = gSprites[healthBoxSpriteId];
+    gSprites[spriteId4] = gSprites[spriteId1];
+    gSprites[spriteId3].oam.objMode = ST_OAM_OBJ_WINDOW;
+    gSprites[spriteId4].oam.objMode = ST_OAM_OBJ_WINDOW;
+    gSprites[spriteId3].callback = SpriteCallbackDummy;
+    gSprites[spriteId4].callback = SpriteCallbackDummy;
+
+    GetBattleAnimBg1Data(&animBgData);
+    AnimLoadCompressedBgTilemap(animBgData.bgId, UnusedLevelupAnimationTilemap);
+    AnimLoadCompressedBgGfx(animBgData.bgId, UnusedLevelupAnimationGfx, animBgData.tilesOffset);
+    LoadPalette(gCureBubblesPal, BG_PLTT_ID(animBgData.paletteId), PLTT_SIZE_4BPP);
+
+    gBattle_BG1_X = -gSprites[spriteId3].x + 32;
+    gBattle_BG1_Y = -gSprites[spriteId3].y - 32;
+    gTasks[taskId].data[1] = 640;
+    gTasks[taskId].data[0] = spriteId3;
+    gTasks[taskId].data[2] = spriteId4;
+    gTasks[taskId].func = AnimTask_UnusedLevelUpHealthBox_Step;
+}
+
+static void AnimTask_UnusedLevelUpHealthBox_Step(u8 taskId)
+{
+    u8 spriteId1, spriteId2;
+    enum BattlerId battler = gBattleAnimAttacker;
+    gTasks[taskId].data[13] += gTasks[taskId].data[1];
+    gBattle_BG1_Y += (u16)gTasks[taskId].data[13] >> 8;
+    gTasks[taskId].data[13] &= 0xFF;
+
+    switch (gTasks[taskId].data[15])
+    {
+    case 0:
+        if (gTasks[taskId].data[11]++ > 1)
+        {
+            gTasks[taskId].data[11] = 0;
+            gTasks[taskId].data[12]++;
+            SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(gTasks[taskId].data[12], 16 - gTasks[taskId].data[12]));
+            if (gTasks[taskId].data[12] == 8)
+                gTasks[taskId].data[15]++;
+        }
+        break;
+    case 1:
+        if (++gTasks[taskId].data[10] == 30)
+            gTasks[taskId].data[15]++;
+        break;
+    case 2:
+        if (gTasks[taskId].data[11]++ > 1)
+        {
+            gTasks[taskId].data[11] = 0;
+            gTasks[taskId].data[12]--;
+            SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(gTasks[taskId].data[12], 16 - gTasks[taskId].data[12]));
+            if (gTasks[taskId].data[12] == 0)
+            {
+                ResetBattleAnimBg(FALSE);
+                gBattle_WIN0H = 0;
+                gBattle_WIN0V = 0;
+                SetGpuReg(REG_OFFSET_WININ, WININ_WIN0_BG_ALL | WININ_WIN0_OBJ | WININ_WIN0_CLR | WININ_WIN1_BG_ALL | WININ_WIN1_OBJ | WININ_WIN1_CLR);
+                SetGpuReg(REG_OFFSET_WINOUT, WINOUT_WIN01_BG_ALL | WINOUT_WIN01_OBJ | WINOUT_WIN01_CLR | WINOUT_WINOBJ_BG_ALL | WINOUT_WINOBJ_OBJ | WINOUT_WINOBJ_CLR);
+                if (!IsContest())
+                    SetAnimBgAttribute(1, BG_ANIM_CHAR_BASE_BLOCK, 0);
+
+                SetGpuReg(REG_OFFSET_DISPCNT, GetGpuReg(REG_OFFSET_DISPCNT) ^ DISPCNT_OBJWIN_ON);
+                SetGpuReg(REG_OFFSET_BLDCNT, 0);
+                SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(0, 0));
+                DestroySprite(&gSprites[gTasks[taskId].data[0]]);
+                DestroySprite(&gSprites[gTasks[taskId].data[2]]);
+                SetAnimBgAttribute(1, BG_ANIM_AREA_OVERFLOW_MODE, 0);
+                spriteId1 = gSprites[gHealthboxSpriteIds[battler]].oam.affineParam;
+                spriteId2 = gSprites[gHealthboxSpriteIds[battler]].data[5];
+                gSprites[gHealthboxSpriteIds[battler]].oam.priority = 1;
+                gSprites[spriteId1].oam.priority = 1;
+                gSprites[spriteId2].oam.priority = 1;
+                DestroyAnimVisualTask(taskId);
+            }
+        }
+        break;
+    }
+}
 
 void LoadHealthboxPalsForLevelUp(u8 *paletteId1, u8 *paletteId2, enum BattlerId battler)
 {
@@ -721,7 +839,7 @@ void AnimTask_ThrowBall_StandingTrainer(u8 taskId)
     else
     {
         x = 23;
-        y = 5;
+        y = 10;
     }
 
     ballId = ItemIdToBallId(gLastUsedItem);
@@ -1262,7 +1380,7 @@ static void SpriteCB_Ball_Capture_Step(struct Sprite *sprite)
         gDoingBattleAnim = FALSE;
         UpdateOamPriorityInAllHealthboxes(1, FALSE);
         m4aMPlayAllStop();
-        PlaySE(MUS_RG_CAUGHT_INTRO);
+        PlaySE(IS_HNS ? MUS_HG_EVOLVED : MUS_RG_CAUGHT_INTRO);
     }
     else if (sprite->sTimer == 315)
     {
@@ -1365,7 +1483,7 @@ static void MakeCaptureStars(struct Sprite *sprite)
     LoadBallParticleGfx(BALL_MASTER);
     for (i = 0; i < ARRAY_COUNT(sCaptureStars); i++)
     {
-        u8 spriteId = CreateSpriteUnchecked(&sBallParticles[BALL_MASTER].spriteTemplate, sprite->x, sprite->y, subpriority);
+        u8 spriteId = CreateSprite(&sBallParticles[BALL_MASTER].spriteTemplate, sprite->x, sprite->y, subpriority);
         if (spriteId != MAX_SPRITES)
         {
             gSprites[spriteId].sDuration = 24;
@@ -1491,7 +1609,7 @@ static void SpriteCB_Ball_Block_Step(struct Sprite *sprite)
 
 #undef sFrame
 
-static void LoadBallParticleGfx(enum PokeBall ballId)
+static void LoadBallParticleGfx(u8 ballId)
 {
     if (GetSpriteTileStartByTag(sBallParticles[ballId].pic.tag) == 0xFFFF)
     {
@@ -1500,7 +1618,7 @@ static void LoadBallParticleGfx(enum PokeBall ballId)
     }
 }
 
-u8 AnimateBallOpenParticles(u8 x, u8 y, u8 priority, u8 subpriority, enum PokeBall ballId)
+u8 AnimateBallOpenParticles(u8 x, u8 y, u8 priority, u8 subpriority, u8 ballId)
 {
     u8 taskId;
 
@@ -1527,7 +1645,7 @@ static void PokeBallOpenParticleAnimation(u8 taskId)
     u8 spriteId;
     u8 x, y;
     u8 priority, subpriority;
-    enum PokeBall ballId;
+    u8 ballId;
     u8 var0;
 
     ballId = gTasks[taskId].data[15];
@@ -1956,7 +2074,7 @@ static void DestroyBallOpenAnimationParticle(struct Sprite *sprite)
 #define tPaletteHi data[11]
 #define tBallId    data[15]
 
-u8 LaunchBallFadeMonTask(bool8 unfadeLater, u8 spritePalNum, u32 selectedPalettes, enum PokeBall ballId)
+u8 LaunchBallFadeMonTask(bool8 unfadeLater, u8 spritePalNum, u32 selectedPalettes, u8 ballId)
 {
     u8 taskId;
 
@@ -1985,7 +2103,7 @@ u8 LaunchBallFadeMonTask(bool8 unfadeLater, u8 spritePalNum, u32 selectedPalette
 
 static void Task_FadeMon_ToBallColor(u8 taskId)
 {
-    enum PokeBall ballId = gTasks[taskId].tBallId;
+    u8 ballId = gTasks[taskId].tBallId;
 
     if (gTasks[taskId].tTimer <= 16)
     {
@@ -2013,7 +2131,7 @@ static void Task_FadeMon_ToNormal(u8 taskId)
 
 static void Task_FadeMon_ToNormal_Step(u8 taskId)
 {
-    enum PokeBall ballId = gTasks[taskId].tBallId;
+    u8 ballId = gTasks[taskId].tBallId;
 
     if (gTasks[taskId].tTimer <= 16)
     {
@@ -2163,7 +2281,7 @@ void TryShinyAnimation(enum BattlerId battler, struct Pokemon *mon)
     if (illusionMon != NULL)
         mon = illusionMon;
 
-    if (IsBattlerSpriteVisible(battler) && IsValidForBattle(mon) && (!gTestRunnerHeadless || gBattleTestRunnerState->forceMoveAnim))
+    if (IsBattlerSpriteVisible(battler) && IsValidForBattle(mon) && !gTestRunnerHeadless)
     {
         if (isShiny)
         {
@@ -2322,8 +2440,11 @@ static void SpriteCB_ShinyStars_Diagonal(struct Sprite *sprite)
 
 void AnimTask_LoadPokeblockGfx(u8 taskId)
 {
+    u8 UNUSED paletteIndex;
+
     LoadCompressedSpriteSheetUsingHeap(&gBattleAnimTable[GET_TRUE_SPRITE_INDEX(ANIM_TAG_POKEBLOCK)].pic);
     LoadSpritePalette(&gBattleAnimTable[GET_TRUE_SPRITE_INDEX(ANIM_TAG_POKEBLOCK)].palette);
+    paletteIndex = IndexOfSpritePaletteTag(ANIM_TAG_POKEBLOCK);
     DestroyAnimVisualTask(taskId);
 }
 

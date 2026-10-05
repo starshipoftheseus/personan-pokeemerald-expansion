@@ -25,11 +25,9 @@
 #include "config/follower_npc.h"
 #include "config/general.h"
 #include "config/item.h"
-#include "config/map_preview_screen.h"
 #include "config/overworld.h"
 #include "config/pokemon.h"
 #include "config/summary_screen.h"
-#include "config/wild_encounter.h"
 
 // Invalid Versions show as "----------" in Gen 4 and Gen 5's summary screen.
 // In Gens 6 and 7, invalid versions instead show "a distant land" in the summary screen.
@@ -67,14 +65,19 @@ enum Language
 #ifdef FIRERED
     #define GAME_VERSION (VERSION_FIRE_RED)
     #define IS_FRLG 1
-#else
-    #ifdef LEAFGREEN
+    #define IS_HNS 0
+#elif defined(LEAFGREEN)
     #define GAME_VERSION (VERSION_LEAF_GREEN)
     #define IS_FRLG 1
-    #else
+    #define IS_HNS 0
+#elif defined(POKEMON_HNS)
     #define GAME_VERSION (VERSION_EMERALD)
     #define IS_FRLG 0
-    #endif
+    #define IS_HNS 1
+#else
+    #define GAME_VERSION (VERSION_EMERALD)
+    #define IS_FRLG 0
+    #define IS_HNS 0
 #endif
 #define GAME_LANGUAGE (LANGUAGE_ENGLISH)
 
@@ -105,16 +108,33 @@ enum Language
 #define MAX_REMATCH_ENTRIES 100 // only REMATCH_TABLE_ENTRIES (78) are used
 #define NUM_CONTEST_WINNERS 13
 #define UNION_ROOM_KB_ROW_COUNT 10
+#define GIFT_RIBBONS_COUNT 11
 #define SAVED_TRENDS_COUNT 5
 #define PYRAMID_BAG_ITEMS_COUNT 10
-#define ROAMER_COUNT 1 // Number of maximum concurrent active roamers
+#if IS_HNS
+#define ROAMER_COUNT 4
+#else
+#define ROAMER_COUNT 1
+#endif
 
 // Bag constants
-#define BAG_ITEMS_COUNT 30
-#define BAG_KEYITEMS_COUNT 30
-#define BAG_POKEBALLS_COUNT 16
-#define BAG_TMHM_COUNT 64
-#define BAG_BERRIES_COUNT 46
+#if I_COMBINE_BAG_POCKETS == TRUE
+#define BAG_ITEMS_COUNT (200 + 36)
+#define BAG_KEYITEMS_COUNT 60
+#define BAG_POKEBALLS_COUNT 39 // 29 + padding
+#define BAG_TMHM_COUNT 160 // 110 + padding
+#define BAG_BERRIES_COUNT 66 // 46 + padding
+#define BAG_MEDICINE_COUNT (60 + 32) // 40 + padding
+#else
+#define BAG_ITEMS_COUNT 200
+#define BAG_KEYITEMS_COUNT 60
+#define BAG_POKEBALLS_COUNT 39 // 29 + padding
+#define BAG_TMHM_COUNT 160 // 110 + padding
+#define BAG_BERRIES_COUNT 66 // 46 + padding
+#define BAG_MEDICINE_COUNT 60 // 40 + padding
+#define BAG_BATTLE_ITEMS_COUNT 32 // 12 + padding
+#define BAG_TREASURES_COUNT 36 // 26 + padding
+#endif
 
 // Number of facilities for Ranking Hall.
 // 7 facilities for single mode + tower double mode + tower multi mode.
@@ -200,6 +220,11 @@ enum Gender
 
 #define OPTIONS_BATTLE_STYLE_SHIFT 0
 #define OPTIONS_BATTLE_STYLE_SET 1
+
+#define OPTIONS_EXP_MULTIPLIER_1X   0   // 1x EXP multiplier    Normal Difficulty
+#define OPTIONS_EXP_MULTIPLIER_1_5X 1   // 1.5x EXP multiplier  Easier Difficulty
+#define OPTIONS_EXP_MULTIPLIER_2X   2   // 2x EXP multiplier    Easiest Difficulty
+#define OPTIONS_EXP_MULTIPLIER_0X   3   // 0x EXP multiplier    Hardest Difficulty
 
 enum __attribute__((packed)) Direction
 {

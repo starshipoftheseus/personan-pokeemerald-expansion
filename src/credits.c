@@ -24,7 +24,7 @@
 #include "event_data.h"
 #include "random.h"
 
-#if !IS_FRLG
+#if !IS_FRLG && !IS_HNS
 
 #define COLOR_DARK_GREEN RGB(7, 11, 6)
 #define COLOR_LIGHT_GREEN RGB(13, 20, 12)
@@ -87,8 +87,8 @@ static EWRAM_DATA u16 sSavedTaskId = 0;
 EWRAM_DATA bool8 gHasHallOfFameRecords = 0;
 static EWRAM_DATA struct CreditsData *sCreditsData = {0};
 
-static const u16 sCredits_Pal[] = INCGFX_U16("graphics/credits/credits.pal", ".gbapal");
-static const u32 sCreditsCopyrightEnd_Gfx[] = INCGFX_U32("graphics/credits/the_end_copyright.png", ".4bpp.smol");
+static const u16 sCredits_Pal[] = INCBIN_U16("graphics/credits/credits.gbapal");
+static const u32 sCreditsCopyrightEnd_Gfx[] = INCBIN_U32("graphics/credits/the_end_copyright.4bpp.smol");
 
 static void SpriteCB_CreditsMonBg(struct Sprite *);
 static void Task_WaitPaletteFade(u8);
@@ -433,7 +433,7 @@ void CB2_StartCreditsSequence(void)
     BeginNormalPaletteFade(PALETTES_ALL, 0, 16, 0, RGB_BLACK);
     EnableInterrupts(INTR_FLAG_VBLANK);
     SetVBlankCallback(VBlankCB_Credits);
-    m4aSongNumStart(MUS_CREDITS);
+    m4aSongNumStart(MUS_CREDITS, FlagGet(FLAG_SYS_GBS_ENABLED));
     SetMainCallback2(CB2_Credits);
     sCreditsData = AllocZeroed(sizeof(struct CreditsData));
 
@@ -676,7 +676,7 @@ static void Task_CreditsTheEnd6(u8 taskId)
             FadeOutBGM(8);
 
         if (gTasks[taskId].tDelay == 6840)
-            m4aSongNumStart(MUS_END);
+            m4aSongNumStart(MUS_END, FlagGet(FLAG_SYS_GBS_ENABLED));
 
         gTasks[taskId].tDelay--;
     }
@@ -1624,4 +1624,4 @@ static void DeterminePokemonToShow(void)
     sCreditsData->numMonToShow = NUM_MON_SLIDES;
 }
 
-#endif // !IS_FRLG
+#endif // !IS_FRLG && !IS_HNS

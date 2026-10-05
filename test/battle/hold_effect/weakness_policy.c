@@ -8,7 +8,7 @@ ASSUMPTIONS
 
 SINGLE_BATTLE_TEST("Weakness Policy does not activate if Disguise blocks the damage")
 {
-    enum Species species;
+    u32 species;
 
     PARAMETRIZE { species = SPECIES_MIMIKYU_BUSTED; }
     PARAMETRIZE { species = SPECIES_MIMIKYU_DISGUISED; }

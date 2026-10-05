@@ -9,7 +9,7 @@ ASSUMPTIONS
 SINGLE_BATTLE_TEST("Tar Shot doubles the effectiveness of Fire-type moves used on the target")
 {
     s16 damage[2];
-    enum Species species;
+    u32 species;
 
     PARAMETRIZE { species = SPECIES_WOBBUFFET; }
     PARAMETRIZE { species = SPECIES_OMASTAR; } // Dual type with double resists

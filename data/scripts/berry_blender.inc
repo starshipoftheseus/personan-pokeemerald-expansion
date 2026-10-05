@@ -236,6 +236,12 @@ BerryBlender_Text_DontHaveAnyBerriesNoneToSpare:
 
 BerryBlender_EventScript_BerryBlender1::
 	lockall
+@ HnS gates the Blend Master behind the Elite Four, because he is the only route
+@ to a Gold Pokeblock and so to a five-perfect-IV Safari Zone catch. Vanilla's
+@ Lilycove Contest Lobby shares this script, so the check has to stay HnS-only.
+#if IS_HNS
+	goto_if_unset FLAG_IS_CHAMPION, BerryBlender_EventScript_TooWeakToBlend
+#endif
 	goto_if_unset FLAG_HIDE_LILYCOVE_CONTEST_HALL_BLEND_MASTER, BerryBlender_EventScript_BlendMasterPresent
 	setvar NUM_OPPONENTS, 1
 	applymovement LOCALID_BLEND_MASTER, BerryBlender_Movement_BlendLeaderWalkInPlace
@@ -244,6 +250,20 @@ BerryBlender_EventScript_BerryBlender1::
 	goto_if_eq VAR_RESULT, YES, BerryBlender_EventScript_TryUseBerryBlender1
 	goto BerryBlender_EventScript_DeclineBlender1
 	end
+
+BerryBlender_EventScript_TooWeakToBlend::
+	msgbox BerryBlender_Text_TooWeakToBlend, MSGBOX_DEFAULT
+	closemessage
+	releaseall
+	end
+
+BerryBlender_Text_TooWeakToBlend::
+	.string "BLEND MASTER: Hmmm! So, you wish to\n"
+	.string "see my mastery in action?\p"
+	.string "Sorry, but my blending is far too\n"
+	.string "advanced for a rookie like yourself.\p"
+	.string "Come back and see me once you've\n"
+	.string "achieved greatness.$"
 
 BerryBlender_EventScript_DeclineBlender1:
 	msgbox BerryBlender_Text_MadeOldTimerSad, MSGBOX_DEFAULT
@@ -300,6 +320,7 @@ BerryBlender_EventScript_DoBerryBlending:
 	copyvar VAR_0x8004, NUM_OPPONENTS
 	fadescreen FADE_TO_BLACK
 	special DoBerryBlending
+	waitstate
 	releaseall
 	end
 
@@ -564,6 +585,7 @@ BerryBlender_EventScript_TryDoLinkBlender:
 	message BerryBlender_Text_SearchingForFriends
 	waitmessage
 	special TryBerryBlenderLinkup
+	waitstate
 	goto_if_eq VAR_RESULT, LINKUP_SUCCESS, BerryBlender_EventScript_SpawnLinkPartners
 	goto_if_eq VAR_RESULT, LINKUP_SOMEONE_NOT_READY, BerryBlender_EventScript_CloseLinkNotReady
 	goto_if_eq VAR_RESULT, LINKUP_DIFF_SELECTIONS, BerryBlender_EventScript_CloseLinkDifferentSelections
@@ -594,6 +616,7 @@ BerryBlender_EventScript_DoLinkBerryBlending:
 	removeobject 238
 	removeobject 237
 	special DoBerryBlending
+	waitstate
 	releaseall
 	end
 
@@ -686,10 +709,12 @@ BerryBlender_EventScript_TryJoinGroup:
 
 BerryBlender_EventScript_TryBecomeLinkLeader:
 	special TryBecomeLinkLeader
+	waitstate
 	return
 
 BerryBlender_EventScript_TryJoinLinkGroup:
 	special TryJoinLinkGroup
+	waitstate
 	return
 
 BerryBlender_EventScript_LinkLeaderDecided:

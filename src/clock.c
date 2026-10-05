@@ -7,10 +7,8 @@
 #include "field_weather.h"
 #include "lottery_corner.h"
 #include "main.h"
-#include "mass_outbreak.h"
 #include "overworld.h"
 #include "pokerus.h"
-#include "random.h"
 #include "rtc.h"
 #include "time_events.h"
 #include "tv.h"
@@ -39,33 +37,6 @@ void DoTimeBasedEvents(void)
     }
 }
 
-void UpdateDailySeed(void)
-{
-    gSaveBlock1Ptr->dailySeed = Random32();
-}
-
-void DoDailyEvents(u32 daysSince)
-{
-    ClearDailyFlags();
-    UpdateDailySeed();
-    UpdateMassOutbreakDaysLeft(daysSince);
-    UpdateDewfordTrendPerDay(daysSince);
-    UpdateTVShowsPerDay(daysSince);
-    UpdateWeatherPerDay(daysSince);
-    UpdatePartyPokerusTime(daysSince);
-    UpdateBirchState(daysSince);
-    UpdateFrontierManiac(daysSince);
-    UpdateFrontierGambler(daysSince);
-    SetShoalItemFlag(daysSince);
-    if (!OW_USE_DAILY_SEED_FOR_VANILLA_VARIABLES)
-    {
-        UpdateMirageRnd(daysSince);
-        SetRandomLotteryNumber(daysSince);
-    }
-    UpdateDaysPassedSinceFormChange(daysSince);
-    DailyResetApricornTrees();
-}
-
 static void UpdatePerDay(struct Time *localTime)
 {
     u16 *days = GetVarPointer(VAR_DAYS);
@@ -74,7 +45,23 @@ static void UpdatePerDay(struct Time *localTime)
     if (*days != localTime->days && *days <= localTime->days)
     {
         daysSince = localTime->days - *days;
-        DoDailyEvents(daysSince);
+        ClearDailyFlags();
+        UpdateDewfordTrendPerDay(daysSince);
+        UpdateTVShowsPerDay(daysSince);
+        UpdateWeatherPerDay(daysSince);
+        UpdatePartyPokerusTime(daysSince);
+        UpdateMirageRnd(daysSince);
+        UpdateBirchState(daysSince);
+        UpdateFrontierManiac(daysSince);
+        UpdateFrontierGambler(daysSince);
+        SetShoalItemFlag(daysSince);
+        SetRandomLotteryNumber(daysSince);
+        UpdateDaysPassedSinceFormChange(daysSince);
+        DailyResetApricornTrees();
+        *days = localTime->days;
+    }
+    else
+    {
         *days = localTime->days;
     }
 }
@@ -86,13 +73,15 @@ static void UpdatePerMinute(struct Time *localTime)
 
     CalcTimeDifference(&difference, &gSaveBlock2Ptr->lastBerryTreeUpdate, localTime);
     minutes = 24 * 60 * difference.days + 60 * difference.hours + difference.minutes;
-    if (minutes != 0)
+
+    if (minutes > 0)
     {
-        if (minutes >= 0)
-        {
-            BerryTreeTimeUpdate(minutes);
-            gSaveBlock2Ptr->lastBerryTreeUpdate = *localTime;
-        }
+        BerryTreeTimeUpdate(minutes);
+        gSaveBlock2Ptr->lastBerryTreeUpdate = *localTime;
+    }
+    else if (minutes < 0)
+    {
+        gSaveBlock2Ptr->lastBerryTreeUpdate = *localTime;
     }
 }
 
@@ -101,7 +90,7 @@ void FormChangeTimeUpdate()
     s32 i;
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        TryFormChange(&gParties[B_TRAINER_PLAYER][i], FORM_CHANGE_TIME_OF_DAY, B_TRAINER_PLAYER);
+        TryFormChange(&gPlayerParty[i], FORM_CHANGE_TIME_OF_DAY);
     }
 }
 

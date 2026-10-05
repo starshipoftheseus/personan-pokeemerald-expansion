@@ -2,8 +2,6 @@
 #define GUARD_CONSTANTS_FLAGS_FRLG_H
 
 
-#define FLAG_0x020               0x020
-#define FLAG_0x021               0x021
 #define FLAG_0x022               0x022
 #define FLAG_0x023               0x023
 #define FLAG_0x024               0x024
@@ -1489,7 +1487,7 @@
 #define FLAG_0x8FE                                                  (SYS_FLAGS + 0xFE)
 #define FLAG_0x8FF                                                  (SYS_FLAGS + 0xFF)
 
-#define FLAGS_COUNT (FLAG_0x8FF + 1)
+#define BUILD_FLAGS_END                             FLAG_0x8FF
 
 // Special Flags (Stored in EWRAM (sSpecialFlags, not in the SaveBlock)
 #define SPECIAL_FLAGS_START           0x4000
@@ -1532,7 +1530,7 @@
 #define FLAG_OCEANIC_MUSEUM_MET_REPORTER     0
 #define FLAG_RECEIVED_HM_STRENGTH            0
 #define FLAG_RECEIVED_HM_ROCK_SMASH          0
-#define FLAG_WHITEOUT_TO_LAVARIDGE           0 // Set after defeating Flannery, so the player can't white out from poison before receiving Go Goggles
+#define FLAG_WHITEOUT_TO_LAVARIDGE           0 // Set after defeating Flannery, so the player cant white out from poison before receiving Go Goggles
 #define FLAG_RECEIVED_HM_FLASH               0
 #define FLAG_RECEIVED_HM_FLY                 0
 #define FLAG_GROUDON_AWAKENED_MAGMA_HIDEOUT  0
@@ -2674,6 +2672,35 @@
 #define FLAG_DAILY_SOOTOPOLIS_RECEIVED_BERRY        0
 #define FLAG_UNUSED_0x933                           0
 #define FLAG_DAILY_APPRENTICE_LEAVES                0
+
+// HnS visited flags
+
+#define FLAG_VISITED_NEWBARK_TOWN                   0
+#define FLAG_VISITED_CHERRYGROVE_CITY               0
+#define FLAG_VISITED_VIOLET_CITY                    0
+#define FLAG_VISITED_AZALEA_TOWN                    0
+#define FLAG_VISITED_GOLDENROD_CITY                 0
+#define FLAG_VISITED_ECRUTEAK_CITY                  0
+#define FLAG_VISITED_OLIVINE_CITY                   0
+#define FLAG_VISITED_CIANWOOD_CITY                  0
+#define FLAG_VISITED_MAHOGANY_TOWN                  0
+#define FLAG_VISITED_LAKE_OF_RAGE                   0
+#define FLAG_VISITED_BLACKTHORN_CITY                0
+#define FLAG_VISITED_INDIGO_PLATEAU                 0
+#define FLAG_VISITED_MT_SILVER                      0
+#define FLAG_VISITED_RECEPTION_GATE                 0
+#define FLAG_VISITED_SAFARI_ZONE_GATE               0
+#define FLAG_VISITED_KANTO                          0
+#define FLAG_VISITED_PALLET_TOWN                    0
+#define FLAG_VISITED_VIRIDIAN_CITY                  0
+#define FLAG_VISITED_PEWTER_CITY                    0
+#define FLAG_VISITED_CERULEAN_CITY                  0
+#define FLAG_VISITED_VERMILION_CITY                 0
+#define FLAG_VISITED_LAVENDER_TOWN                  0
+#define FLAG_VISITED_CELADON_CITY                   0
+#define FLAG_VISITED_SAFFRON_CITY                   0
+#define FLAG_VISITED_FUCHSIA_CITY                   0
+#define FLAG_VISITED_CINNABAR_ISLAND                0
 
 // Special Flags (Stored in EWRAM (sSpecialFlags), not in the SaveBlock)
 #define SPECIAL_FLAGS_START                     0x4000

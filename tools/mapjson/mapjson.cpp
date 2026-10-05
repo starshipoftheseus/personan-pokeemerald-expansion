@@ -162,39 +162,27 @@ string generate_map_header_text(Json map_data, Json layouts_data) {
     else
         text << "\t.4byte NULL\n";
 
-    text << "\t.2byte " << json_to_string(map_data, "music") << "\n";
-
-    text << "\t.2byte " << json_to_string(layout, "id") << "\n"
+    text << "\t.2byte " << json_to_string(map_data, "music") << "\n"
+         << "\t.2byte " << json_to_string(layout, "id") << "\n"
          << "\t.byte "  << json_to_string(map_data, "region_map_section") << "\n"
+         << "\t.byte "  << json_to_string(map_data, "requires_flash") << "\n"
          << "\t.byte "  << json_to_string(map_data, "weather") << "\n"
          << "\t.byte "  << json_to_string(map_data, "map_type") << "\n";
 
-    string floor_number = json_to_string(map_data, "floor_number", true);
-    if (floor_number.empty())
-        text << "\t.byte 0\n";
-    else
-        text << "\t.byte " << floor_number << "\n";
-
-    if (!map_data["night_music"].is_null())
-        text << "\t.2byte " << json_to_string(map_data, "night_music") << "\n";
-    else
-        text << "\t.2byte MUS_NONE\n";
+    if (version != "firered")
+        text << "\t.2byte 0\n";
 
     if (version == "ruby")
         text << "\t.byte " << json_to_string(map_data, "show_map_name") << "\n";
-    else if (version == "emerald" || version == "firered")
-    {
+    else if (version == "emerald" || version == "firered" || version == "hns")
         text << "\tmap_header_flags "
              << "allow_cycling=" << json_to_string(map_data, "allow_cycling") << ", "
              << "allow_escaping=" << json_to_string(map_data, "allow_escaping") << ", "
              << "allow_running=" << json_to_string(map_data, "allow_running") << ", "
-             << "show_map_name=" << json_to_string(map_data, "show_map_name") << ", ";
-        if (map_data.object_items().find("write_specialvar_iseffect") != map_data.object_items().end())
-            text << "write_specialvar_iseffect=" << json_to_string(map_data, "write_specialvar_iseffect") << ", ";
-        else
-            text  << "write_specialvar_iseffect=FALSE" << ", ";
-        text << "requires_flash=" << json_to_string(map_data, "requires_flash") << "\n";
-    }
+             << "show_map_name=" << json_to_string(map_data, "show_map_name") << "\n";
+
+    if (version == "firered")
+        text << "\t.byte " << json_to_string(map_data, "floor_number") << "\n";
 
      text << "\t.byte " << json_to_string(map_data, "battle_scene") << "\n\n";
 
@@ -476,35 +464,26 @@ string generate_groups_text(Json groups_data, vector<string> &invalid_maps) {
 
     text << get_generated_warning("data/maps/map_groups.json", true);
 
-    vector<string> valid_groups;
     for (auto &key : groups_data["group_order"].array_items()) {
         string group = json_to_string(key);
-        vector<string> valid_maps;
         auto maps = groups_data[group].array_items();
+
+        text << group << "::\n";
         for (Json &map_name : maps) {
             string map_name_str = json_to_string(map_name);
             auto it = find(invalid_maps.begin(), invalid_maps.end(), map_name_str);
             if (it == invalid_maps.end()) {
-                valid_maps.push_back(map_name_str);
+                text << "\t.4byte " << map_name_str << "\n";
+            } else {
+                text << "\t.4byte NULL\n";
             }
         }
-
-        if (valid_maps.size() > 0) {
-            text << group << "::\n";
-            for (string map : valid_maps)
-                text << "\t.4byte " << map << "\n";
-            text << "\n";
-            valid_groups.push_back(group);
-        }
+        text << "\n";
     }
 
     text << "\t.align 2\n" << "gMapGroups::\n";
     for (auto &group : groups_data["group_order"].array_items()) {
-        string group_str = json_to_string(group);
-        if (find(valid_groups.begin(), valid_groups.end(), group_str) != valid_groups.end())
-            text << "\t.4byte " << group_str << "\n";
-        else
-            text << "\t.4byte NULL\n";
+        text << "\t.4byte " << json_to_string(group) << "\n";
     }
     text << "\n";
 
@@ -740,18 +719,17 @@ void process_groups(string groups_filepath, vector<string> &map_filepaths, strin
         if (map_data == Json())
             FATAL_ERROR("Failed to read '%s' while processing groups: %s\n", filepath.c_str(), err.c_str());
 
-        string region = json_to_string(map_data, "region", true);
+        string game_ver = json_to_string(map_data, "game_version", true);
+        if (game_ver.empty())
+            game_ver = "emerald";
 
-        if (region.empty()) {
-            if (version == "emerald")
-                region = "REGION_HOENN";
-            else if (version == "firered")
-                region = "REGION_KANTO";
-        }
         string map_name = json_to_string(map_data, "name");
 
-        if ((version == "emerald" && region != "REGION_HOENN")
-         || (version == "firered" && region != "REGION_KANTO")) {
+        string expected_game_ver = version;
+        if (expected_game_ver == "firered")
+            expected_game_ver = "frlg";
+
+        if (game_ver != expected_game_ver) {
             invalid_maps.push_back(map_name);
         }
     }
@@ -773,6 +751,16 @@ void process_groups(string groups_filepath, vector<string> &map_filepaths, strin
     write_text_file(output_c + sep + "map_groups.h", map_header_text);
 }
 
+bool layout_matches_version(const Json &layout) {
+    string game_ver = json_to_string(layout, "game_version", true);
+    if (game_ver.empty())
+        game_ver = "emerald";
+    string expected = version;
+    if (expected == "firered")
+        expected = "frlg";
+    return game_ver == expected;
+}
+
 string generate_layout_headers_text(Json layouts_data) {
     ostringstream text;
 
@@ -782,17 +770,11 @@ string generate_layout_headers_text(Json layouts_data) {
         if (layout == Json::object()) continue;
         if (!std::filesystem::exists(json_to_string(layout, "border_filepath")))
             continue;
-        string layout_version = json_to_string(layout, "layout_version", true);
-
-        if (layout_version.empty()) {
-            if (version == "emerald")
-                layout_version = "emerald";
-            else if (version == "firered")
-                layout_version = "frlg";
-        }
-        if ((version == "emerald" && layout_version != "emerald")
-         || (version == "firered" && layout_version != "frlg"))
+        if (!layout_matches_version(layout))
             continue;
+        string layout_version = json_to_string(layout, "layout_version", true);
+        if (layout_version.empty())
+            layout_version = "emerald";
         string layoutName = json_to_string(layout, "name");
         string border_label = layoutName + "_Border";
         string blockdata_label = layoutName + "_Blockdata";
@@ -809,9 +791,11 @@ string generate_layout_headers_text(Json layouts_data) {
              << "\t.4byte " << json_to_string(layout, "primary_tileset") << "\n"
              << "\t.4byte " << json_to_string(layout, "secondary_tileset") << "\n";
         if (layout_version == "frlg")
-            text << "\t.byte TRUE\n";
+            text << "\t.byte 1\n"; // LAYOUT_VERSION_FRLG
+        else if (layout_version == "hns")
+            text << "\t.byte 2\n"; // LAYOUT_VERSION_HNS
         else
-            text << "\t.byte FALSE\n";
+            text << "\t.byte 0\n"; // LAYOUT_VERSION_EMERALD
 
         if (layout_version == "frlg")
         {
@@ -841,14 +825,7 @@ string generate_layouts_table_text(Json layouts_data) {
     for (auto &layout : layouts_data["layouts"].array_items()) {
         if (!std::filesystem::exists(json_to_string(layout, "border_filepath")))
             continue;
-        string layout_version = json_to_string(layout, "layout_version", true);
-        if (layout_version.empty()) {
-            if (version == "emerald")
-                layout_version = "emerald";
-            else if (version == "firered")
-                layout_version = "frlg";
-        }
-        if ((version == "emerald" && layout_version != "emerald") || (version == "firered" && layout_version != "frlg")) {
+        if (!layout_matches_version(layout)) {
             text << "\t.4byte NULL\n";
         } else {
             string layout_name = json_to_string(layout, "name", true);
@@ -942,8 +919,8 @@ int main(int argc, char *argv[]) {
 
     char *version_arg = argv[2];
     version = string(version_arg);
-    if (version != "emerald" && version != "ruby" && version != "firered")
-        FATAL_ERROR("ERROR: <game-version> must be 'emerald', 'firered', or 'ruby'.\n");
+    if (version != "emerald" && version != "ruby" && version != "firered" && version != "hns")
+        FATAL_ERROR("ERROR: <game-version> must be 'emerald', 'firered', 'hns', or 'ruby'.\n");
 
     char *mode_arg = argv[1];
     string mode(mode_arg);

@@ -27,7 +27,6 @@
 #include "task.h"
 #include "test_runner.h"
 #include "text.h"
-#include "trainer.h"
 #include "util.h"
 #include "wild_encounter.h"
 #include "constants/abilities.h"
@@ -35,6 +34,7 @@
 #include "constants/songs.h"
 #include "test/battle.h"
 #include "test/test.h"
+#include "test/test_runner_battle.h"
 
 static EWRAM_DATA u8 sLinkSendTaskId = 0;
 static EWRAM_DATA u8 sLinkReceiveTaskId = 0;
@@ -55,6 +55,7 @@ static void SpriteCB_FreeOpponentSprite(struct Sprite *sprite);
 static u32 ReturnAnimIdForBattler(bool32 isPlayerSide, u32 specificBattler);
 static void LaunchKOAnimation(enum BattlerId battlerId, u16 animId, bool32 isFront);
 static void AnimateMonAfterKnockout(enum BattlerId battler);
+
 
 bool32 IsAiVsAiBattle(void)
 {
@@ -114,14 +115,6 @@ bool32 BattlerHasAi(enum BattlerId battlerId)
 
     if (IsAiVsAiBattle())
         return TRUE;
-
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED
-     && gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER
-     && !(gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
-     && battlerId == B_BATTLER_2)
-    {
-        return TRUE;
-    }
 
     return FALSE;
 }
@@ -192,12 +185,6 @@ void InitBattleControllers(void)
         *((u8 *)(&gBattleStruct->tv) + i) = 0;
 }
 
-static void SetBattlerControllerFunc(enum BattlerPosition position, BattleControllerFunc func)
-{
-    assertf(position < MAX_POSITION_COUNT, "invalid battler position: %d", position);
-    gBattlerControllerFuncs[position] = func;
-}
-
 static void InitBtlControllersInternal(void)
 {
     s32 i;
@@ -221,7 +208,7 @@ static void InitBtlControllersInternal(void)
 
     if ((gBattleTypeFlags & BATTLE_TYPE_BATTLE_TOWER)
         || !isMulti
-        || (TESTING && isMulti)
+        || (IsMultibattleTest())
         || (!isLink && !isRecorded)
         || (isLink && !isDouble))
     {
@@ -246,109 +233,84 @@ static void InitBtlControllersInternal(void)
         if (isLink)
         {
             if (isDouble && isMulti && !isMaster)
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_0), SetControllerToLinkPartner);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = SetControllerToLinkPartner;
             else
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_0), SetControllerToPlayer);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = SetControllerToPlayer;
 
             if (!isDouble || !isMulti || !isMaster)
             {
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_1), SetControllerToLinkOpponent);
-                if (isDouble)
-                {
-                    SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_2), SetControllerToPlayer);
-                    SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_3), SetControllerToLinkOpponent);
-                }
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_1)] = SetControllerToLinkOpponent;
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_2)] = SetControllerToPlayer;
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_3)] = SetControllerToLinkOpponent;
             }
             else
             {
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_1), SetControllerToOpponent);
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_2), SetControllerToLinkPartner);
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_3), SetControllerToOpponent);
-            }
-
-            // Set gBattlerBattleController early for link multis so GetBattlerTrainer can use it
-            if (isDouble && isMulti)
-            {
-                for (enum BattlerId i = 0; i < MAX_BATTLERS_COUNT; i++)
-                {
-                    if (gBattlerControllerFuncs[i] == SetControllerToPlayer)
-                        gBattlerBattleController[i] = BATTLE_CONTROLLER_PLAYER;
-                    else if (gBattlerControllerFuncs[i] == SetControllerToLinkPartner)
-                        gBattlerBattleController[i] = BATTLE_CONTROLLER_LINK_PARTNER;
-                    else if (gBattlerControllerFuncs[i] == SetControllerToLinkOpponent)
-                        gBattlerBattleController[i] = BATTLE_CONTROLLER_LINK_OPPONENT;
-                    else if (gBattlerControllerFuncs[i] == SetControllerToOpponent)
-                        gBattlerBattleController[i] = BATTLE_CONTROLLER_OPPONENT;
-                }
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_1)] = SetControllerToOpponent;
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_2)] = SetControllerToLinkPartner;
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_3)] = SetControllerToOpponent;
             }
         }
         else
         {
             // Player 1
             if (isRecorded)
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_0), SetControllerToRecordedPlayer);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = SetControllerToRecordedPlayer;
             else if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_0), SetControllerToSafari);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = SetControllerToSafari;
             else if (gBattleTypeFlags & BATTLE_TYPE_CATCH_TUTORIAL)
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_0), IS_FRLG ? SetControllerToOakOrOldMan : SetControllerToWally);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = IS_FRLG ? SetControllerToOakOrOldMan : SetControllerToWally;
             else if (IS_FRLG && (gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE))
-                SetBattlerControllerFunc(gBattlerPositions[B_BATTLER_0], SetControllerToOakOrOldMan);
+                gBattlerControllerFuncs[gBattlerPositions[B_BATTLER_0]] = SetControllerToOakOrOldMan;
             else if (isAIvsAI)
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_0), SetControllerToPlayerPartner);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = SetControllerToPlayerPartner;
             else
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_0), SetControllerToPlayer);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_0)] = SetControllerToPlayer;
 
             // Opponent 1
             bool32 isOpponent1Recorded;
             if (isDouble)
-                isOpponent1Recorded = ((!isInGamePartner && isRecorded && !isMulti && isRecordedLink) || (TESTING && isMulti && isRecordedLink));
+                isOpponent1Recorded = ((!isInGamePartner && isRecorded && !isMulti && isRecordedLink) || (IsMultibattleTest() && isRecordedLink));
             else
                 isOpponent1Recorded = isRecorded && isRecordedLink;
 
             if (isOpponent1Recorded)
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_1), SetControllerToRecordedOpponent);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_1)] = SetControllerToRecordedOpponent;
             else
-                SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_1), SetControllerToOpponent);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_1)] = SetControllerToOpponent;
 
-            // Singles leave the second pair of positions at B_POSITION_ABSENT.
-            if (isDouble)
+            // Player 2
+            if (IsMultibattleTest() && isRecordedLink)
             {
-                // Player 2
-                if (TESTING && isMulti && isRecordedLink)
-                {
-                    SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_2), SetControllerToRecordedPartner);
-                }
-                else if (TESTING && isMulti && isRecorded && !isRecordedLink)
-                { // Sets to PlayerPartner if EXPECT_XXXX used in test for partner trainer, else sets to RecordedPartner.
-#if TESTING
-                    if (gBattleTestRunnerState->data.expectedAiActions[B_BATTLER_2][0].actionSet == TRUE)
-                        SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_2), SetControllerToPlayerPartner);
-                    else
-#endif
-                        SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_2), SetControllerToRecordedPartner);
-                }
-                else if ((isInGamePartner && !isRecorded)
-                        || isAIvsAI)
-                {
-                    SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_2), SetControllerToPlayerPartner);
-                }
-                else if (isRecorded)
-                {
-                    SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_2), SetControllerToRecordedPlayer);
-                }
-                else
-                {
-                    SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_2), SetControllerToPlayer);
-                }
-
-                // Opponent 2
-                if (TESTING && isMulti && isRecordedLink)
-                    SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_3), SetControllerToRecordedOpponent);
-                else if (isInGamePartner || !isRecorded || isMulti || !isRecordedLink)
-                    SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_3), SetControllerToOpponent);
-                else
-                    SetBattlerControllerFunc(GetBattlerPosition(B_BATTLER_3), SetControllerToRecordedOpponent);
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_2)] = SetControllerToRecordedPartner;
             }
+            else if (IsMultibattleTest() && isRecorded && !isRecordedLink)
+            { // Sets to PlayerPartner if EXPECT_XXXX used in test for partner trainer, else sets to RecordedPartner.
+                if (gBattleTestRunnerState->data.expectedAiActions[B_BATTLER_2][0].actionSet == TRUE)
+                    gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_2)] = SetControllerToPlayerPartner;
+                else
+                    gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_2)] = SetControllerToRecordedPartner;
+            }
+            else if ((isInGamePartner && !isRecorded)
+                    || isAIvsAI)
+            {
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_2)] = SetControllerToPlayerPartner;
+            }
+            else if (isRecorded)
+            {
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_2)] = SetControllerToRecordedPlayer;
+            }
+            else
+            {
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_2)] = SetControllerToPlayer;
+            }
+
+            // Opponent 2
+            if (IsMultibattleTest() && isRecordedLink)
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_3)] = SetControllerToRecordedOpponent;
+            else if (isInGamePartner || !isRecorded || isMulti || !isRecordedLink)
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_3)] = SetControllerToOpponent;
+            else
+                gBattlerControllerFuncs[GetBattlerPosition(B_BATTLER_3)] = SetControllerToRecordedOpponent;
         }
 
         bool32 bufferPartyOrders;
@@ -367,8 +329,11 @@ static void InitBtlControllersInternal(void)
 
             gBattlerPartyIndexes[0] = 0;
             gBattlerPartyIndexes[1] = 0;
-            gBattlerPartyIndexes[2] = BattleSideHasTwoTrainers(B_SIDE_PLAYER) ? 0 : 1;
-            gBattlerPartyIndexes[3] = BattleSideHasTwoTrainers(B_SIDE_OPPONENT) ? 0 : 1;
+            gBattlerPartyIndexes[2] = 3;
+            if (!isLink && isInGamePartner && (BATTLE_TWO_VS_ONE_OPPONENT || WILD_DOUBLE_BATTLE))
+                gBattlerPartyIndexes[3] = 1;
+            else
+                gBattlerPartyIndexes[3] = 3;
         }
     }
     else
@@ -399,19 +364,29 @@ static void InitBtlControllersInternal(void)
                 linkPositionRight = B_POSITION_OPPONENT_RIGHT;
                 linkBtlControllerFunc = isLink ? SetControllerToLinkOpponent : SetControllerToRecordedOpponent;
             }
-            // Set early to set gBattlerBattleController for GetBattlerTrainer
-            linkBtlControllerFunc(gLinkPlayers[i].id);
-
-            gBattlerPositions[gLinkPlayers[i].id] = gLinkPlayers[i].id & BIT_FLANK ? linkPositionRight : linkPositionLeft;
-            BufferBattlePartyCurrentOrderBySide(gLinkPlayers[i].id, gLinkPlayers[i].id & BIT_FLANK);
-            gBattlerPartyIndexes[gLinkPlayers[i].id] = 0;
+            gBattlerControllerFuncs[gLinkPlayers[i].id] = linkBtlControllerFunc;
+            switch (gLinkPlayers[i].id)
+            {
+            case 0:
+            case 3:
+                BufferBattlePartyCurrentOrderBySide(gLinkPlayers[i].id, 0);
+                gBattlerPositions[gLinkPlayers[i].id] = linkPositionLeft;
+                gBattlerPartyIndexes[gLinkPlayers[i].id] = 0;
+                break;
+            case 1:
+            case 2:
+                BufferBattlePartyCurrentOrderBySide(gLinkPlayers[i].id, 1);
+                gBattlerPositions[gLinkPlayers[i].id] = linkPositionRight;
+                gBattlerPartyIndexes[gLinkPlayers[i].id] = 3;
+                break;
+            }
         }
     }
 }
 
 bool32 IsValidForBattle(struct Pokemon *mon)
 {
-    enum Species species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
+    u32 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
     return (species != SPECIES_NONE
          && species != SPECIES_EGG
          && GetMonData(mon, MON_DATA_HP) != 0
@@ -420,7 +395,7 @@ bool32 IsValidForBattle(struct Pokemon *mon)
 
 bool32 IsValidForBattleButDead(struct Pokemon *mon)
 {
-    enum Species species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
+    u32 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
     return (species != SPECIES_NONE
          && species != SPECIES_EGG
          && GetMonData(mon, MON_DATA_IS_EGG) == FALSE);
@@ -506,9 +481,9 @@ static void SetBattlePartyIds(void)
                 }
                 else
                 {
-                    if (gBattlerPartyIndexes[i - 2] == j && BattlersShareParty(i - 2, i))
+                    if (gBattlerPartyIndexes[i - 2] == j)
                     {
-                        // Exclude already assigned Pokémon;
+                        // Exclude already assigned pokemon;
                     }
                     else if (IsValidForBattle(&GetBattlerParty(i)[j]))
                     {
@@ -535,7 +510,7 @@ static void SetBattlePartyIds(void)
         }
 
         if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
-            gBattlerPartyIndexes[1] = 0, gBattlerPartyIndexes[3] = 0;
+            gBattlerPartyIndexes[1] = 0, gBattlerPartyIndexes[3] = 3;
     }
 }
 
@@ -1101,17 +1076,17 @@ void BtlController_EmitYesNoBox(enum BattlerId battler, u32 bufferId)
     PrepareBufferDataTransfer(battler, bufferId, gBattleResources->transferBuffer, 4);
 }
 
-void BtlController_EmitChooseMove(enum BattlerId battler, u32 bufferId, bool8 isDoubleBattle, bool8 noPPNumber, struct ChooseMoveStruct *movePPData)
+void BtlController_EmitChooseMove(enum BattlerId battler, u32 bufferId, bool8 isDoubleBattle, bool8 NoPpNumber, struct ChooseMoveStruct *movePpData)
 {
     s32 i;
 
     gBattleResources->transferBuffer[0] = CONTROLLER_CHOOSEMOVE;
     gBattleResources->transferBuffer[1] = isDoubleBattle;
-    gBattleResources->transferBuffer[2] = noPPNumber;
+    gBattleResources->transferBuffer[2] = NoPpNumber;
     gBattleResources->transferBuffer[3] = 0;
-    for (i = 0; i < sizeof(*movePPData); i++)
-        gBattleResources->transferBuffer[4 + i] = *((u8 *)(movePPData) + i);
-    PrepareBufferDataTransfer(battler, bufferId, gBattleResources->transferBuffer, sizeof(*movePPData) + 4);
+    for (i = 0; i < sizeof(*movePpData); i++)
+        gBattleResources->transferBuffer[4 + i] = *((u8 *)(movePpData) + i);
+    PrepareBufferDataTransfer(battler, bufferId, gBattleResources->transferBuffer, sizeof(*movePpData) + 4);
 }
 
 void BtlController_EmitChooseItem(enum BattlerId battler, u32 bufferId, u8 *battlePartyOrder)
@@ -1124,7 +1099,7 @@ void BtlController_EmitChooseItem(enum BattlerId battler, u32 bufferId, u8 *batt
     PrepareBufferDataTransfer(battler, bufferId, gBattleResources->transferBuffer, 4);
 }
 
-void BtlController_EmitChoosePokemon(enum BattlerId battler, u32 bufferId, u8 caseId, u8 slotId, enum Ability abilityId, enum BattlerId battlerPreventingSwitchout, u8 *data)
+void BtlController_EmitChoosePokemon(enum BattlerId battler, u32 bufferId, u8 caseId, u8 slotId, u16 abilityId, enum BattlerId battlerPreventingSwitchout, u8 *data)
 {
     s32 i;
 
@@ -1465,7 +1440,7 @@ void BtlController_Complete(enum BattlerId battler)
 static u32 GetBattlerMonData(enum BattlerId battler, struct Pokemon *party, u32 monId, u8 *dst)
 {
     struct BattlePokemon battleMon;
-    struct MovePPInfo moveData;
+    struct MovePpInfo moveData;
     u8 nickname[POKEMON_NAME_LENGTH * 2];
     u8 *src;
     s16 data16;
@@ -1505,7 +1480,6 @@ static u32 GetBattlerMonData(enum BattlerId battler, struct Pokemon *party, u32 
         battleMon.otId = GetMonData(&party[monId], MON_DATA_OT_ID);
         battleMon.metLevel = GetMonData(&party[monId], MON_DATA_MET_LEVEL);
         battleMon.isShiny = GetMonData(&party[monId], MON_DATA_IS_SHINY);
-        battleMon.affectionHearts = GetMonAffectionHearts(&party[monId]);
         GetMonData(&party[monId], MON_DATA_NICKNAME, nickname);
         StringCopy_Nickname(battleMon.nickname, nickname);
         GetMonData(&party[monId], MON_DATA_OT_NAME, battleMon.otName);
@@ -1782,7 +1756,7 @@ static u32 GetBattlerMonData(enum BattlerId battler, struct Pokemon *party, u32 
 static void SetBattlerMonData(enum BattlerId battler, struct Pokemon *party, u32 monId)
 {
     struct BattlePokemon *battlePokemon = (struct BattlePokemon *)&gBattleResources->bufferA[battler][3];
-    struct MovePPInfo *moveData = (struct MovePPInfo *)&gBattleResources->bufferA[battler][3];
+    struct MovePpInfo *moveData = (struct MovePpInfo *)&gBattleResources->bufferA[battler][3];
     s32 i;
 
     switch (gBattleResources->bufferA[battler][1])
@@ -2020,7 +1994,7 @@ static bool8 ShouldDoSlideInAnim(enum BattlerId battler)
 
 void StartSendOutAnim(enum BattlerId battler, bool32 dontClearTransform, bool32 dontClearSubstituteBit, bool32 doSlideIn)
 {
-    enum Species species;
+    u16 species;
     struct Pokemon *mon = GetBattlerMon(battler);
     u32 sendoutType;
 
@@ -2188,8 +2162,10 @@ static void Controller_HandleTrainerSlideBack(enum BattlerId battler)
 void Controller_WaitForHealthBar(enum BattlerId battler)
 {
     s16 hpValue = MoveBattleBar(battler, gHealthboxSpriteIds[battler], HEALTH_BAR, 0);
-    struct Pokemon *mon = GetBattlerMon(battler);
-    s32 maxHP = GetMonData(mon, MON_DATA_MAX_HP);
+    // Read max HP from the party mon, the same source the bar itself uses in
+    // BtlController_HandleHealthBarUpdate. gBattleMons can be stale in link
+    // battles, which printed a full bar next to "x/0".
+    s32 maxHP = GetMonData(GetBattlerMon(battler), MON_DATA_MAX_HP);
 
     SetHealthboxSpriteVisible(gHealthboxSpriteIds[battler]);
     if (hpValue != -1)
@@ -2289,7 +2265,7 @@ void BattleControllerDummy(enum BattlerId battler)
 // Handlers of the controller commands
 void BtlController_HandleGetMonData(enum BattlerId battler)
 {
-    u8 monData[sizeof(struct Pokemon) * 2 + 56]; // this allows to get full data of two Pokémon, trying to get more will result in overwriting data
+    u8 monData[sizeof(struct Pokemon) * 2 + 56]; // this allows to get full data of two pokemon, trying to get more will result in overwriting data
     struct Pokemon *party = GetBattlerParty(battler);
     u32 size = 0;
     u8 monToCheck;
@@ -2366,7 +2342,7 @@ void BtlController_HandleLoadMonSprite(enum BattlerId battler)
 {
     u32 y;
     struct Pokemon *mon = GetBattlerMon(battler);
-    enum Species species = GetBattlerVisualSpecies(battler);
+    u16 species = GetBattlerVisualSpecies(battler);
 
     if (gBattleTypeFlags & BATTLE_TYPE_GHOST && GetBattlerSide(battler) == B_SIDE_OPPONENT)
     {
@@ -2462,7 +2438,7 @@ void BtlController_HandleDrawTrainerPic(enum BattlerId battler, enum TrainerPicI
                                                    yPos,
                                                    subpriority);
 
-        gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(GetTrainerPicTag(trainerPicId, TRUE));
+        gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(gTrainerSprites[trainerPicId].palette.tag);
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].x2 = -DISPLAY_WIDTH;
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].sSpeedX = 2;
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.affineParam = trainerPicId;
@@ -2480,14 +2456,14 @@ void BtlController_HandleDrawTrainerPic(enum BattlerId battler, enum TrainerPicI
                                                              yPos,
                                                              subpriority);
 
-            gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(GetTrainerPicTag(trainerPicId, TRUE));
+            gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(gTrainerSprites[trainerPicId].palette.tag);
             gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.affineMode = ST_OAM_AFFINE_OFF;
             gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].hFlip = 1;
             gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].y2 = 48;
         }
         else
         {
-            LoadSpritePaletteWithTag(GetTrainerBackPicPalette(trainerPicId), GetTrainerPicTag(trainerPicId, FALSE));
+            DecompressTrainerBackPic(trainerPicId, battler);
             SetMultiuseSpriteTemplateToTrainerBack(trainerPicId, GetBattlerPosition(battler));
             if (subpriority == -1)
                 subpriority = GetBattlerSpriteSubpriority(battler);
@@ -2500,12 +2476,12 @@ void BtlController_HandleDrawTrainerPic(enum BattlerId battler, enum TrainerPicI
 
             // Sets sprite priority to 1 so mons don't remain in foreground
             gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.priority = 1;
-            gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(GetTrainerPicTag(trainerPicId, FALSE));
+            gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(gTrainerBacksprites[trainerPicId].palette.tag);
         }
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].x2 = DISPLAY_WIDTH;
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].sSpeedX = -2;
     }
-    if (B_FAST_INTRO_NO_SLIDE || gTestRunnerHeadless)
+    if (B_FAST_INTRO_NO_SLIDE || gTestRunnerHeadless || !gSaveBlock3Ptr->challengeSettings.fastIntro)
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].callback = SpriteCB_TrainerSpawn;
     else
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].callback = SpriteCB_TrainerSlideIn;
@@ -2517,17 +2493,17 @@ void BtlController_HandleTrainerSlide(enum BattlerId battler, enum TrainerPicID 
 {
     if (IsOnPlayerSide(battler))
     {
-        LoadSpritePaletteWithTag(GetTrainerBackPicPalette(trainerPicId), GetTrainerPicTag(trainerPicId, FALSE));
+        DecompressTrainerBackPic(trainerPicId, battler);
         SetMultiuseSpriteTemplateToTrainerBack(trainerPicId, GetBattlerPosition(battler));
         gBattleStruct->trainerSlideSpriteIds[battler] = CreateSprite(&gMultiuseSpriteTemplate,
                                                          80,
-                                                         (8 - GetTrainerBackPicCoords(trainerPicId)->size) * 4 + 80,
+                                                         (8 - gTrainerBacksprites[trainerPicId].coordinates.size) * 4 + 80,
                                                          30);
         if ((gBattleTypeFlags & BATTLE_TYPE_SAFARI) && GetBattlerPosition(battler) == B_POSITION_PLAYER_LEFT)
             gBattlerSpriteIds[battler] = gBattleStruct->trainerSlideSpriteIds[battler];
         // Sets sprite priority to 1 so mons don't remain in foreground
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.priority = 1;
-        gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(GetTrainerPicTag(trainerPicId, FALSE));
+        gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(gTrainerBacksprites[trainerPicId].palette.tag);
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].x2 = -96;
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].sSpeedX = 2;
     }
@@ -2537,7 +2513,7 @@ void BtlController_HandleTrainerSlide(enum BattlerId battler, enum TrainerPicID 
         SetMultiuseSpriteTemplateToTrainerFront(trainerPicId, GetBattlerPosition(battler));
         gBattleStruct->trainerSlideSpriteIds[battler] = CreateSprite(&gMultiuseSpriteTemplate, 176, 40, 0);
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.affineParam = trainerPicId;
-        gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(GetTrainerPicTag(trainerPicId, TRUE));
+        gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].oam.paletteNum = IndexOfSpritePaletteTag(gTrainerSprites[trainerPicId].palette.tag);
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].x2 = 96;
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].x += 32;
         gSprites[gBattleStruct->trainerSlideSpriteIds[battler]].sSpeedX = -2;
@@ -2597,9 +2573,16 @@ void BtlController_HandleFaintAnimation(enum BattlerId battler)
             }
             // The player's sprite callback just slides the mon, the opponent's removes the sprite.
             // The player's sprite is removed in Controller_FaintPlayerMon. Controller_FaintOpponentMon only removes the healthbox once the sprite is removed by SpriteCB_FaintOpponentMon.
+
+            // Must stay inside this branch. This handler is re-run by the controller every frame
+            // until the line above reassigns gBattlerControllerFuncs, so calling it any higher up
+            // launches a KO animation (and a task) per frame. With a Substitute still up the
+            // animationState == 0 branch holds specialAnimActive for the whole substitute-to-mon
+            // animation, which fills gTasks. Reachable from the Battle Arena referee decision,
+            // which faints a mon before cleareffectsonfaint drops its Substitute.
+            AnimateMonAfterKnockout(battler);
         }
     }
-    AnimateMonAfterKnockout(battler);
 }
 
 #undef sSpeedX
@@ -2668,7 +2651,7 @@ void BtlController_HandlePrintString(enum BattlerId battler)
     if (gTestRunnerEnabled)
     {
         TestRunner_Battle_RecordMessage(gDisplayedStringBattle);
-        if (gTestRunnerHeadless || *stringId == STRINGID_CELEBRATEMESSAGE)
+        if (gTestRunnerHeadless)
         {
             BtlController_Complete(battler);
             return;
@@ -2852,16 +2835,16 @@ void BtlController_HandleSpriteInvisibility(enum BattlerId battler)
     BtlController_Complete(battler);
 }
 
-bool32 TwoPlayerIntroMons(enum BattlerId battler) // Double battle with both player Pokémon active.
+bool32 TwoPlayerIntroMons(enum BattlerId battler) // Double battle with both player pokemon active.
 {
     return (IsDoubleBattle() && IsValidForBattle(GetBattlerMon(battler ^ BIT_FLANK)));
 }
 
-bool32 TwoOpponentIntroMons(enum BattlerId battler) // Double battle with both opponent Pokémon active.
+bool32 TwoOpponentIntroMons(enum BattlerId battler) // Double battle with both opponent pokemon active.
 {
     return (IsDoubleBattle()
             && IsValidForBattle(GetBattlerMon(battler))
-            && IsValidForBattle(GetBattlerMon(GetPartnerBattler(battler))));
+            && IsValidForBattle(GetBattlerMon(BATTLE_PARTNER(battler))));
 }
 
 // Task data for Task_StartSendOutAnim
@@ -3075,8 +3058,8 @@ static void AnimateMonAfterKnockout(enum BattlerId battler)
     if (B_ANIMATE_MON_AFTER_KO == FALSE)
         return;
 
-    enum BattlerId oppositeBattler = GetOppositeBattler(battler);
-    enum BattlerId partnerBattler = GetPartnerBattler(oppositeBattler);
+    enum BattlerId oppositeBattler = BATTLE_OPPOSITE(battler);
+    enum BattlerId partnerBattler = BATTLE_PARTNER(oppositeBattler);
     bool32 wasPlayerSideKnockedOut = (IsOnPlayerSide(battler));
 
     if (IsBattlerAlive(oppositeBattler))
@@ -3088,7 +3071,7 @@ static void AnimateMonAfterKnockout(enum BattlerId battler)
 
 static void LaunchKOAnimation(enum BattlerId battlerId, u16 animId, bool32 isFront)
 {
-    enum Species species = GetBattlerVisualSpecies(battlerId);
+    u32 species = GetBattlerVisualSpecies(battlerId);
     u32 spriteId = gBattlerSpriteIds[battlerId];
 
     gBattleStruct->battlerKOAnimsRunning++;
@@ -3110,7 +3093,7 @@ static void LaunchKOAnimation(enum BattlerId battlerId, u16 animId, bool32 isFro
 
 static u32 ReturnAnimIdForBattler(bool32 wasPlayerSideKnockedOut, u32 specificBattler)
 {
-    enum Species species = GetBattlerVisualSpecies(specificBattler);
+    u32 species = GetBattlerVisualSpecies(specificBattler);
     if (wasPlayerSideKnockedOut)
         return gSpeciesInfo[species].frontAnimId;
     else
@@ -3285,7 +3268,7 @@ void UpdateFriendshipFromXItem(enum BattlerId battler)
     gBattleResources->bufferA[battler][1] = REQUEST_FRIENDSHIP_BATTLE;
     GetBattlerMonData(battler, party, gBattlerPartyIndexes[battler], &friendship);
 
-    enum Item heldItem;
+    u16 heldItem;
     gBattleResources->bufferA[battler][1] = REQUEST_HELDITEM_BATTLE;
     GetBattlerMonData(battler, party, gBattlerPartyIndexes[battler], (u8*)&heldItem);
 
@@ -3321,107 +3304,23 @@ void FreeShinyStars(void)
 
 enum BattleTrainer GetBattlerTrainer(enum BattlerId battler)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
+    switch (battler)
     {
-        switch (gBattlerBattleController[battler])
-        {
-        case BATTLE_CONTROLLER_PLAYER:
-        case BATTLE_CONTROLLER_RECORDED_PLAYER:
-            return B_TRAINER_PLAYER;
-        case BATTLE_CONTROLLER_LINK_PARTNER:
-        case BATTLE_CONTROLLER_RECORDED_PARTNER:
-            return B_TRAINER_PARTNER;
-        case BATTLE_CONTROLLER_LINK_OPPONENT:
-        case BATTLE_CONTROLLER_RECORDED_OPPONENT:
-        case BATTLE_CONTROLLER_OPPONENT:
-            if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-                return (battler & BIT_FLANK) ? B_TRAINER_OPPONENT_B : B_TRAINER_OPPONENT_A;
-            return B_TRAINER_OPPONENT_A;
-        default:
-            break;
-        }
-    }
-
-    return (enum BattleTrainer)(BattleSideHasTwoTrainers(battler & BIT_SIDE) ? battler : battler & BIT_SIDE);
-}
-
-enum BattleTrainer GetTrainerFromBattlePosition(enum BattlerPosition position)
-{
-    return GetBattlerTrainer(GetBattlerAtPosition(position));
-}
-
-bool32 BattleSideHasTwoTrainers(enum BattleSide side)
-{
-    if (side == B_SIDE_PLAYER)
-        return gBattleTypeFlags & BATTLE_TYPE_MULTI;
-    else
-        return ((gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS && TRAINER_BATTLE_PARAM.opponentB != 0xFFFF) || (gBattleTypeFlags & BATTLE_TYPE_LINK && gBattleTypeFlags & BATTLE_TYPE_MULTI));
-}
-
-bool32 BattlersShareParty(enum BattlerId battler1, enum BattlerId battler2)
-{
-    return (GetBattlerParty(battler1) == GetBattlerParty(battler2));
-}
-
-bool32 TrainerHasParty(enum BattleTrainer trainer)
-{
-    return (trainer < B_TRAINER_PARTNER || BattleSideHasTwoTrainers((enum BattleSide)(trainer & BIT_SIDE)));
-}
-
-// Used for partner and opponent
-void SetFinalChosenTarget(enum BattlerId battler, bool32 checkPartner)
-{
-    struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct *)(&gBattleResources->bufferA[battler][4]);
-
-    enum BattlerId chosenTarget = gAiBattleData->chosenTarget[battler];
-    u32 chosenMoveIndex = gAiBattleData->chosenMoveIndex[battler];
-    u32 chosenMove = moveInfo->moves[chosenMoveIndex];
-    enum MoveTarget targetType = GetBattlerMoveSelectionTargetType(battler, chosenMove);
-
-    switch (targetType)
-    {
-    case TARGET_ALLY:
-        chosenTarget = GetPartnerBattler(battler);
-        break;
-    case TARGET_USER_OR_ALLY: // AI could have chosen opponent as the target because of the way the score system works
-        if (!IsBattlerAlly(battler, chosenTarget) || !IsBattlerAlive(GetPartnerBattler(battler)))
-            chosenTarget = battler;
-        break;
-    case TARGET_USER:
-    case TARGET_ALL_BATTLERS:
-    case TARGET_FIELD:
-        chosenTarget = battler;
-        break;
-    case TARGET_BOTH:
-        if (checkPartner)
-        {
-            chosenTarget = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
-            if (!IsBattlerAlive(chosenTarget))
-                chosenTarget = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
-        }
+    case B_BATTLER_0:
+        return B_TRAINER_0;
+    case B_BATTLER_1:
+        return B_TRAINER_1;
+    case B_BATTLER_2:
+        if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
+            return B_TRAINER_2;
         else
-        {
-            chosenTarget = GetBattlerAtPosition(B_POSITION_PLAYER_LEFT);
-            if (!IsBattlerAlive(chosenTarget))
-                chosenTarget = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
-        }
-        break;
+            return B_TRAINER_0;
+    case B_BATTLER_3:
+        if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
+            return B_TRAINER_3;
+        else
+            return B_TRAINER_1;
     default:
-        break;
-    }
-
-    gBattlerTarget = chosenTarget;
-
-    enum Gimmick usableGimmick = gBattleStruct->gimmick.usableGimmick[battler];
-    bool32 isAIUsingGimmick = gAiBattleData->aiUsingGimmick & (1u << battler);
-    if (usableGimmick != GIMMICK_NONE && isAIUsingGimmick && !HasTrainerUsedGimmick(battler, usableGimmick))
-    {
-        gBattleStruct->gimmick.toActivate |= 1u << battler;
-        BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_EXEC_SCRIPT, (chosenMoveIndex) | (RET_GIMMICK) | (chosenTarget << 8));
-    }
-    else
-    {
-        SetAIUsingGimmick(battler, NO_GIMMICK);
-        BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_EXEC_SCRIPT, (chosenMoveIndex) | (chosenTarget << 8));
+        return B_TRAINER_1;
     }
 }

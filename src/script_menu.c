@@ -17,7 +17,8 @@
 #include "malloc.h"
 #include "util.h"
 #include "item_icon.h"
-#include "pokemon_icon.h"
+#include "sprite.h"
+#include "decompress.h"
 #include "constants/field_specials.h"
 #include "constants/items.h"
 #include "constants/script_menu.h"
@@ -25,6 +26,51 @@
 #include "constants/songs.h"
 
 #include "data/script_menu.h"
+
+// Shiny star indicator graphics and tags
+#define GFXTAG_SHINY_STAR_PREVIEW 5000
+#define PALTAG_SHINY_STAR_PREVIEW 5000
+
+static const u32 sShinyStarTiles[] = INCBIN_U32("graphics/summary_screen/shiny_icon.4bpp.lz");
+static const u16 sShinyStarPal[] = INCBIN_U16("graphics/summary_screen/heart.gbapal");
+
+static const struct OamData sOam_ShinyStarIcon =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(8x8),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(8x8),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+};
+
+static const union AnimCmd sAnim_ShinyStarIcon[] =
+{
+    ANIMCMD_FRAME(0, 0),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sAnims_ShinyStarIcon[] =
+{
+    sAnim_ShinyStarIcon
+};
+
+static const struct SpriteTemplate sSpriteTemplate_ShinyStarIcon =
+{
+    .tileTag = GFXTAG_SHINY_STAR_PREVIEW,
+    .paletteTag = PALTAG_SHINY_STAR_PREVIEW,
+    .oam = &sOam_ShinyStarIcon,
+    .anims = sAnims_ShinyStarIcon,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
 
 struct DynamicListMenuEventArgs
 {
@@ -66,10 +112,9 @@ static void InitMultichoiceNoWrap(bool8 ignoreBPress, u8 unusedCount, u8 windowI
 static void MultichoiceDynamicEventDebug_OnInit(struct DynamicListMenuEventArgs *eventArgs);
 static void MultichoiceDynamicEventDebug_OnSelectionChanged(struct DynamicListMenuEventArgs *eventArgs);
 static void MultichoiceDynamicEventDebug_OnDestroy(struct DynamicListMenuEventArgs *eventArgs);
-static void MultichoiceDynamicEventShowSprite_OnInit(struct DynamicListMenuEventArgs *eventArgs);
+static void MultichoiceDynamicEventShowItem_OnInit(struct DynamicListMenuEventArgs *eventArgs);
 static void MultichoiceDynamicEventShowItem_OnSelectionChanged(struct DynamicListMenuEventArgs *eventArgs);
-static void MultichoiceDynamicEventShowPkmn_OnSelectionChanged(struct DynamicListMenuEventArgs *eventArgs);
-static void MultichoiceDynamicEventShowSprite_OnDestroy(struct DynamicListMenuEventArgs *eventArgs);
+static void MultichoiceDynamicEventShowItem_OnDestroy(struct DynamicListMenuEventArgs *eventArgs);
 
 static const struct DynamicListMenuEventCollection sDynamicListMenuEventCollections[] =
 {
@@ -81,15 +126,9 @@ static const struct DynamicListMenuEventCollection sDynamicListMenuEventCollecti
     },
     [DYN_MULTICHOICE_CB_SHOW_ITEM] =
     {
-        .OnInit = MultichoiceDynamicEventShowSprite_OnInit,
+        .OnInit = MultichoiceDynamicEventShowItem_OnInit,
         .OnSelectionChanged = MultichoiceDynamicEventShowItem_OnSelectionChanged,
-        .OnDestroy = MultichoiceDynamicEventShowSprite_OnDestroy
-    },
-    [DYN_MULTICHOICE_CB_SHOW_PKMN] =
-    {
-        .OnInit = MultichoiceDynamicEventShowSprite_OnInit,
-        .OnSelectionChanged = MultichoiceDynamicEventShowPkmn_OnSelectionChanged,
-        .OnDestroy = MultichoiceDynamicEventShowSprite_OnDestroy
+        .OnDestroy = MultichoiceDynamicEventShowItem_OnDestroy
     }
 };
 
@@ -164,10 +203,10 @@ static void MultichoiceDynamicEventDebug_OnDestroy(struct DynamicListMenuEventAr
 }
 
 #define sAuxWindowId sDynamicMenuEventScratchPad[0]
-#define sSpriteId sDynamicMenuEventScratchPad[1]
-#define TAG_CB_SPRITE_ICON 3000
+#define sItemSpriteId sDynamicMenuEventScratchPad[1]
+#define TAG_CB_ITEM_ICON 3000
 
-static void MultichoiceDynamicEventShowSprite_OnInit(struct DynamicListMenuEventArgs *eventArgs)
+static void MultichoiceDynamicEventShowItem_OnInit(struct DynamicListMenuEventArgs *eventArgs)
 {
     struct WindowTemplate *template = &gWindows[eventArgs->windowId].window;
     u32 baseBlock = template->baseBlock + template->width * template->height;
@@ -177,66 +216,44 @@ static void MultichoiceDynamicEventShowSprite_OnInit(struct DynamicListMenuEvent
     FillWindowPixelBuffer(auxWindowId, 0x11);
     CopyWindowToVram(auxWindowId, COPYWIN_FULL);
     sAuxWindowId = auxWindowId;
-    sSpriteId = MAX_SPRITES;
-}
-
-static void FreeSpriteIfUsed(void)
-{
-    if (sSpriteId != MAX_SPRITES)
-    {
-        FreeSpriteTilesByTag(TAG_CB_SPRITE_ICON);
-        FreeSpritePaletteByTag(TAG_CB_SPRITE_ICON);
-        DestroySprite(&gSprites[sSpriteId]);
-    }
-}
-
-static void ChangeSpriteOnSelection(struct DynamicListMenuEventArgs *eventArgs, u32 x, u32 y)
-{
-    struct WindowTemplate *template = &gWindows[eventArgs->windowId].window;
-    x += template->tilemapLeft * 8 + template->width * 8;
-    y += template->tilemapTop * 8;
-
-    gSprites[sSpriteId].oam.priority = 0;
-    gSprites[sSpriteId].x = x;
-    gSprites[sSpriteId].y = y;
+    sItemSpriteId = MAX_SPRITES;
 }
 
 static void MultichoiceDynamicEventShowItem_OnSelectionChanged(struct DynamicListMenuEventArgs *eventArgs)
 {
-    FreeSpriteIfUsed();
-    sSpriteId = AddItemIconSprite(TAG_CB_SPRITE_ICON, TAG_CB_SPRITE_ICON, eventArgs->selectedItem);
-    if (sSpriteId != MAX_SPRITES)
+    struct WindowTemplate *template = &gWindows[eventArgs->windowId].window;
+    u32 x = template->tilemapLeft * 8 + template->width * 8 + 36;
+    u32 y = template->tilemapTop * 8 + 20;
+
+    if (sItemSpriteId != MAX_SPRITES)
     {
-        ChangeSpriteOnSelection(eventArgs, 36, 20);
+        FreeSpriteTilesByTag(TAG_CB_ITEM_ICON);
+        FreeSpritePaletteByTag(TAG_CB_ITEM_ICON);
+        DestroySprite(&gSprites[sItemSpriteId]);
     }
+
+    sItemSpriteId = AddItemIconSprite(TAG_CB_ITEM_ICON, TAG_CB_ITEM_ICON, eventArgs->selectedItem);
+    gSprites[sItemSpriteId].oam.priority = 0;
+    gSprites[sItemSpriteId].x = x;
+    gSprites[sItemSpriteId].y = y;
 }
 
-static void MultichoiceDynamicEventShowPkmn_OnSelectionChanged(struct DynamicListMenuEventArgs *eventArgs)
-{
-    FreeSpriteIfUsed();
-    sSpriteId = CreateTaggedMonIcon(TAG_CB_SPRITE_ICON, TAG_CB_SPRITE_ICON, eventArgs->selectedItem);
-    if (sSpriteId != MAX_SPRITES)
-    {
-        ChangeSpriteOnSelection(eventArgs, 32, 14);
-    }
-}
-
-static void MultichoiceDynamicEventShowSprite_OnDestroy(struct DynamicListMenuEventArgs *eventArgs)
+static void MultichoiceDynamicEventShowItem_OnDestroy(struct DynamicListMenuEventArgs *eventArgs)
 {
     ClearStdWindowAndFrame(sAuxWindowId, TRUE);
     RemoveWindow(sAuxWindowId);
 
-    if (sSpriteId != MAX_SPRITES)
+    if (sItemSpriteId != MAX_SPRITES)
     {
-        FreeSpriteTilesByTag(TAG_CB_SPRITE_ICON);
-        FreeSpritePaletteByTag(TAG_CB_SPRITE_ICON);
-        DestroySprite(&gSprites[sSpriteId]);
+        FreeSpriteTilesByTag(TAG_CB_ITEM_ICON);
+        FreeSpritePaletteByTag(TAG_CB_ITEM_ICON);
+        DestroySprite(&gSprites[sItemSpriteId]);
     }
 }
 
 #undef sAuxWindowId
-#undef sSpriteId
-#undef TAG_CB_SPRITE_ICON
+#undef sItemSpriteId
+#undef TAG_CB_ITEM_ICON
 
 static void FreeListMenuItems(struct ListMenuItem *items, u32 count)
 {
@@ -626,6 +643,15 @@ bool8 ScriptMenu_YesNo(u8 left, u8 top)
     }
 }
 
+// Unused
+bool8 IsScriptActive(void)
+{
+    if (gSpecialVar_Result == 0xFF)
+        return FALSE;
+    else
+        return TRUE;
+}
+
 static void Task_HandleYesNoInput(u8 taskId)
 {
     if (gTasks[taskId].tRight < 5)
@@ -754,24 +780,26 @@ static void CreatePCMultichoice(void)
     // Include Hall of Fame option if player is champion
     if (FlagGet(FLAG_SYS_GAME_CLEAR))
     {
-        numChoices = 4;
-        windowId = CreateWindowFromRect(0, 0, width, 8);
+        numChoices = 5;
+        windowId = CreateWindowFromRect(0, 0, width, 10);
         SetStandardWindowBorderStyle(windowId, FALSE);
         AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_HallOfFame, x, 33, TEXT_SKIP_DRAW, NULL);
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 49, TEXT_SKIP_DRAW, NULL);
+        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_Challenges, x, 49, TEXT_SKIP_DRAW, NULL);
+        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 65, TEXT_SKIP_DRAW, NULL);
     }
     else
     {
-        numChoices = 3;
-        windowId = CreateWindowFromRect(0, 0, width, 6);
+        numChoices = 4;
+        windowId = CreateWindowFromRect(0, 0, width, 8);
         SetStandardWindowBorderStyle(windowId, FALSE);
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 33, TEXT_SKIP_DRAW, NULL);
+        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_Challenges, x, 33, TEXT_SKIP_DRAW, NULL);
+        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 49, TEXT_SKIP_DRAW, NULL);
     }
 
     // Change PC name if player has met Lanette
     if (FlagGet(FLAG_SYS_PC_LANETTE))
     {
-        if (IS_FRLG)
+        if (IS_FRLG || IS_HNS)
             AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_BillsPc, x, 1, TEXT_SKIP_DRAW, NULL);
         else
             AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LanettesPC, x, 1, TEXT_SKIP_DRAW, NULL);
@@ -963,6 +991,7 @@ void GetLilycoveSSTidalSelection(void)
 #define tWindowX     data[3]
 #define tWindowY     data[4]
 #define tWindowId    data[5]
+#define tShinyStarSpriteId data[6]
 
 static void Task_PokemonPicWindow(u8 taskId)
 {
@@ -978,6 +1007,13 @@ static void Task_PokemonPicWindow(u8 taskId)
         break;
     case 2:
         FreeResourcesAndDestroySprite(&gSprites[task->tMonSpriteId], task->tMonSpriteId);
+        // Destroy shiny star sprite if it exists
+        if (task->tShinyStarSpriteId != 0xFF)
+        {
+            DestroySprite(&gSprites[task->tShinyStarSpriteId]);
+            FreeSpriteTilesByTag(GFXTAG_SHINY_STAR_PREVIEW);
+            FreeSpritePaletteByTag(PALTAG_SHINY_STAR_PREVIEW);
+        }
         task->tState++;
         break;
     case 3:
@@ -987,7 +1023,7 @@ static void Task_PokemonPicWindow(u8 taskId)
     }
 }
 
-bool8 ScriptMenu_ShowPokemonPic(enum Species species, u8 x, u8 y)
+bool8 ScriptMenu_ShowPokemonPic(u16 species, u8 x, u8 y)
 {
     u8 taskId;
     u8 spriteId;
@@ -1004,8 +1040,71 @@ bool8 ScriptMenu_ShowPokemonPic(enum Species species, u8 x, u8 y)
         gTasks[taskId].tState = 0;
         gTasks[taskId].tMonSpecies = species;
         gTasks[taskId].tMonSpriteId = spriteId;
+        gTasks[taskId].tShinyStarSpriteId = 0xFF; // No shiny star for normal pokemon
         gSprites[spriteId].callback = SpriteCallbackDummy;
         gSprites[spriteId].oam.priority = 0;
+        SetStandardWindowBorderStyle(gTasks[taskId].tWindowId, TRUE);
+        ScheduleBgCopyTilemapToVram(0);
+        return TRUE;
+    }
+}
+
+bool8 ScriptMenu_ShowShinyPokemonPic(u16 species, u8 x, u8 y)
+{
+    u8 taskId;
+    u8 spriteId;
+    u8 shinyStarSpriteId;
+    void *gfxBuffer;
+    struct SpriteSheet sheet;
+    struct SpritePalette pal;
+
+    if (FindTaskIdByFunc(Task_PokemonPicWindow) != TASK_NONE)
+    {
+        return FALSE;
+    }
+    else
+    {
+        spriteId = CreateShinyMonSprite_PicBox(species, x * 8 + 40, y * 8 + 40, 0);
+        taskId = CreateTask(Task_PokemonPicWindow, 0x50);
+        gTasks[taskId].tWindowId = CreateWindowFromRect(x, y, 8, 8);
+        gTasks[taskId].tState = 0;
+        gTasks[taskId].tMonSpecies = species;
+        gTasks[taskId].tMonSpriteId = spriteId;
+        gSprites[spriteId].callback = SpriteCallbackDummy;
+        gSprites[spriteId].oam.priority = 0;
+
+        // Load and create shiny star sprite
+        gfxBuffer = Alloc(0x20 * 2);
+        if (gfxBuffer != NULL)
+        {
+            LZ77UnCompWram(sShinyStarTiles, gfxBuffer);
+            
+            sheet.data = gfxBuffer;
+            sheet.size = 0x20 * 2;
+            sheet.tag = GFXTAG_SHINY_STAR_PREVIEW;
+            
+            pal.data = sShinyStarPal;
+            pal.tag = PALTAG_SHINY_STAR_PREVIEW;
+            
+            LoadSpriteSheet(&sheet);
+            LoadSpritePalette(&pal);
+            Free(gfxBuffer);
+            
+            // Position shiny star at upper right corner of window
+            // Window is at (x, y) in tiles, each tile is 8 pixels
+            // Window is 8 tiles wide (64 pixels), so upper right is at x + 64 - 4 (center of 8px star)
+            shinyStarSpriteId = CreateSprite(&sSpriteTemplate_ShinyStarIcon, 
+                                            (x * 8) + 69,  // Upper right corner (64 - 4 for sprite center)
+                                            (y * 8) + 12,   // Top edge + 4 for sprite center
+                                            0);
+            gSprites[shinyStarSpriteId].oam.priority = 0;
+            gTasks[taskId].tShinyStarSpriteId = shinyStarSpriteId;
+        }
+        else
+        {
+            gTasks[taskId].tShinyStarSpriteId = 0xFF; // Failed to allocate
+        }
+
         SetStandardWindowBorderStyle(gTasks[taskId].tWindowId, TRUE);
         ScheduleBgCopyTilemapToVram(0);
         return TRUE;
@@ -1231,6 +1330,7 @@ void DrawSeagallopDestinationMenu(void)
     u8 top;
     u8 numItems;
     u8 cursorWidth;
+    u8 UNUSED fontHeight;
     u8 windowId;
     u8 i;
     gSpecialVar_Result = 0xFF;
@@ -1251,6 +1351,7 @@ void DrawSeagallopDestinationMenu(void)
         top = 0;
     }
     cursorWidth = GetMenuCursorDimensionByFont(FONT_NORMAL, 0);
+    fontHeight = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT);
     windowId = CreateWindowFromRect(17, top, 11, numItems * 2);
     SetStandardWindowBorderStyle(windowId, FALSE);
 

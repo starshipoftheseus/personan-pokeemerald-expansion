@@ -6,30 +6,6 @@ ASSUMPTIONS
     ASSUME(gItemsInfo[ITEM_NORMAL_GEM].holdEffect == HOLD_EFFECT_GEMS);
 }
 
-static const enum Item sStruggleGemItems[] =
-{
-    ITEM_NORMAL_GEM,
-#if B_UPDATED_MOVE_FLAGS >= GEN_2
-    ITEM_FIRE_GEM,
-    ITEM_WATER_GEM,
-    ITEM_ELECTRIC_GEM,
-    ITEM_GRASS_GEM,
-    ITEM_ICE_GEM,
-    ITEM_FIGHTING_GEM,
-    ITEM_POISON_GEM,
-    ITEM_GROUND_GEM,
-    ITEM_FLYING_GEM,
-    ITEM_PSYCHIC_GEM,
-    ITEM_BUG_GEM,
-    ITEM_ROCK_GEM,
-    ITEM_GHOST_GEM,
-    ITEM_DRAGON_GEM,
-    ITEM_DARK_GEM,
-    ITEM_STEEL_GEM,
-    ITEM_FAIRY_GEM,
-#endif
-};
-
 SINGLE_BATTLE_TEST("Gem is consumed when it corresponds to the type of a move")
 {
     GIVEN {
@@ -55,25 +31,26 @@ SINGLE_BATTLE_TEST("Gem is not consumed when using Struggle", s16 damage)
     enum Item item = ITEM_NONE;
 
     PARAMETRIZE { item = ITEM_NONE; }
-    for (u32 j = 0; j < ARRAY_COUNT(sStruggleGemItems); j++)
-        PARAMETRIZE { item = sStruggleGemItems[j]; }
+    PARAMETRIZE { item = ITEM_NORMAL_GEM; }
 
     GIVEN {
-        if (item != ITEM_NONE)
+        if (item != ITEM_NONE) {
             ASSUME(GetItemHoldEffect(item) == HOLD_EFFECT_GEMS);
+            ASSUME(GetItemSecondaryId(item) == GetMoveType(MOVE_STRUGGLE));
+        }
         PLAYER(SPECIES_WOBBUFFET) { Item(item); }
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
         TURN { MOVE(player, MOVE_STRUGGLE); }
     } SCENE {
-        NOT ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_HELD_ITEM_EFFECT, player);
+        NONE_OF {
+            ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_HELD_ITEM_EFFECT, player);
+            MESSAGE("The Normal Gem strengthened Wobbuffet's power!");
+        }
         ANIMATION(ANIM_TYPE_MOVE, MOVE_STRUGGLE, player);
         HP_BAR(opponent, captureDamage: &results[i].damage);
-    } THEN {
-        EXPECT_EQ(player->item, item);
     } FINALLY {
-        for (u32 j = 0; j < ARRAY_COUNT(sStruggleGemItems); j++)
-            EXPECT_EQ(results[0].damage, results[j + 1].damage);
+        EXPECT_EQ(results[0].damage, results[1].damage);
     }
 }
 

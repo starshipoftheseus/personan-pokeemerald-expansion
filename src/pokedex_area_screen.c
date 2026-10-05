@@ -40,10 +40,13 @@
 // Only maps in the following map groups have their encounters considered for the area screen
 #define MAP_GROUP_TOWNS_AND_ROUTES MAP_GROUP(MAP_PETALBURG_CITY)
 #define MAP_GROUP_TOWNS_AND_ROUTES_FRLG MAP_GROUP(MAP_PALLET_TOWN)
+#define MAP_GROUP_TOWNS_AND_ROUTES_HNS MAP_GROUP(MAP_NEW_BARK_TOWN_HNS)
 #define MAP_GROUP_DUNGEONS MAP_GROUP(MAP_METEOR_FALLS_1F_1R)
 #define MAP_GROUP_DUNGEONS_FRLG MAP_GROUP(MAP_VIRIDIAN_FOREST)
+#define MAP_GROUP_DUNGEONS_HNS MAP_GROUP(MAP_DARK_CAVE_SOUTH_SIDE_HNS)
 #define MAP_GROUP_SPECIAL_AREA MAP_GROUP(MAP_SAFARI_ZONE_NORTHWEST)
 #define MAP_GROUP_SPECIAL_AREA_FRLG MAP_GROUP(MAP_NAVEL_ROCK_EXTERIOR_FRLG)
+#define MAP_GROUP_SPECIAL_AREA_HNS MAP_GROUP(MAP_TRAINER_HILL_COURTYARD_HNS)
 
 #define AREA_SCREEN_WIDTH 32
 #define AREA_SCREEN_HEIGHT 20
@@ -88,7 +91,7 @@ struct
     /*0x004*/ MainCallback prev; // unused
     /*0x008*/ MainCallback next; // unused
     /*0x00C*/ u16 state; // unused
-    /*0x00E*/ enum Species species;
+    /*0x00E*/ u16 species;
     /*0x010*/ struct OverworldArea overworldAreasWithMons[MAX_AREA_HIGHLIGHTS];
     /*0x110*/ u16 numOverworldAreas;
     /*0x112*/ u16 numSpecialAreas;
@@ -116,13 +119,13 @@ struct
 
 EWRAM_DATA u8 gAreaTimeOfDay = 0;
 
-static void FindMapsWithMon(enum Species);
+static void FindMapsWithMon(u16);
 static void BuildAreaGlowTilemap(void);
 static void SetAreaHasMon(u16, u16);
 static void SetSpecialMapHasMon(u16, u16);
 static mapsec_u16_t GetRegionMapSectionId(u8, u8);
-static bool8 MapHasSpecies(const struct WildEncounterTypes *, u32, enum Species);
-static bool8 MonListHasSpecies(const struct WildPokemonInfo *, enum Species, u16);
+static bool8 MapHasSpecies(const struct WildEncounterTypes *, u32, u16);
+static bool8 MonListHasSpecies(const struct WildPokemonInfo *, u16, u16);
 static void DoAreaGlow(void);
 static void Task_ShowPokedexAreaScreen(u8 taskId);
 static void Task_UpdatePokedexAreaScreen(u8 taskId);
@@ -140,13 +143,13 @@ static void ClearAreaWindowLabel(enum PokedexAreaLabels labelId);
 
 bool32 ShouldShowAreaUnknownLabel(void);
 
-static const u32 sAreaGlow_Pal[] = INCGFX_U32("graphics/pokedex/area_glow.png", ".gbapal");
-static const u32 sAreaGlow_Gfx[] = INCGFX_U32("graphics/pokedex/area_glow.png", ".4bpp.smol");
+static const u32 sAreaGlow_Pal[] = INCBIN_U32("graphics/pokedex/area_glow.gbapal");
+static const u32 sAreaGlow_Gfx[] = INCBIN_U32("graphics/pokedex/area_glow.4bpp.smol");
 
-static const u32 sPokedexPlusHGSS_ScreenSelectBarSubmenu_Tilemap[] = INCGFX_U32("graphics/pokedex/hgss/SelectBar.bin", ".smolTM");
+static const u32 sPokedexPlusHGSS_ScreenSelectBarSubmenu_Tilemap[] = INCBIN_U32("graphics/pokedex/hgss/SelectBar.bin.smolTM");
 static void LoadHGSSScreenSelectBarSubmenu(void);
 
-static const enum Species sSpeciesHiddenFromAreaScreen[] = { SPECIES_WYNAUT };
+static const u16 sSpeciesHiddenFromAreaScreen[] = { SPECIES_WYNAUT };
 
 static const mapsec_u16_t sMovingRegionMapSections[3] =
 {
@@ -174,6 +177,14 @@ static const mapsec_u16_t sLandmarkData[][2] =
 
 #include "data/pokedex_area_glow.h"
 
+static const struct PokedexAreaMapTemplate sPokedexAreaMapTemplate =
+{
+    .bg = 3,
+    .offset = 0,
+    .mode = 0,
+    .unk = 2,
+};
+
 static const u8 sAreaMarkerTiles[];
 static const struct SpriteSheet sAreaMarkerSpriteSheet =
 {
@@ -200,8 +211,8 @@ static const struct SpriteTemplate sAreaMarkerSpriteTemplate =
     .oam = &sAreaMarkerOamData,
 };
 
-static const u16 sAreaMarkerPalette[] = INCGFX_U16("graphics/pokedex/area_marker.png", ".gbapal");
-static const u8 sAreaMarkerTiles[] = INCGFX_U8("graphics/pokedex/area_marker.png", ".4bpp");
+static const u16 sAreaMarkerPalette[] = INCBIN_U16("graphics/pokedex/area_marker.gbapal");
+static const u8 sAreaMarkerTiles[] = INCBIN_U8("graphics/pokedex/area_marker.4bpp");
 
 static const struct SpritePalette sAreaUnknownSpritePalette =
 {
@@ -285,7 +296,7 @@ static bool8 DrawAreaGlow(void)
     return TRUE;
 }
 
-static void FindMapsWithMon(enum Species species)
+static void FindMapsWithMon(u16 species)
 {
     enum RegionMapType currentRegionMapType;
     u16 i;
@@ -319,12 +330,15 @@ static void FindMapsWithMon(enum Species species)
             {
             case MAP_GROUP_TOWNS_AND_ROUTES:
             case MAP_GROUP_TOWNS_AND_ROUTES_FRLG:
+            case MAP_GROUP_TOWNS_AND_ROUTES_HNS:
                 SetAreaHasMon(sFeebasData[i][1], sFeebasData[i][2]);
                 break;
             case MAP_GROUP_DUNGEONS:
             case MAP_GROUP_DUNGEONS_FRLG:
+            case MAP_GROUP_DUNGEONS_HNS:
             case MAP_GROUP_SPECIAL_AREA:
             case MAP_GROUP_SPECIAL_AREA_FRLG:
+            case MAP_GROUP_SPECIAL_AREA_HNS:
                 SetSpecialMapHasMon(sFeebasData[i][1], sFeebasData[i][2]);
                 break;
             }
@@ -337,8 +351,14 @@ static void FindMapsWithMon(enum Species species)
     {
         u32 headerSectionId = Overworld_GetMapHeaderByGroupAndId(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum)->regionMapSectionId;
 
+#if IS_HNS
+        if (currentRegionMapType == REGION_MAP_JOHTO
+            && headerSectionId >= KANTO_MAPSEC_START && headerSectionId <= KANTO_MAPSEC_END)
+            continue;
+#else
         if (GetRegionMapType(headerSectionId) != currentRegionMapType)
             continue;
+#endif
 
         if (MapHasSpecies(&gWildMonHeaders[i].encounterTypes[gAreaTimeOfDay], headerSectionId, species))
         {
@@ -346,12 +366,15 @@ static void FindMapsWithMon(enum Species species)
             {
             case MAP_GROUP_TOWNS_AND_ROUTES:
             case MAP_GROUP_TOWNS_AND_ROUTES_FRLG:
+            case MAP_GROUP_TOWNS_AND_ROUTES_HNS:
                 SetAreaHasMon(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum);
                 break;
             case MAP_GROUP_DUNGEONS:
             case MAP_GROUP_DUNGEONS_FRLG:
+            case MAP_GROUP_DUNGEONS_HNS:
             case MAP_GROUP_SPECIAL_AREA:
             case MAP_GROUP_SPECIAL_AREA_FRLG:
+            case MAP_GROUP_SPECIAL_AREA_HNS:
                 SetSpecialMapHasMon(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum);
                 break;
             }
@@ -429,7 +452,7 @@ static mapsec_u16_t GetRegionMapSectionId(u8 mapGroup, u8 mapNum)
     return Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum)->regionMapSectionId;
 }
 
-static bool8 MapHasSpecies(const struct WildEncounterTypes *info, u32 headerSectionId, enum Species species)
+static bool8 MapHasSpecies(const struct WildEncounterTypes *info, u32 headerSectionId, u16 species)
 {
     // If this is a header for Altering Cave, skip it if it's not the current Altering Cave encounter set
     if (headerSectionId == MAPSEC_ALTERING_CAVE)
@@ -439,24 +462,24 @@ static bool8 MapHasSpecies(const struct WildEncounterTypes *info, u32 headerSect
             return FALSE;
     }
 
-    if (MonListHasSpecies(info->landMonsInfo, species, NUM_LAND_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->landMonsInfo, species, LAND_WILD_COUNT))
         return TRUE;
-    if (MonListHasSpecies(info->waterMonsInfo, species, NUM_WATER_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->waterMonsInfo, species, WATER_WILD_COUNT))
         return TRUE;
 // When searching the fishing encounters, this incorrectly uses the size of the land encounters.
 // As a result it's reading out of bounds of the fishing encounters tables.
 #ifdef BUGFIX
-    if (MonListHasSpecies(info->fishingMonsInfo, species, NUM_FISHING_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->fishingMonsInfo, species, FISH_WILD_COUNT))
 #else
-    if (MonListHasSpecies(info->fishingMonsInfo, species, NUM_LAND_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->fishingMonsInfo, species, LAND_WILD_COUNT))
 #endif
         return TRUE;
-    if (MonListHasSpecies(info->rockSmashMonsInfo, species, NUM_ROCK_SMASH_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->rockSmashMonsInfo, species, ROCK_WILD_COUNT))
         return TRUE;
     return FALSE;
 }
 
-static bool8 MonListHasSpecies(const struct WildPokemonInfo *info, enum Species species, u16 size)
+static bool8 MonListHasSpecies(const struct WildPokemonInfo *info, u16 species, u16 size)
 {
     u16 i;
     if (info != NULL)
@@ -641,10 +664,6 @@ static const u8 *GetTimeOfDayTextWithButton(enum TimeOfDay timeOfDay)
 
     switch (gAreaTimeOfDay)
     {
-    case TIME_MORNING:
-        return gText_Morning;
-    case TIME_EVENING:
-        return gText_Evening;
     case TIME_NIGHT:
         return gText_Night;
     case TIME_DAY:
@@ -708,7 +727,7 @@ bool32 ShouldShowAreaUnknownLabel(void)
 
 #define tState data[0]
 
-void DisplayPokedexAreaScreen(enum Species species, u8 *screenSwitchState, enum TimeOfDay timeOfDay, enum PokedexAreaScreenState areaState)
+void DisplayPokedexAreaScreen(u16 species, u8 *screenSwitchState, enum TimeOfDay timeOfDay, enum PokedexAreaScreenState areaState)
 {
     u8 taskId;
 
@@ -717,6 +736,8 @@ void DisplayPokedexAreaScreen(enum Species species, u8 *screenSwitchState, enum 
     sPokedexAreaScreen->screenSwitchState = screenSwitchState;
     sPokedexAreaScreen->areaState = areaState;
     gAreaTimeOfDay = timeOfDay;
+    if (gAreaTimeOfDay == TIME_MORNING || gAreaTimeOfDay == TIME_EVENING)
+        gAreaTimeOfDay = TIME_DAY;
     screenSwitchState[0] = 0;
 
     if (sPokedexAreaScreen->areaState == DEX_UPDATE_AREA_SCREEN)
@@ -740,7 +761,7 @@ static void Task_ShowPokedexAreaScreen(u8 taskId)
         break;
     case 1:
         SetBgAttribute(3, BG_ATTR_CHARBASEINDEX, 3);
-        LoadPokedexAreaMapGfx();
+        LoadPokedexAreaMapGfx(&sPokedexAreaMapTemplate);
         StringFill(sPokedexAreaScreen->charBuffer, CHAR_SPACE, 16);
         break;
     case 2:
@@ -815,7 +836,7 @@ static void Task_UpdatePokedexAreaScreen(u8 taskId)
         break;
     case 1:
         SetBgAttribute(3, BG_ATTR_CHARBASEINDEX, 3);
-        LoadPokedexAreaMapGfx();
+        LoadPokedexAreaMapGfx(&sPokedexAreaMapTemplate);
         PokedexAreaMapChangeBgY(-8);
         StringFill(sPokedexAreaScreen->charBuffer, CHAR_SPACE, 16);
         break;
@@ -888,14 +909,14 @@ static void Task_HandlePokedexAreaScreenInput(u8 taskId)
         else if (JOY_NEW(DPAD_UP) && OW_TIME_OF_DAY_ENCOUNTERS == TRUE)
         {
             gTasks[taskId].data[1] = 3;
-            gAreaTimeOfDay = TryDecrementTimeOfDay(gAreaTimeOfDay);
+            gAreaTimeOfDay = (gAreaTimeOfDay == TIME_DAY) ? TIME_NIGHT : TIME_DAY;
             sPokedexAreaScreen->areaState = DEX_UPDATE_AREA_SCREEN;
             PlaySE(SE_DEX_PAGE);
         }
         else if (JOY_NEW(DPAD_DOWN) && OW_TIME_OF_DAY_ENCOUNTERS == TRUE)
         {
             gTasks[taskId].data[1] = 3;
-            gAreaTimeOfDay = TryIncrementTimeOfDay(gAreaTimeOfDay);
+            gAreaTimeOfDay = (gAreaTimeOfDay == TIME_DAY) ? TIME_NIGHT : TIME_DAY;
             sPokedexAreaScreen->areaState = DEX_UPDATE_AREA_SCREEN;
             PlaySE(SE_DEX_PAGE);
         }
@@ -924,6 +945,7 @@ static void Task_HandlePokedexAreaScreenInput(u8 taskId)
         sPokedexAreaScreen->screenSwitchState[0] = gTasks[taskId].data[1];
         ResetPokedexAreaMapBg();
         DestroyTask(taskId);
+        FreePokedexAreaMapBgNum();
         FREE_AND_SET_NULL(sPokedexAreaScreen);
         return;
     }
@@ -953,11 +975,11 @@ static void CreateAreaMarkerSprites(void)
     for (i = 0; i < sPokedexAreaScreen->numSpecialAreas; i++)
     {
         mapSecId = sPokedexAreaScreen->specialAreaRegionMapSectionIds[i];
-        x = 8 * (gRegionMapEntries[mapSecId].x + 1) + 4;
-        y = 8 * (gRegionMapEntries[mapSecId].y) + 28;
-        x += 4 * (gRegionMapEntries[mapSecId].width - 1);
-        y += 4 * (gRegionMapEntries[mapSecId].height - 1);
-        spriteId = CreateSpriteUnchecked(&sAreaMarkerSpriteTemplate, x, y, 0);
+        x = 8 * (GetActiveRegionMapEntries()[mapSecId].x + 1) + 4;
+        y = 8 * (GetActiveRegionMapEntries()[mapSecId].y) + 28;
+        x += 4 * (GetActiveRegionMapEntries()[mapSecId].width - 1);
+        y += 4 * (GetActiveRegionMapEntries()[mapSecId].height - 1);
+        spriteId = CreateSprite(&sAreaMarkerSpriteTemplate, x, y, 0);
         if (spriteId != MAX_SPRITES)
         {
             gSprites[spriteId].invisible = TRUE;
@@ -1018,7 +1040,7 @@ static void CreateAreaUnknownSprites(void)
         // The current species is absent on the map, try to create "Area Unknown" sprites
         for (i = 0; i < ARRAY_COUNT(sPokedexAreaScreen->areaUnknownSprites); i++)
         {
-            u8 spriteId = CreateSpriteUnchecked(&sAreaUnknownSpriteTemplate, i * 32 + 160, 140, 0);
+            u8 spriteId = CreateSprite(&sAreaUnknownSpriteTemplate, i * 32 + 160, 140, 0);
             if (spriteId != MAX_SPRITES)
             {
                 gSprites[spriteId].oam.tileNum += i * 16;

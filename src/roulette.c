@@ -429,9 +429,9 @@ static const u8 Roulette_Text_KeepPlaying[] = _("Keep playing?");
 static const u8 Roulette_Text_BoardWillBeCleared[] = _("The ROULETTE board will be cleared.");
 static const u8 Roulette_Text_CoinCaseIsFull[] = _("Your COIN CASE is full!\nCoins can be exchanged for prizes.");
 
-static const u16 sWheel_Pal[] = INCGFX_U16("graphics/roulette/wheel.png", ".gbapal"); // also palette for grid
-static const u32 sGrid_Tilemap[] = INCGFX_U32("graphics/roulette/grid.bin", ".smolTM");
-static const u32 sWheel_Tilemap[] = INCGFX_U32("graphics/roulette/wheel.bin", ".smolTM");
+static const u16 sWheel_Pal[] = INCBIN_U16("graphics/roulette/wheel.gbapal"); // also palette for grid
+static const u32 sGrid_Tilemap[] = INCBIN_U32("graphics/roulette/grid.bin.smolTM");
+static const u32 sWheel_Tilemap[] = INCBIN_U32("graphics/roulette/wheel.bin.smolTM");
 static const struct BgTemplate sBgTemplates[] =
 {
     // Text box
@@ -1157,7 +1157,7 @@ static void InitRouletteTableData(void)
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        switch (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES_OR_EGG))
+        switch (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG))
         {
         case SPECIES_SHROOMISH:
             sRoulette->partySpeciesFlags |= HAS_SHROOMISH;
@@ -1535,7 +1535,7 @@ static void Task_HandleBetGridInput(u8 taskId)
         }
         else
         {
-            m4aSongNumStart(SE_SHOP);
+            m4aSongNumStart(SE_SHOP, FlagGet(FLAG_SYS_GBS_ENABLED));
             gTasks[taskId].func = Task_PlaceBet;
         }
     }
@@ -1692,7 +1692,7 @@ static void Task_RollBall(u8 taskId)
     gTasks[taskId].tBallNum++;
     gTasks[taskId].tTotalBallNum++;
     SetBallCounterNumLeft(BALLS_PER_ROUND - gTasks[taskId].tBallNum);
-    m4aSongNumStart(SE_ROULETTE_BALL);
+    m4aSongNumStart(SE_ROULETTE_BALL, FlagGet(FLAG_SYS_GBS_ENABLED));
     gTasks[taskId].func = Task_RecordBallHit;
 }
 
@@ -1832,7 +1832,7 @@ static void Task_PrintSpinResult(u8 taskId)
         break;
     case FALSE:
     default:
-        m4aSongNumStart(SE_FAILURE);
+        m4aSongNumStart(SE_FAILURE, FlagGet(FLAG_SYS_GBS_ENABLED));
         DrawStdWindowFrame(sTextWindowId, FALSE);
         AddTextPrinterParameterized(sTextWindowId, FONT_NORMAL, Roulette_Text_NothingDoing, 0, 1, TEXT_SKIP_DRAW, NULL);
         CopyWindowToVram(sTextWindowId, COPYWIN_FULL);
@@ -1850,7 +1850,7 @@ static void Task_GivePayout(u8 taskId)
     {
     case 0:
         gTasks[taskId].tCoins++;
-        m4aSongNumStart(SE_PIN);
+        m4aSongNumStart(SE_PIN, FlagGet(FLAG_SYS_GBS_ENABLED));
         SetCreditDigits(gTasks[taskId].tCoins);
         if (gTasks[taskId].tCoins >= MAX_COINS)
         {
@@ -1863,7 +1863,7 @@ static void Task_GivePayout(u8 taskId)
         }
         break;
     case 3:
-        m4aSongNumStop(SE_PIN);
+        m4aSongNumStop(SE_PIN, FlagGet(FLAG_SYS_GBS_ENABLED));
         gTasks[taskId].data[7] = 0;
         break;
     default:
@@ -2336,29 +2336,29 @@ static void UpdateWheelPosition(void)
 }
 
 static const u8 sFiller[3] = {};
-static const u16 sShadow_Pal[] = INCGFX_U16("graphics/roulette/shadow.png", ".gbapal");
-static const u16 sBall_Pal[] = INCGFX_U16("graphics/roulette/ball.png", ".gbapal");
-static const u16 sBallCounter_Pal[] = INCGFX_U16("graphics/roulette/ball_counter.png", ".gbapal");
-static const u16 sCursor_Pal[] = INCGFX_U16("graphics/roulette/cursor.png", ".gbapal");
-static const u16 sCredit_Pal[] = INCGFX_U16("graphics/roulette/credit.png", ".gbapal");
-static const u16 sShroomish_Pal[] = INCGFX_U16("graphics/roulette/shroomish.png", ".gbapal");
-static const u16 sTaillow_Pal[] = INCGFX_U16("graphics/roulette/tailow.png", ".gbapal");
-static const u16 sGridIcons_Pal[] = INCGFX_U16("graphics/roulette/grid_icons.png", ".gbapal");
-static const u16 sWynaut_Pal[] = INCGFX_U16("graphics/roulette/wynaut.png", ".gbapal");
-static const u16 sAzurill_Pal[] = INCGFX_U16("graphics/roulette/azurill.png", ".gbapal");
-static const u16 sSkitty_Pal[] = INCGFX_U16("graphics/roulette/skitty.png", ".gbapal");
-static const u16 sMakuhita_Pal[] = INCGFX_U16("graphics/roulette/makuhita.png", ".gbapal");
-static const u16 sUnused1_Pal[] = INCGFX_U16("graphics/roulette/unused_1.pal", ".gbapal");
-static const u16 sUnused2_Pal[] = INCGFX_U16("graphics/roulette/unused_2.pal", ".gbapal");
-static const u16 sUnused3_Pal[] = INCGFX_U16("graphics/roulette/unused_3.pal", ".gbapal");
-static const u16 sUnused4_Pal[] = INCGFX_U16("graphics/roulette/unused_4.pal", ".gbapal");
-static const u32 sBall_Gfx[] = INCGFX_U32("graphics/roulette/ball.png", ".4bpp.smol");
-static const u32 sBallCounter_Gfx[] = INCGFX_U32("graphics/roulette/ball_counter.png", ".4bpp.smol");
-static const u32 sShroomishTaillow_Gfx[] = INCGFX_U32("graphics/roulette/roulette_tilt.4bpp", ".smol");
-static const u32 sGridIcons_Gfx[] = INCGFX_U32("graphics/roulette/grid_icons.png", ".4bpp.smol");
-static const u32 sWheelIcons_Gfx[] = INCGFX_U32("graphics/roulette/wheel_icons.4bpp", ".smol");
-static const u32 sShadow_Gfx[] = INCGFX_U32("graphics/roulette/shadow.png", ".4bpp.smol");
-static const u32 sCursor_Gfx[] = INCGFX_U32("graphics/roulette/cursor.png", ".4bpp.smol");
+static const u16 sShadow_Pal[] = INCBIN_U16("graphics/roulette/shadow.gbapal");
+static const u16 sBall_Pal[] = INCBIN_U16("graphics/roulette/ball.gbapal");
+static const u16 sBallCounter_Pal[] = INCBIN_U16("graphics/roulette/ball_counter.gbapal");
+static const u16 sCursor_Pal[] = INCBIN_U16("graphics/roulette/cursor.gbapal");
+static const u16 sCredit_Pal[] = INCBIN_U16("graphics/roulette/credit.gbapal");
+static const u16 sShroomish_Pal[] = INCBIN_U16("graphics/roulette/shroomish.gbapal");
+static const u16 sTaillow_Pal[] = INCBIN_U16("graphics/roulette/tailow.gbapal");
+static const u16 sGridIcons_Pal[] = INCBIN_U16("graphics/roulette/grid_icons.gbapal");
+static const u16 sWynaut_Pal[] = INCBIN_U16("graphics/roulette/wynaut.gbapal");
+static const u16 sAzurill_Pal[] = INCBIN_U16("graphics/roulette/azurill.gbapal");
+static const u16 sSkitty_Pal[] = INCBIN_U16("graphics/roulette/skitty.gbapal");
+static const u16 sMakuhita_Pal[] = INCBIN_U16("graphics/roulette/makuhita.gbapal");
+static const u16 sUnused1_Pal[] = INCBIN_U16("graphics/roulette/unused_1.gbapal");
+static const u16 sUnused2_Pal[] = INCBIN_U16("graphics/roulette/unused_2.gbapal");
+static const u16 sUnused3_Pal[] = INCBIN_U16("graphics/roulette/unused_3.gbapal");
+static const u16 sUnused4_Pal[] = INCBIN_U16("graphics/roulette/unused_4.gbapal");
+static const u32 sBall_Gfx[] = INCBIN_U32("graphics/roulette/ball.4bpp.smol");
+static const u32 sBallCounter_Gfx[] = INCBIN_U32("graphics/roulette/ball_counter.4bpp.smol");
+static const u32 sShroomishTaillow_Gfx[] = INCBIN_U32("graphics/roulette/roulette_tilt.4bpp.smol");
+static const u32 sGridIcons_Gfx[] = INCBIN_U32("graphics/roulette/grid_icons.4bpp.smol");
+static const u32 sWheelIcons_Gfx[] = INCBIN_U32("graphics/roulette/wheel_icons.4bpp.smol");
+static const u32 sShadow_Gfx[] = INCBIN_U32("graphics/roulette/shadow.4bpp.smol");
+static const u32 sCursor_Gfx[] = INCBIN_U32("graphics/roulette/cursor.4bpp.smol");
 
 static const struct SpritePalette sSpritePalettes[] =
 {
@@ -3793,7 +3793,7 @@ static void CreateWheelBallSprites(void)
     u8 i;
     for (i = 0; i < BALLS_PER_ROUND; i++)
     {
-        sRoulette->spriteIds[i] = CreateSpriteUnchecked(&sSpriteTemplate_Ball, 116, 80, 57 - i);
+        sRoulette->spriteIds[i] = CreateSprite(&sSpriteTemplate_Ball, 116, 80, 57 - i);
         if (sRoulette->spriteIds[i] != MAX_SPRITES)
         {
             gSprites[sRoulette->spriteIds[i]].invisible = TRUE;
@@ -3837,7 +3837,7 @@ static void HideWheelBalls(void)
     UpdateBallRelativeWheelAngle(sprite);                                                           \
     sprite->sBallWheelAngle = (sprite->sBallWheelAngle / DEGREES_PER_SLOT) * DEGREES_PER_SLOT + 15; \
     sprite->callback = SpriteCB_BallLandInSlot;                                                     \
-    m4aSongNumStartOrChange(SE_BRIDGE_WALK);                                                              \
+    m4aSongNumStartOrChange(SE_BRIDGE_WALK, FlagGet(FLAG_SYS_GBS_ENABLED));                                                              \
 }
 
 // "wheelAngle" and "sBallAngle" are relative to the screen (e.g. 180 degrees for either is always screen bottom)
@@ -4049,7 +4049,7 @@ static void SpriteCB_UnstickBall_TaillowPickUp(struct Sprite *sprite)
             sprite->animEnded = FALSE;
             sprite->data[2] = 0;
             sprite->callback = SpriteCB_UnstickBall_TaillowDrop;
-            m4aSongNumStart(SE_BALL_THROW);
+            m4aSongNumStart(SE_BALL_THROW, FlagGet(FLAG_SYS_GBS_ENABLED));
         }
     }
 }
@@ -4116,7 +4116,7 @@ static void SpriteCB_RollBall_TryLandAdjacent(struct Sprite *sprite)
         {
             // Ball is stuck, need Shroomish/Taillow to clear ball
             sprite->animPaused = TRUE;
-            m4aSongNumStart(SE_BALL_BOUNCE_1);
+            m4aSongNumStart(SE_BALL_BOUNCE_1, FlagGet(FLAG_SYS_GBS_ENABLED));
             SetBallStuck(sprite);
         }
     }
@@ -4137,7 +4137,7 @@ static void SpriteCB_RollBall_TryLand(struct Sprite *sprite)
         // Space has already been landed on, try to fall into adjacent space
         u8 slotId;
         u32 fallRight;
-        m4aSongNumStart(SE_BALL_BOUNCE_1);
+        m4aSongNumStart(SE_BALL_BOUNCE_1, FlagGet(FLAG_SYS_GBS_ENABLED));
         fallRight = Random() & 1;
         if (fallRight)
         {
@@ -4232,7 +4232,7 @@ static void SpriteCB_RollBall_Fast(struct Sprite *sprite)
     if (sRoulette->ballDistToCenter > 60.0f)
         return;
 
-    m4aSongNumStartOrChange(SE_ROULETTE_BALL2);
+    m4aSongNumStartOrChange(SE_ROULETTE_BALL2, FlagGet(FLAG_SYS_GBS_ENABLED));
     sRoulette->ballFallSpeed = -(20.0f / (f32)(sRoulette->ballTravelDistMed));
     sRoulette->ballAngleAccel = ((1.0f - sRoulette->ballAngleSpeed) / (f32)(sRoulette->ballTravelDistMed));
     sprite->animNum = 1;
@@ -4264,8 +4264,10 @@ static void CreateShroomishSprite(struct Sprite *ball)
         {116, 44},
         {116, 112}
     };
+    struct Roulette UNUSED *roulette;
 
     t = ball->data[7] - 2;
+    roulette = sRoulette;  // Unnecessary, needed to match
     sRoulette->spriteIds[SPR_CLEAR_MON] = CreateSprite(&sSpriteTemplate_Shroomish, 36, -12, 50);
     sRoulette->spriteIds[SPR_CLEAR_MON_SHADOW_1] = CreateSprite(&sSpriteTemplate_ShroomishShadow[0], coords[ball->sStuckOnWheelLeft][0], coords[ball->sStuckOnWheelLeft][1], 59);
     sRoulette->spriteIds[SPR_CLEAR_MON_SHADOW_2] = CreateSprite(&sSpriteTemplate_ShroomishShadow[1], 36, 140, 51);
@@ -4484,7 +4486,7 @@ static void SpriteCB_ShroomishFall(struct Sprite *sprite)
         gSprites[sprite->sMonShadowSpriteId].data[1] = -2;
         gSprites[sprite->sBallShadowSpriteId].invisible = FALSE;
         gSprites[sprite->sBallShadowSpriteId].callback  = SpriteCB_ShroomishShakeScreen;
-        m4aSongNumStart(SE_M_STRENGTH);
+        m4aSongNumStart(SE_M_STRENGTH, FlagGet(FLAG_SYS_GBS_ENABLED));
     }
 }
 
@@ -4507,7 +4509,7 @@ static void SpriteCB_Shroomish(struct Sprite *sprite)
 
         sprite->invisible = FALSE;
         sprite->data[7]++;
-        m4aSongNumStart(SE_FALL);
+        m4aSongNumStart(SE_FALL, FlagGet(FLAG_SYS_GBS_ENABLED));
         sRoulette->shroomishShadowTimer = 1;
         sRoulette->shroomishShadowAlpha = sShroomishShadowAlphas[0];
     }
@@ -4554,7 +4556,7 @@ static void SpriteCB_Taillow_FlyAway(struct Sprite *sprite)
         sprite->callback = SpriteCallbackDummy;
         sprite->invisible = TRUE;
         sprite->animPaused = TRUE;
-        m4aSongNumStop(SE_TAILLOW_WING_FLAP);
+        m4aSongNumStop(SE_TAILLOW_WING_FLAP, FlagGet(FLAG_SYS_GBS_ENABLED));
         DestroySprite(sprite);
         FreeOamMatrix(gSprites[sRoulette->spriteIds[SPR_CLEAR_MON_SHADOW_1]].oam.matrixNum);
         DestroySprite(&gSprites[sRoulette->spriteIds[SPR_CLEAR_MON_SHADOW_1]]);
@@ -4585,7 +4587,7 @@ static void SpriteCB_Taillow_PickUpBall(struct Sprite *sprite)
         }
         else
         {
-            m4aSongNumStart(SE_FALL);
+            m4aSongNumStart(SE_FALL, FlagGet(FLAG_SYS_GBS_ENABLED));
             StartSpriteAnim(sprite, sRoulette->ball->sStuckOnWheelLeft + 4);
             sprite->callback = SpriteCB_Taillow_FlyAway;
             gSprites[sprite->sMonShadowSpriteId].affineAnimPaused = FALSE;
@@ -4626,7 +4628,7 @@ static void SpriteCB_Taillow_FlyIn(struct Sprite *sprite)
         }
         else
         {
-            m4aSongNumStartOrChange(SE_TAILLOW_WING_FLAP);
+            m4aSongNumStartOrChange(SE_TAILLOW_WING_FLAP, FlagGet(FLAG_SYS_GBS_ENABLED));
             if (sRoulette->ball->sStuckOnWheelLeft == 0)
                 PlayCry_Normal(SPECIES_TAILLOW, 63);
             else
@@ -4681,5 +4683,5 @@ static void SpriteCB_Taillow(struct Sprite *sprite)
     }
     gSprites[sprite->sMonShadowSpriteId].callback = SpriteCB_TaillowShadow_FlyIn;
     gSprites[sprite->sMonSpriteId].callback = SpriteCB_Taillow_FlyIn;
-    m4aSongNumStart(SE_FALL);
+    m4aSongNumStart(SE_FALL, FlagGet(FLAG_SYS_GBS_ENABLED));
 }

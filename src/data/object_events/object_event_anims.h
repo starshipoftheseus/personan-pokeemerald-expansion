@@ -1618,6 +1618,10 @@ static const struct StepAnimTable sStepAnimTables[] = {
         .animPos = {1, 3, 0, 2},
     },
     {
+        .anims = sAnimTable_Following_Asym,
+        .animPos = {1, 3, 0, 2},
+    },
+    {
         .anims = sAnimTable_BrendanMayNormal,
         .animPos = {1, 3, 0, 2},
     },
@@ -1651,3 +1655,85 @@ static const union AnimCmd *const sAnimTable_RedGreenVSSeeker[] = {
 static const union AnimCmd *const sAnimTable_RedGreenVSSeekerBike[] = {
     sAnim_VSSeekerBike,
 };
+
+#if IS_HNS
+static const union AnimCmd *const sAnimTable_Nurse_hns[] = {
+    [ANIM_STD_FACE_SOUTH] = sAnim_FaceSouth,
+    [ANIM_STD_FACE_NORTH] = sAnim_FaceNorth,
+    [ANIM_STD_FACE_WEST] = sAnim_FaceWest,
+    [ANIM_STD_FACE_EAST] = sAnim_FaceEast,
+    [ANIM_STD_GO_SOUTH] = sAnim_GoSouth,
+    [ANIM_STD_GO_NORTH] = sAnim_GoNorth,
+    [ANIM_STD_GO_WEST] = sAnim_GoWest,
+    [ANIM_STD_GO_EAST] = sAnim_GoEast,
+    [ANIM_STD_GO_FAST_SOUTH] = sAnim_GoFastSouth,
+    [ANIM_STD_GO_FAST_NORTH] = sAnim_GoFastNorth,
+    [ANIM_STD_GO_FAST_WEST] = sAnim_GoFastWest,
+    [ANIM_STD_GO_FAST_EAST] = sAnim_GoFastEast,
+    [ANIM_STD_GO_FASTER_SOUTH] = sAnim_GoFasterSouth,
+    [ANIM_STD_GO_FASTER_NORTH] = sAnim_GoFasterNorth,
+    [ANIM_STD_GO_FASTER_WEST]  = sAnim_GoFasterWest,
+    [ANIM_STD_GO_FASTER_EAST]  = sAnim_GoFasterEast,
+    [ANIM_STD_GO_FASTEST_SOUTH] = sAnim_GoFastestSouth,
+    [ANIM_STD_GO_FASTEST_NORTH] = sAnim_GoFastestNorth,
+    [ANIM_STD_GO_FASTEST_WEST] = sAnim_GoFastestWest,
+    [ANIM_STD_GO_FASTEST_EAST] = sAnim_GoFastestEast,
+    [ANIM_NURSE_BOW] = sAnim_NurseBow,
+};
+
+static const union AnimCmd *const sAnimTable_BreakableRock_hns[] = {
+    [ANIM_STAY_STILL] = sAnim_StayStill,
+    [ANIM_REMOVE_OBSTACLE] = sAnim_RockBreak,
+};
+
+static const union AnimCmd *const sAnimTable_CuttableTree_hns[] = {
+    [ANIM_STAY_STILL] = sAnim_StayStill,
+    [ANIM_REMOVE_OBSTACLE] = sAnim_TreeCut,
+};
+
+static const union AnimCmd *const sAnimTable_TowerBeam_hns[] = {
+    [ANIM_STD_FACE_SOUTH] = sAnim_RayquazaFaceSouth,
+    [ANIM_STD_FACE_NORTH] = sAnim_RayquazaFaceNorth,
+    [ANIM_STD_FACE_WEST] = sAnim_RayquazaFaceWest,
+    [ANIM_STD_FACE_EAST] = sAnim_RayquazaFaceEast,
+    [ANIM_STD_GO_SOUTH] = sAnim_RayquazaCoiledAsleep,
+    [ANIM_STD_GO_NORTH] = sAnim_RayquazaFlyUp,
+    [ANIM_STD_GO_WEST] = sAnim_RayquazaCoiledMouthOpen,
+    [ANIM_STD_GO_EAST] = sAnim_RayquazaNormal,
+    [ANIM_STD_GO_FAST_SOUTH] = sAnim_RayquazaCoiledAsleep,
+    [ANIM_STD_GO_FAST_NORTH] = sAnim_RayquazaFlyUp,
+    [ANIM_STD_GO_FAST_WEST] = sAnim_RayquazaCoiledAwake,
+    [ANIM_STD_GO_FAST_EAST] = sAnim_RayquazaNormal,
+    [ANIM_STD_GO_FASTER_SOUTH] = sAnim_RayquazaCoiledAsleep,
+    [ANIM_STD_GO_FASTER_NORTH] = sAnim_RayquazaFlyUp,
+    [ANIM_STD_GO_FASTER_WEST] = sAnim_RayquazaCoiledMouthOpen,
+    [ANIM_STD_GO_FASTER_EAST] = sAnim_RayquazaNormal,
+    [ANIM_STD_GO_FASTEST_SOUTH] = sAnim_RayquazaCoiledAsleep,
+    [ANIM_STD_GO_FASTEST_NORTH] = sAnim_RayquazaFlyUp,
+    [ANIM_STD_GO_FASTEST_WEST] = sAnim_RayquazaCoiledMouthOpen,
+    [ANIM_STD_GO_FASTEST_EAST] = sAnim_RayquazaNormal,
+};
+
+static const union AnimCmd *const sAnimTable_Whirlpool_hns[] = {
+    [ANIM_STD_FACE_SOUTH] = sAnim_RayquazaFaceSouth,
+    [ANIM_STD_FACE_NORTH] = sAnim_RayquazaFaceNorth,
+    [ANIM_STD_FACE_WEST] = sAnim_RayquazaFaceWest,
+    [ANIM_STD_FACE_EAST] = sAnim_RayquazaFaceEast,
+    [ANIM_STD_GO_SOUTH] = sAnim_RayquazaCoiledAsleep,
+    [ANIM_STD_GO_NORTH] = sAnim_RayquazaFlyUp,
+    [ANIM_STD_GO_WEST] = sAnim_RayquazaCoiledMouthOpen,
+    [ANIM_STD_GO_EAST] = sAnim_RayquazaNormal,
+    [ANIM_STD_GO_FAST_SOUTH] = sAnim_RayquazaCoiledAsleep,
+    [ANIM_STD_GO_FAST_NORTH] = sAnim_RayquazaFlyUp,
+    [ANIM_STD_GO_FAST_WEST] = sAnim_RayquazaCoiledAwake,
+    [ANIM_STD_GO_FAST_EAST] = sAnim_RayquazaNormal,
+    [ANIM_STD_GO_FASTER_SOUTH] = sAnim_RayquazaCoiledAsleep,
+    [ANIM_STD_GO_FASTER_NORTH] = sAnim_RayquazaFlyUp,
+    [ANIM_STD_GO_FASTER_WEST] = sAnim_RayquazaCoiledMouthOpen,
+    [ANIM_STD_GO_FASTER_EAST] = sAnim_RayquazaNormal,
+    [ANIM_STD_GO_FASTEST_SOUTH] = sAnim_RayquazaCoiledAsleep,
+    [ANIM_STD_GO_FASTEST_NORTH] = sAnim_RayquazaFlyUp,
+    [ANIM_STD_GO_FASTEST_WEST] = sAnim_RayquazaCoiledMouthOpen,
+    [ANIM_STD_GO_FASTEST_EAST] = sAnim_RayquazaNormal,
+};
+#endif // IS_HNS

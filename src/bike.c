@@ -4,12 +4,11 @@
 #include "field_player_avatar.h"
 #include "fieldmap.h"
 #include "field_specials.h"
+#include "load_save.h"
 #include "metatile_behavior.h"
 #include "oras_dowse.h"
 #include "overworld.h"
 #include "sound.h"
-#include "wild_encounter.h"
-#include "wild_encounter_ow.h"
 #include "constants/songs.h"
 
 // this file's functions
@@ -158,8 +157,34 @@ static const struct BikeHistoryInputInfo sAcroBikeTricksList[] =
 };
 
 // code
+static bool8 ShouldForceCyclingRoadDownward(void)
+{
+    s16 x, y;
+    PlayerGetDestCoords(&x, &y);
+    return MetatileBehavior_IsCyclingRoadPullDownTile(MapGridGetMetatileBehaviorAt(x, y));
+}
+
 void MovePlayerOnBike(enum Direction direction, u16 newKeys, u16 heldKeys)
 {
+    if (IS_HNS || IS_FRLG)
+    {
+        newKeys &= ~B_BUTTON;
+        heldKeys &= ~B_BUTTON;
+    }
+
+    if (ShouldForceCyclingRoadDownward() && heldKeys == 0)
+    {
+        enum Collision collision = GetBikeCollision(DIR_SOUTH);
+
+        if (collision == COLLISION_NONE)
+            PlayerWalkFaster(DIR_SOUTH);
+        else if (collision == COLLISION_LEDGE_JUMP)
+            PlayerJumpLedge(DIR_SOUTH);
+
+        gPlayerAvatar.runningState = MOVING;
+        return;
+    }
+
     if ((gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_MACH_BIKE) && (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_ACRO_BIKE))
         MovePlayerOnStandardBike(direction, newKeys, heldKeys);
     else if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_MACH_BIKE)
@@ -1112,6 +1137,12 @@ static u8 AcroBike_GetJumpDirection(void)
 {
     u32 i;
 
+    // No acro tricks (side jump / turn jump) in these builds.
+    // The trick history is fed unmasked keys from MovePlayerAvatar, so masking
+    // B in MovePlayerOnBike alone isn't enough to suppress the jumps.
+    if (IS_HNS || IS_FRLG)
+        return DIR_NONE;
+
     for (i = 0; i < ARRAY_COUNT(sAcroBikeTricksList); i++)
     {
         const struct BikeHistoryInputInfo *historyInputInfo = &sAcroBikeTricksList[i];
@@ -1204,6 +1235,14 @@ static enum Collision GetBikeCollisionAt(struct ObjectEvent *objectEvent, s16 x,
     return collision;
 }
 
+bool8 RS_IsRunningDisallowed(u8 tile)
+{
+    if (IsRunningDisallowedByMetatile(tile) != FALSE || gMapHeader.mapType == MAP_TYPE_INDOOR)
+        return TRUE;
+    else
+        return FALSE;
+}
+
 static bool8 IsRunningDisallowedByMetatile(u8 tile)
 {
     if (MetatileBehavior_IsRunningDisallowed(tile))
@@ -1281,16 +1320,24 @@ void GetOnOffBike(u8 transitionFlags)
 {
     if (gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
     {
+        PlaySE(SE_BIKE_BELL);
         SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_ON_FOOT);
-        Overworld_ClearSavedMusic();
-        Overworld_PlaySpecialMapMusic();
+        if (!gSaveblock3.challengeSettings.bikeMusic)
+        {
+            Overworld_ClearSavedMusic();
+            Overworld_PlaySpecialMapMusic();
+        }
     }
     else
     {
+        PlaySE(SE_BIKE_BELL);
         EndORASDowsing();
         SetPlayerAvatarTransitionFlags(transitionFlags);
-        Overworld_SetSavedMusic(IS_FRLG ? MUS_RG_CYCLING : MUS_CYCLING);
-        Overworld_ChangeMusicTo(IS_FRLG ? MUS_RG_CYCLING : MUS_CYCLING);
+        if (!gSaveblock3.challengeSettings.bikeMusic)
+        {
+            Overworld_SetSavedMusic(IS_HNS ? MUS_HG_CYCLING : IS_FRLG ? MUS_RG_CYCLING : MUS_CYCLING);
+            Overworld_ChangeMusicTo(IS_HNS ? MUS_HG_CYCLING : IS_FRLG ? MUS_RG_CYCLING : MUS_CYCLING);
+        }
     }
 }
 

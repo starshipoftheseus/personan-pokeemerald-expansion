@@ -452,7 +452,7 @@ static void AnimGunkShotParticlesStep(struct Sprite *sprite)
 
 static void AnimSuckerPunch(struct Sprite *sprite)
 {
-    if (GetPartnerBattler(gBattleAnimAttacker) == gBattleAnimTarget && GetBattlerPosition(gBattleAnimTarget) < B_POSITION_PLAYER_RIGHT)
+    if (BATTLE_PARTNER(gBattleAnimAttacker) == gBattleAnimTarget && GetBattlerPosition(gBattleAnimTarget) < B_POSITION_PLAYER_RIGHT)
         gBattleAnimArgs[0] *= -1;
 
     InitSpritePosToAnimTarget(sprite, TRUE);

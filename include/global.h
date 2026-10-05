@@ -18,7 +18,6 @@
 #include "constants/apricorn_tree.h"
 #include "constants/berry.h"
 #include "constants/maps.h"
-#include "constants/mass_outbreak.h"
 #include "constants/pokemon.h"
 #include "constants/easy_chat.h"
 #include "constants/trainer_hill.h"
@@ -43,17 +42,14 @@
 // We define these when using certain IDEs to fool preproc
 #define _(x)        {x}
 #define __(x)       {x}
-#define COMPOUND_STRING(x) 0
 #define INCBIN(...) {0}
 #define INCBIN_U8   INCBIN
 #define INCBIN_U16  INCBIN
 #define INCBIN_U32  INCBIN
+#define INCBIN_S8   INCBIN
+#define INCBIN_S16  INCBIN
+#define INCBIN_S32  INCBIN
 #define INCBIN_COMP INCBIN
-#define INCGFX(...) {0}
-#define INCGFX_U8   INCGFX
-#define INCGFX_U16  INCGFX
-#define INCGFX_U32  INCGFX
-#define INCGFX_COMP INCGFX
 #endif // IDE support
 
 #define ARRAY_COUNT(array) (size_t)(sizeof(array) / sizeof((array)[0]))
@@ -254,11 +250,99 @@ struct NPCFollower
 #include "constants/items.h"
 #define ITEM_FLAGS_COUNT ((ITEMS_COUNT / 8) + ((ITEMS_COUNT % 8) ? 1 : 0))
 
+struct ChallengeSettings
+{
+    // Options Plus
+    u8 followerEnable:1;
+    u8 followerLargeEnable:1;
+    u8 autorunSurf:1;
+    u8 autorunDive:1;
+    u8 fishing:1;
+    u8 evenFasterJoy:1;
+    u8 unitSystem:1;
+    u8 fastIntro:1;
+    u8 fastBattle:1;
+    u8 optionStyle:1;
+    u8 lrToRun:1;
+    u8 ballPrompt:1;
+    u8 newBackgrounds:1;
+    u8 newBattleUI:1;
+    u8 genOneRecharge:1;
+    u8 musicOnOff:1;
+    u8 runType:3;
+    u8 disableMatchCall:1;
+    u8 bikeMusic:1;
+    u8 surfMusic:1;
+    bool8 autoRun;
+    // Randomizer
+    u8 tx_Random_Chaos:1;
+    u8 tx_Random_WildPokemon:1;
+    u8 tx_Random_Similar:1;
+    u8 tx_Random_MapBased:1;
+    u8 tx_Random_IncludeLegendaries:1;
+    u8 tx_Random_Type:1;
+    u8 tx_Random_TypeEffectiveness:1;
+    u8 tx_Random_Abilities:1;
+    u8 tx_Random_Moves:1;
+    u8 tx_Random_Trainer:1;
+    u8 tx_Random_Evolutions:1;
+    u8 tx_Random_EvolutionMethods:1;
+    u8 tx_Random_Items:1;
+    u8 tx_Random_Static:1;
+    u8 tx_Random_Starter:1;
+    u8 tx_Random_GenScope:1; // 0 = all gens, 1 = Gen 1-3 families only
+    // Challenges
+    u8 tx_Challenges_EvoLimit:2;
+    u8 tx_Challenges_Nuzlocke:1;
+    u8 tx_Challenges_NuzlockeHardcore:1;
+    u8 tx_Challenges_PartyLimit:3;
+    u8 tx_Challenges_OneTypeChallenge:5;
+    u8 tx_Challenges_NoItemPlayer:1;
+    u8 tx_Challenges_NoItemTrainer:1;
+    u8 tx_Challenges_PkmnCenter:2;
+    u8 tx_Challenges_LessEscapes:1;
+    u8 tx_Challenges_BaseStatEqualizer:2;
+    u8 tx_Challenges_LevelCap:2;
+    u8 tx_Challenges_ExpMultiplier:2;
+    u8 tx_Challenges_Mirror:1;
+    u8 tx_Challenges_Mirror_Thief:1;
+    u8 tx_Challenges_NoEVs:1;
+    u8 tx_Challenges_PCHeal:1;
+    u8 tx_Challenges_Expensive:3;
+    u8 tx_Challenges_TrainerScalingIVs:2;
+    u8 tx_Challenges_TrainerScalingEVs:2;
+    u8 tx_Challenges_MaxPartyIVs:2;
+    // Nuzlocke
+    u8 tx_Nuzlocke_SpeciesClause:1;
+    u8 tx_Nuzlocke_ShinyClause:1;
+    u8 tx_Nuzlocke_Nicknaming:1;
+    u8 tx_Nuzlocke_Deletion:1;
+    u8 tx_Nuzlocke_EasyMode:1;
+    u8 tx_Nuzlocke_RareCandy:1;
+    u8 nuzlockeEncounterFlags[16];
+    // Mode / Features
+    u8 tx_Mode_InfiniteTMs:1;
+    u8 tx_Mode_PoisonSurvive:1;
+    u8 tx_Mode_AlternateSpawns:1;
+    u8 tx_Mode_Synchronize:1;
+    u8 tx_Mode_Mints:1;
+    u8 tx_Mode_New_Citrus:1;
+    u8 tx_Mode_Fairy_Types:1;
+    u8 tx_Mode_Sturdy:1;
+    u8 tx_Mode_Modern_Moves:1;
+    u8 tx_Mode_Legendary_Abilities:1;
+    u8 tx_Features_ShinyColors:1;
+    u8 tx_Features_RTCType:1;
+    u8 tx_Features_LimitDifficulty:1;
+    u8 tx_Features_WildMonDropItems:1;
+    u8 tx_Features_FrontierBans:1;
+    u8 tx_Difficulty_EscapeRopeDig:1;
+    u8 tx_Features_ShinyChance:4;
+};
+
 struct SaveBlock3
 {
-#if OW_USE_FAKE_RTC
     struct SiiRtcInfo fakeRTC;
-#endif
 #if FNPC_ENABLE_NPC_FOLLOWERS
     struct NPCFollower NPCfollower;
 #endif
@@ -272,6 +356,8 @@ struct SaveBlock3
 #if APRICORN_TREE_COUNT > 0
     u8 apricornTrees[NUM_APRICORN_TREE_BYTES];
 #endif
+    struct ChallengeSettings challengeSettings;
+    u16 registeredItemHold;
 }; /* max size 1624 bytes */
 
 extern struct SaveBlock3 *gSaveBlock3Ptr;
@@ -334,7 +420,7 @@ struct BerryCrush
 
 struct ApprenticeMon
 {
-    enum Species species;
+    u16 species;
     enum Move moves[MAX_MON_MOVES];
     enum Item item;
 };
@@ -359,8 +445,8 @@ struct Apprentice
 
 struct BattleTowerPokemon
 {
-    enum Species species;
-    enum Item heldItem;
+    u16 species;
+    u16 heldItem;
     enum Move moves[MAX_MON_MOVES];
     u8 level;
     u8 ppBonuses;
@@ -402,8 +488,8 @@ struct EmeraldBattleTowerRecord
 
 struct BattleTowerInterview
 {
-    enum Species playerSpecies;
-    enum Species opponentSpecies;
+    u16 playerSpecies;
+    u16 opponentSpecies;
     u8 opponentName[PLAYER_NAME_LENGTH + 1];
     u8 opponentMonNickname[VANILLA_POKEMON_NAME_LENGTH + 1];
     u8 opponentLanguage;
@@ -623,6 +709,7 @@ struct SaveBlock2
 #endif //FREE_RECORD_MIXING_HALL_RECORDS
     /*0x624*/ u16 contestLinkResults[CONTEST_CATEGORIES_COUNT][CONTESTANT_COUNT];
     /*0x64C*/ struct BattleFrontier frontier;
+             u8 rivalName[PLAYER_NAME_LENGTH + 1];
 }; // sizeof=0xF2C
 
 extern struct SaveBlock2 *gSaveBlock2Ptr;
@@ -633,8 +720,8 @@ struct SecretBaseParty
 {
     u32 personality[PARTY_SIZE];
     enum Move moves[PARTY_SIZE * MAX_MON_MOVES];
-    enum Species species[PARTY_SIZE];
-    enum Item heldItems[PARTY_SIZE];
+    u16 species[PARTY_SIZE];
+    u16 heldItems[PARTY_SIZE];
     u8 levels[PARTY_SIZE];
     u8 EVs[PARTY_SIZE];
 };
@@ -694,7 +781,7 @@ struct Roamer
 {
     /*0x00*/ u32 ivs;
     /*0x04*/ u32 personality;
-    /*0x08*/ enum Species species;
+    /*0x08*/ u16 species;
     /*0x0A*/ u16 hp;
     /*0x0C*/ u8 level;
     /*0x0D*/ u8 statusA;
@@ -706,7 +793,8 @@ struct Roamer
     /*0x13*/ bool8 active;
     /*0x14*/ u8 statusB; // Stores frostbite
     /*0x15*/ bool8 shiny;
-    /*0x16*/ u8 filler[0x6];
+    /*0x16*/ u8 locationTableId;
+    /*0x17*/ u8 filler[0x5];
 };
 
 struct RamScriptData
@@ -841,7 +929,7 @@ struct ContestWinner
 {
     u32 personality;
     u32 trainerId;
-    enum Species species;
+    u16 species;
     u8 contestCategory;
     u8 monName[VANILLA_POKEMON_NAME_LENGTH + 1];
     u8 trainerName[PLAYER_NAME_LENGTH + 1];
@@ -855,7 +943,7 @@ struct Mail
     /*0x00*/ u16 words[MAIL_WORDS_COUNT];
     /*0x12*/ u8 playerName[PLAYER_NAME_LENGTH + 1];
     /*0x1A*/ u8 trainerId[TRAINER_ID_LENGTH];
-    /*0x1E*/ enum Species species;
+    /*0x1E*/ u16 species;
     /*0x20*/ enum Item itemId;
 };
 
@@ -1001,7 +1089,7 @@ struct WonderNews
 struct WonderCard
 {
     u16 flagId; // Event flag (sReceivedGiftFlags) + WONDER_CARD_FLAG_OFFSET
-    enum Species iconSpecies;
+    u16 iconSpecies;
     u32 idNumber;
     u8 type:2; // CARD_TYPE_*
     u8 bgType:4;
@@ -1020,7 +1108,7 @@ struct WonderCardMetadata
     u16 battlesWon;
     u16 battlesLost;
     u16 numTrades;
-    enum Species iconSpecies;
+    u16 iconSpecies;
     u16 stampData[2][MAX_STAMP_CARD_STAMPS]; // First element is STAMP_SPECIES, second is STAMP_ID
 };
 
@@ -1086,14 +1174,30 @@ struct ExternalEventFlags
 struct Bag
 {
     struct ItemSlot items[BAG_ITEMS_COUNT];
+#if I_COMBINE_BAG_POCKETS == FALSE
+    struct ItemSlot treasures[BAG_TREASURES_COUNT];
+#endif
     struct ItemSlot keyItems[BAG_KEYITEMS_COUNT];
     struct ItemSlot pokeBalls[BAG_POKEBALLS_COUNT];
     struct ItemSlot TMsHMs[BAG_TMHM_COUNT];
     struct ItemSlot berries[BAG_BERRIES_COUNT];
+    struct ItemSlot medicine[BAG_MEDICINE_COUNT];
+#if I_COMBINE_BAG_POCKETS == FALSE
+    struct ItemSlot battleItems[BAG_BATTLE_ITEMS_COUNT];
+#endif
+};
+
+struct MomSavingsData
+{
+    u32 momsMoney;
+    u16 normalGiftFlags;
+    u8 isSavingMoney;
+    u8 isInitialized;
 };
 
 struct SaveBlock1
 {
+             u16 saveVersion;
     /*0x00*/ struct Coords16 pos;
     /*0x04*/ struct WarpData location;
     /*0x0C*/ struct WarpData continueGameWarp;
@@ -1121,8 +1225,8 @@ struct SaveBlock1
     /*0x988*/ u8 filler1[0x34]; // Previously Dex Flags, feel free to remove.
 #endif //FREE_EXTRA_SEEN_FLAGS_SAVEBLOCK1
     /*0x9BC*/ u16 berryBlenderRecords[3];
-    /*0x9C2*/ u8 unused_9C2[2];
-              u32 dailySeed;
+    /*0x9C2*/ u32 saveVersionMagic;
+    /*0x9C6*/ u8 unused_9C6[2];
 #if FREE_MATCH_CALL == FALSE
     /*0x9C8*/ u16 trainerRematchStepCounter;
     /*0x9CA*/ u8 trainerRematches[MAX_REMATCH_ENTRIES];
@@ -1148,7 +1252,7 @@ struct SaveBlock1
     /*0x27CC*/ TVShow tvShows[TV_SHOWS_COUNT];
     /*0x27CA*/ //u8 padding4[2];
     /*0x2B50*/ PokeNews pokeNews[POKE_NEWS_COUNT];
-    /*0x2B90*/ enum Species outbreakPokemonSpecies;
+    /*0x2B90*/ u16 outbreakPokemonSpecies;
     /*0x2B92*/ u8 outbreakLocationMapNum;
     /*0x2B93*/ u8 outbreakLocationMapGroup;
     /*0x2B94*/ u8 outbreakPokemonLevel;
@@ -1173,11 +1277,11 @@ struct SaveBlock1
 #if FREE_LINK_BATTLE_RECORDS == FALSE
     /*0x3150*/ struct LinkBattleRecords linkBattleRecords;
 #endif //FREE_LINK_BATTLE_RECORDS
-    /*0x31A8*/ u8 giftRibbons[NUM_GIFT_RIBBONS];
-               u8 padding[4];
+    /*0x31A8*/ u8 giftRibbons[GIFT_RIBBONS_COUNT];
     /*0x31B3*/ struct ExternalEventData externalEventData;
     /*0x31C7*/ struct ExternalEventFlags externalEventFlags;
     /*0x31DC*/ struct Roamer roamer[ROAMER_COUNT];
+    /*0x3???*/ struct Roamer roamerPadding[7 - ROAMER_COUNT]; // Padding for extra roamers
 #if FREE_ENIGMA_BERRY == FALSE
     /*0x31F8*/ struct EnigmaBerry enigmaBerry;
 #endif //FREE_ENIGMA_BERRY
@@ -1185,7 +1289,9 @@ struct SaveBlock1
     /*0x322C*/ struct MysteryGiftSave mysteryGift;
 #endif //FREE_MYSTERY_GIFT
     /*0x3???*/ u8 dexSeen[NUM_DEX_FLAG_BYTES];
+    /*0x3???*/ u8 dexPadding1[0xBF - NUM_DEX_FLAG_BYTES]; // Padding so the dex can be expanded later
     /*0x3???*/ u8 dexCaught[NUM_DEX_FLAG_BYTES];
+    /*0x3???*/ u8 dexPadding2[0xBF - NUM_DEX_FLAG_BYTES]; // Padding so the dex can be expanded later
 #if FREE_TRAINER_HILL == FALSE
     /*0x3???*/ u32 trainerHillTimes[NUM_TRAINER_HILL_MODES];
 #endif //FREE_TRAINER_HILL
@@ -1210,6 +1316,9 @@ struct SaveBlock1
     u8 rivalName[PLAYER_NAME_LENGTH + 1];
     struct DaycareMon route5DayCareMon;
 #endif
+#if IS_HNS
+    struct MomSavingsData momSavings;
+#endif
     // sizeof: 0x3???
 };
 
@@ -1222,10 +1331,10 @@ struct MapPosition
     s8 elevation;
 };
 
-#if TESTING
+#if T_SHOULD_RUN_MOVE_ANIM
 extern bool32 gLoadFail;
 extern bool32 gCountAllocs;
 extern s32 gSpriteAllocs;
-#endif // TESTING
+#endif // T_SHOULD_RUN_MOVE_ANIM
 
 #endif // GUARD_GLOBAL_H

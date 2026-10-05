@@ -225,8 +225,7 @@ DOUBLE_BATTLE_TEST("Powder still blocks the target's Fire type moves even if it 
 
 SINGLE_BATTLE_TEST("Powder prevents Protean/Libero from changing its user to Fire type")
 {
-    enum Ability ability;
-    enum Species species;
+    u32 ability, species;
     PARAMETRIZE { ability = ABILITY_PROTEAN; species = SPECIES_GRENINJA; }
     PARAMETRIZE { ability = ABILITY_LIBERO;  species = SPECIES_RABOOT; }
     GIVEN {
@@ -295,7 +294,7 @@ DOUBLE_BATTLE_TEST("Powder damages a target using Shell Trap even if it wasn't h
         ASSUME(GetMoveCategory(MOVE_SCRATCH) == DAMAGE_CATEGORY_PHYSICAL);
         ASSUME(GetMoveCategory(MOVE_EMBER) == DAMAGE_CATEGORY_SPECIAL);
         ASSUME(GetMoveCategory(MOVE_TICKLE) == DAMAGE_CATEGORY_STATUS);
-        ASSUME_STAT_CHANGE(MOVE_TICKLE, attack: -1, defense: -1);
+        ASSUME(GetMoveEffect(MOVE_TICKLE) == EFFECT_TICKLE);
         PLAYER(SPECIES_TURTONATOR);
         PLAYER(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_WYNAUT);

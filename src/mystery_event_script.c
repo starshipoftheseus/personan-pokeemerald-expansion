@@ -1,13 +1,14 @@
 #include "global.h"
 #include "berry.h"
 #include "battle_special.h"
+#include "challenge_menu.h"
 #include "easy_chat.h"
 #include "event_data.h"
 #include "mail.h"
 #include "mystery_event_script.h"
 #include "pokedex.h"
 #include "pokemon.h"
-#include "give_gift_ribbon_to_party.h"
+#include "pokemon_size_record.h"
 #include "script.h"
 #include "strings.h"
 #include "string_util.h"
@@ -314,8 +315,8 @@ bool8 MEScrCmd_givepokemon(struct ScriptContext *ctx)
 {
     struct Mail mail;
     struct Pokemon pokemon;
-    enum Species species;
-    enum Item heldItem;
+    u16 species;
+    u16 heldItem;
     u32 data = ScriptReadWord(ctx) - ctx->mOffset + ctx->mScriptBase;
     void *pokemonPtr = (void *)data;
     void *mailPtr = (void *)(data + sizeof(struct Pokemon));
@@ -328,14 +329,14 @@ bool8 MEScrCmd_givepokemon(struct ScriptContext *ctx)
     else
         StringCopyN(gStringVar1, gText_Pokemon, POKEMON_NAME_LENGTH + 1);
 
-    if (gPartiesCount[B_TRAINER_PLAYER] == PARTY_SIZE)
+    if (gPlayerPartyCount == GetMaxPartySize())
     {
         StringExpandPlaceholders(gStringVar4, gText_MysteryEventFullParty);
         ctx->mStatus = MEVENT_STATUS_FAILURE;
     }
     else
     {
-        memcpy(&gParties[B_TRAINER_PLAYER][PARTY_SIZE - 1], pokemonPtr, sizeof(struct Pokemon));
+        memcpy(&gPlayerParty[GetMaxPartySize() - 1], pokemonPtr, sizeof(struct Pokemon));
         memcpy(&mail, mailPtr, sizeof(struct Mail));
 
         if (species != SPECIES_EGG)
@@ -345,9 +346,9 @@ bool8 MEScrCmd_givepokemon(struct ScriptContext *ctx)
             GetSetPokedexFlag(pokedexNum, FLAG_SET_CAUGHT);
         }
 
-        heldItem = GetMonData(&gParties[B_TRAINER_PLAYER][PARTY_SIZE - 1], MON_DATA_HELD_ITEM);
+        heldItem = GetMonData(&gPlayerParty[GetMaxPartySize() - 1], MON_DATA_HELD_ITEM);
         if (ItemIsMail(heldItem))
-            GiveMailToMon(&gParties[B_TRAINER_PLAYER][PARTY_SIZE - 1], &mail);
+            GiveMailToMon(&gPlayerParty[GetMaxPartySize() - 1], &mail);
         CompactPartySlots();
         CalculatePlayerPartyCount();
         StringExpandPlaceholders(gStringVar4, gText_MysteryEventSentOver);

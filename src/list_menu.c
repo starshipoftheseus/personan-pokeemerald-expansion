@@ -281,10 +281,10 @@ static const struct SpriteTemplate sSpriteTemplate_RedArrowCursor =
     .callback = SpriteCallback_RedArrowCursor,
 };
 
-static const u16 sRedInterface_Pal[]    = INCGFX_U16("graphics/interface/red.pal", ".gbapal"); // Shared by all of the below gfx
-static const u32 sScrollIndicator_Gfx[] = INCGFX_U32("graphics/interface/scroll_indicator.png", ".4bpp.smol");
-static const u32 sOutlineCursor_Gfx[]   = INCGFX_U32("graphics/interface/outline_cursor.png", ".4bpp.smol", "-num_tiles 8 -Wnum_tiles");
-static const u32 sArrowCursor_Gfx[]     = INCGFX_U32("graphics/interface/arrow_cursor.png", ".4bpp.smol");
+static const u16 sRedInterface_Pal[]    = INCBIN_U16("graphics/interface/red.gbapal"); // Shared by all of the below gfx
+static const u32 sScrollIndicator_Gfx[] = INCBIN_U32("graphics/interface/scroll_indicator.4bpp.smol");
+static const u32 sOutlineCursor_Gfx[]   = INCBIN_U32("graphics/interface/outline_cursor.4bpp.smol");
+static const u32 sArrowCursor_Gfx[]     = INCBIN_U32("graphics/interface/arrow_cursor.4bpp.smol");
 
 // code
 static void ListMenuDummyTask(u8 taskId)
@@ -366,6 +366,26 @@ u8 ListMenuInit(struct ListMenuTemplate *listMenuTemplate, u16 scrollOffset, u16
     return taskId;
 }
 
+// unused
+u8 ListMenuInitInRect(struct ListMenuTemplate *listMenuTemplate, struct ListMenuWindowRect *rect, u16 scrollOffset, u16 selectedRow)
+{
+    s32 i;
+
+    u8 taskId = ListMenuInitInternal(listMenuTemplate, scrollOffset, selectedRow);
+    for (i = 0; rect[i].palNum != 0xFF; i++)
+    {
+        PutWindowRectTilemapOverridePalette(listMenuTemplate->windowId,
+                                            rect[i].x,
+                                            rect[i].y,
+                                            rect[i].width,
+                                            rect[i].height,
+                                            rect[i].palNum);
+    }
+    CopyWindowToVram(listMenuTemplate->windowId, COPYWIN_GFX);
+
+    return taskId;
+}
+
 s32 ListMenu_ProcessInput(u8 listTaskId)
 {
     struct ListMenu *list = (void *) gTasks[listTaskId].data;
@@ -380,6 +400,16 @@ s32 ListMenu_ProcessInput(u8 listTaskId)
     else if (JOY_NEW(B_BUTTON))
     {
         return LIST_CANCEL;
+    }
+    else if (JOY_NEW(DPAD_UP))
+    {
+        ListMenuChangeSelectionLoop(list, TRUE, FALSE);
+        return LIST_NOTHING_CHOSEN;
+    }
+    else if (JOY_NEW(DPAD_DOWN))
+    {
+        ListMenuChangeSelectionLoop(list, TRUE, TRUE);
+        return LIST_NOTHING_CHOSEN;
     }
     else if (JOY_REPEAT(DPAD_UP))
     {
@@ -452,8 +482,50 @@ void RedrawListMenu(u8 listTaskId)
     FillWindowPixelBuffer(list->template.windowId, PIXEL_FILL(list->template.fillValue));
     ListMenuPrintEntries(list, list->scrollOffset, 0, list->template.maxShowed);
     ListMenuDrawCursor(list);
-    ListMenuCallSelectionChangedCallback(list, TRUE);
     CopyWindowToVram(list->template.windowId, COPYWIN_GFX);
+}
+
+// unused
+void ChangeListMenuPals(u8 listTaskId, u8 cursorPal, u8 fillValue, u8 cursorShadowPal)
+{
+    struct ListMenu *list = (void *) gTasks[listTaskId].data;
+
+    list->template.cursorPal = cursorPal;
+    list->template.fillValue = fillValue;
+    list->template.cursorShadowPal = cursorShadowPal;
+}
+
+// unused
+void ChangeListMenuCoords(u8 listTaskId, u8 x, u8 y)
+{
+    struct ListMenu *list = (void *) gTasks[listTaskId].data;
+
+    SetWindowAttribute(list->template.windowId, WINDOW_TILEMAP_LEFT, x);
+    SetWindowAttribute(list->template.windowId, WINDOW_TILEMAP_TOP, y);
+}
+
+// unused
+s32 ListMenuTestInput(struct ListMenuTemplate *template, u32 scrollOffset, u32 selectedRow, u16 keys, u16 *newScrollOffset, u16 *newSelectedRow)
+{
+    struct ListMenu list;
+
+    list.template = *template;
+    list.scrollOffset = scrollOffset;
+    list.selectedRow = selectedRow;
+    list.unk_1C = 0;
+    list.unk_1D = 0;
+
+    if (keys == DPAD_UP)
+        ListMenuChangeSelection(&list, FALSE, 1, FALSE);
+    if (keys == DPAD_DOWN)
+        ListMenuChangeSelection(&list, FALSE, 1, TRUE);
+
+    if (newScrollOffset != NULL)
+        *newScrollOffset = list.scrollOffset;
+    if (newSelectedRow != NULL)
+        *newSelectedRow = list.selectedRow;
+
+    return LIST_NOTHING_CHOSEN;
 }
 
 void ListMenuGetCurrentItemArrayId(u8 listTaskId, u16 *arrayId)
@@ -723,6 +795,107 @@ static u8 ListMenuUpdateSelectedRowIndexAndScrollOffset(struct ListMenu *list, b
     return 2;
 }
 
+static u8 ListMenuUpdateSelectedRowIndexAndScrollOffsetLoop(struct ListMenu *list, bool8 movingDown)
+{
+    u16 selectedRow = list->selectedRow;
+    u16 scrollOffset = list->scrollOffset;
+    u16 newRow;
+    u32 newScroll;
+
+    if (!movingDown)
+    {
+        // When scrolling up, tries to place the cursor just above the middle of the displayed rows
+        if (list->template.maxShowed == 1)
+            newRow = 0;
+        else
+            newRow = list->template.maxShowed - ((list->template.maxShowed / 2) + (list->template.maxShowed % 2)) - 1;
+
+        if (scrollOffset == 0) // Already viewing the top X rows of the list
+        {
+            while (selectedRow >= 0)
+            {
+                selectedRow--;
+                if (selectedRow == UINT16_MAX)
+                {
+                    list->selectedRow = list->template.maxShowed - 1;
+                    list->scrollOffset = list->template.totalItems - list->template.maxShowed;
+                    if (list->scrollOffset < 0)
+                        list->scrollOffset = 0;
+                    return 3;
+                }
+                else if (list->template.items[scrollOffset + selectedRow].id != LIST_HEADER)
+                {
+                    list->selectedRow = selectedRow;
+                    return 1;
+                }
+            }
+
+            return 0;
+        }
+        else
+        {
+            while (selectedRow > newRow)
+            {
+                selectedRow--;
+                if (list->template.items[scrollOffset + selectedRow].id != LIST_HEADER)
+                {
+                    list->selectedRow = selectedRow;
+                    return 1;
+                }
+            }
+
+            newScroll = scrollOffset - 1;
+        }
+    }
+    else
+    {
+        // When scrolling down, tries to place the cursor just below the middle of the displayed rows
+        if (list->template.maxShowed == 1)
+            newRow = 0;
+        else
+            newRow = ((list->template.maxShowed / 2) + (list->template.maxShowed % 2));
+
+        if (scrollOffset == list->template.totalItems - list->template.maxShowed) // already viewing the bottom X rows of the list
+        {
+            while (selectedRow < list->template.maxShowed)
+            {
+                selectedRow++;
+                if (selectedRow + scrollOffset > list->template.totalItems - 1)
+                {
+                    list->selectedRow = 0;
+                    list->scrollOffset = 0;
+                    return 3;
+                }
+                else if (list->template.items[scrollOffset + selectedRow].id != LIST_HEADER)
+                {
+                    list->selectedRow = selectedRow;
+                    return 1;
+                }
+            }
+
+            return 0;
+        }
+        else
+        {
+            while (selectedRow < newRow)
+            {
+                selectedRow++;
+                if (list->template.items[scrollOffset + selectedRow].id != LIST_HEADER)
+                {
+                    list->selectedRow = selectedRow;
+                    return 1;
+                }
+            }
+
+            newScroll = scrollOffset + 1;
+        }
+    }
+
+    list->selectedRow = newRow;
+    list->scrollOffset = newScroll;
+    return 2;
+}
+
 static void ListMenuScroll(struct ListMenu *list, u8 count, bool8 movingDown)
 {
     if (count >= list->template.maxShowed)
@@ -761,6 +934,12 @@ static void ListMenuScroll(struct ListMenu *list, u8 count, bool8 movingDown)
                                 0, 0, width, list->template.upText_Y);
         }
     }
+}
+
+static void ListMenuScrollLoop(struct ListMenu *list)
+{
+    FillWindowPixelBuffer(list->template.windowId, PIXEL_FILL(list->template.fillValue));
+    ListMenuPrintEntries(list, list->scrollOffset, 0, list->template.maxShowed);
 }
 
 bool8 ListMenuChangeSelectionFull(struct ListMenu *list, bool32 updateCursor, bool32 callCallback, u8 count, bool8 movingDown)
@@ -822,9 +1001,68 @@ bool8 ListMenuChangeSelectionFull(struct ListMenu *list, bool32 updateCursor, bo
     return FALSE;
 }
 
+bool8 ListMenuChangeSelectionFullLoop(struct ListMenu *list, bool32 updateCursor, bool32 callCallback, bool8 movingDown)
+{
+    u16 oldSelectedRow;
+    u8 selectionChange, cursorCount;
+
+    oldSelectedRow = list->selectedRow;
+    cursorCount = 0;
+    selectionChange = 0;
+
+    do
+    {
+        u8 ret = ListMenuUpdateSelectedRowIndexAndScrollOffsetLoop(list, movingDown);
+        selectionChange |= ret;
+        if (ret != 2)
+            break;
+        cursorCount++;
+    } while (list->template.items[list->scrollOffset + list->selectedRow].id == LIST_HEADER);
+
+    if (updateCursor)
+    {
+        switch (selectionChange)
+        {
+        case 0:
+        default:
+            return TRUE;
+        case 1:
+            ListMenuErasePrintedCursor(list, oldSelectedRow);
+            ListMenuDrawCursor(list);
+            if (callCallback)
+                ListMenuCallSelectionChangedCallback(list, FALSE);
+            CopyWindowToVram(list->template.windowId, COPYWIN_GFX);
+            break;
+        case 2:
+            ListMenuErasePrintedCursor(list, oldSelectedRow);
+            ListMenuScroll(list, cursorCount, movingDown);
+            ListMenuDrawCursor(list);
+            if (callCallback)
+                ListMenuCallSelectionChangedCallback(list, FALSE);
+            CopyWindowToVram(list->template.windowId, COPYWIN_GFX);
+            break;
+        case 3:
+            ListMenuErasePrintedCursor(list, oldSelectedRow);
+            ListMenuScrollLoop(list);
+            ListMenuDrawCursor(list);
+            if (callCallback)
+                ListMenuCallSelectionChangedCallback(list, FALSE);
+            CopyWindowToVram(list->template.windowId, COPYWIN_GFX);
+            break;
+        }
+    }
+
+    return FALSE;
+}
+
 bool8 ListMenuChangeSelection(struct ListMenu *list, bool8 updateCursorAndCallCallback, u8 count, bool8 movingDown)
 {
     return ListMenuChangeSelectionFull(list, updateCursorAndCallCallback, updateCursorAndCallCallback, count, movingDown);
+}
+
+bool8 ListMenuChangeSelectionLoop(struct ListMenu *list, bool8 updateCursorAndCallCallback, bool8 movingDown)
+{
+    return ListMenuChangeSelectionFullLoop(list, updateCursorAndCallCallback, updateCursorAndCallCallback, movingDown);
 }
 
 static void ListMenuCallSelectionChangedCallback(struct ListMenu *list, u8 onInit)
@@ -833,10 +1071,125 @@ static void ListMenuCallSelectionChangedCallback(struct ListMenu *list, u8 onIni
         list->template.moveCursorFunc(list->template.items[list->scrollOffset + list->selectedRow].id, onInit, list);
 }
 
+void JumpListMenuToBottom(u8 listTaskId)
+{
+    struct ListMenu *list = (void *) gTasks[listTaskId].data;
+    u16 oldSelectedRow = list->selectedRow;
+    u16 oldScrollOffset = list->scrollOffset;
+
+    if (list->template.totalItems == 0)
+        return;
+
+    // Calculate the raw bottom positions
+    if (list->template.totalItems > list->template.maxShowed)
+    {
+        list->scrollOffset = list->template.totalItems - list->template.maxShowed;
+        list->selectedRow = list->template.maxShowed - 1;
+    }
+    else
+    {
+        list->scrollOffset = 0;
+        list->selectedRow = list->template.totalItems - 1;
+    }
+
+    // Prevent landing on an unselectable LIST_HEADER
+    if (!list->template.isDynamic)
+    {
+        while (list->template.items[list->scrollOffset + list->selectedRow].id == LIST_HEADER)
+        {
+            if (list->selectedRow > 0)
+            {
+                list->selectedRow--;
+            }
+            else if (list->scrollOffset > 0)
+            {
+                list->scrollOffset--;
+            }
+            else
+            {
+                break; 
+            }
+        }
+    }
+
+    // Only update if the position actually changed
+    if (oldSelectedRow != list->selectedRow || oldScrollOffset != list->scrollOffset)
+    {
+        if (oldScrollOffset != list->scrollOffset)
+        {
+            // Scroll changed: Requires a full window redraw
+            RedrawListMenu(listTaskId);
+        }
+        else
+        {
+            // Only the cursor moved: Optimize by just moving the cursor
+            ListMenuErasePrintedCursor(list, oldSelectedRow);
+            ListMenuDrawCursor(list);
+            CopyWindowToVram(list->template.windowId, COPYWIN_GFX);
+        }
+    }
+
+    ListMenuCallSelectionChangedCallback(list, FALSE);
+}
+
+// unused
+void ListMenuOverrideSetColors(u8 cursorPal, u8 fillValue, u8 cursorShadowPal)
+{
+    gListMenuOverride.cursorPal = cursorPal;
+    gListMenuOverride.fillValue = fillValue;
+    gListMenuOverride.cursorShadowPal = cursorShadowPal;
+    gListMenuOverride.enabled = TRUE;
+}
+
 void ListMenuDefaultCursorMoveFunc(s32 itemIndex, bool8 onInit, struct ListMenu *list)
 {
     if (!onInit)
-        PlaySE(SE_SELECT);
+        PlaySECursorMove(SE_SELECT);
+}
+
+// unused
+s32 ListMenuGetTemplateField(u8 taskId, u8 field)
+{
+    struct ListMenu *data = (void *) gTasks[taskId].data;
+
+    switch (field)
+    {
+    case LISTFIELD_MOVECURSORFUNC:
+    case LISTFIELD_MOVECURSORFUNC2:
+        return (s32)(data->template.moveCursorFunc);
+    case LISTFIELD_TOTALITEMS:
+        return data->template.totalItems;
+    case LISTFIELD_MAXSHOWED:
+        return data->template.maxShowed;
+    case LISTFIELD_WINDOWID:
+        return data->template.windowId;
+    case LISTFIELD_HEADERX:
+        return data->template.header_X;
+    case LISTFIELD_ITEMX:
+        return data->template.item_X;
+    case LISTFIELD_CURSORX:
+        return data->template.cursor_X;
+    case LISTFIELD_UPTEXTY:
+        return data->template.upText_Y;
+    case LISTFIELD_CURSORPAL:
+        return data->template.cursorPal;
+    case LISTFIELD_FILLVALUE:
+        return data->template.fillValue;
+    case LISTFIELD_CURSORSHADOWPAL:
+        return data->template.cursorShadowPal;
+    case LISTFIELD_LETTERSPACING:
+        return data->template.lettersSpacing;
+    case LISTFIELD_ITEMVERTICALPADDING:
+        return data->template.itemVerticalPadding;
+    case LISTFIELD_SCROLLMULTIPLE:
+        return data->template.scrollMultiple;
+    case LISTFIELD_FONTID:
+        return data->template.fontId;
+    case LISTFIELD_CURSORKIND:
+        return data->template.cursorKind;
+    default:
+        return -1;
+    }
 }
 
 void ListMenuSetTemplateField(u8 taskId, u8 field, s32 value)

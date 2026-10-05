@@ -2,6 +2,7 @@
 #define GUARD_CONSTANTS_VARS_H
 
 #include "constants/vars_frlg.h"
+#include "constants/vars_hns.h"
 
 #define VARS_START 0x4000
 
@@ -53,8 +54,8 @@
 #define VAR_REPEL_STEP_COUNT                             0x4021
 #define VAR_ICE_STEP_COUNT                               0x4022
 #define VAR_STARTER_MON                                  0x4023 // 0=Treecko, 1=Torchic, 2=Mudkip
-#define VAR_MIRAGE_RND_H                                 0x4024 // Unused if OW_USE_DAILY_SEED_FOR_VANILLA_VARIABLES is TRUE
-#define VAR_MIRAGE_RND_L                                 0x4025 // Unused if OW_USE_DAILY_SEED_FOR_VANILLA_VARIABLES is TRUE
+#define VAR_MIRAGE_RND_H                                 0x4024
+#define VAR_MIRAGE_RND_L                                 0x4025
 #define VAR_SECRET_BASE_MAP                              0x4026
 #define VAR_CYCLING_ROAD_RECORD_COLLISIONS               0x4027
 #define VAR_CYCLING_ROAD_RECORD_TIME_L                   0x4028
@@ -94,8 +95,8 @@
 #define VAR_ASH_GATHER_COUNT                             0x4048
 #define VAR_BIRCH_STATE                                  0x4049
 #define VAR_CRUISE_STEP_COUNT                            0x404A
-#define VAR_POKELOT_RND1                                 0x404B // Unused if OW_USE_DAILY_SEED_FOR_VANILLA_VARIABLES is TRUE
-#define VAR_POKELOT_RND2                                 0x404C // Unused if OW_USE_DAILY_SEED_FOR_VANILLA_VARIABLES is TRUE
+#define VAR_POKELOT_RND1                                 0x404B
+#define VAR_POKELOT_RND2                                 0x404C
 #define VAR_POKELOT_PRIZE_PLACE                          0x404D
 #define VAR_UNUSED_0x404E                                0x404E // Unused Var
 #define VAR_LOTAD_SIZE_RECORD                            0x404F
@@ -157,7 +158,7 @@
 #define VAR_CABLE_CLUB_STATE                             0x4087
 #define VAR_CONTEST_TYPE                                 0x4088
 #define VAR_SECRET_BASE_INITIALIZED                      0x4089
-#define VAR_CONTEST_PRIZE_PICKUP                         0x408A
+#define VAR_CONTEST_PRIZE_PICKUP_EM                         0x408A
 #define VAR_UNUSED_0x408B                                0x408B // Unused Var
 #define VAR_LITTLEROOT_HOUSES_STATE_BRENDAN              0x408C
 #define VAR_LITTLEROOT_RIVAL_STATE                       0x408D
@@ -272,8 +273,8 @@
 #define VAR_UNUSED_0x40FA                                0x40FA // Unused Var
 #define VAR_UNUSED_0x40FB                                0x40FB // Unused Var
 #define VAR_UNUSED_0x40FC                                0x40FC // Unused Var
-#define VAR_UNUSED_0x40FD                                0x40FD // Unused Var
-#define VAR_UNUSED_0x40FE                                0x40FE // Unused Var
+#define VAR_SURF_MON_SLOT                                0x40FD // Added new VAR for Surfing Overworld Sprites - Holds Surfing Party Mon index
+#define VAR_FREEZE_SURF_BLOB                             0x40FE // Added new VAR for Surfing Overworld Sprites - Set on surf init to stop blob overlay being offset incorrectly
 #define VAR_UNUSED_0x40FF                                0x40FF // Unused Var
 
 #define VARS_END                                         0x40FF
@@ -337,10 +338,5 @@
 #define TESTING_VAR_UNUSED_6                (TESTING_VARS_START + 0x6)
 #define TESTING_VAR_UNUSED_7                (TESTING_VARS_START + 0x7)
 #endif // TESTING
-
-#if !defined(FIRERED) && !defined(LEAFGREEN)
-// Combined Hoenn + Kanto build: Kanto-only constants in their own range.
-#include "constants/vars_kanto.h"
-#endif
 
 #endif // GUARD_CONSTANTS_VARS_H

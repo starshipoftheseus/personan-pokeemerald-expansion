@@ -19,7 +19,6 @@
 #include "event_object_lock.h"
 #include "event_object_movement.h"
 #include "event_scripts.h"
-#include "evolution_scene.h"
 #include "fake_rtc.h"
 #include "field_message_box.h"
 #include "field_player_avatar.h"
@@ -44,6 +43,8 @@
 #include "pokedex.h"
 #include "pokemon_storage_system.h"
 #include "random.h"
+#include "randomizer.h"
+#include "nuzlocke.h"
 #include "overworld.h"
 #include "rotating_tile_puzzle.h"
 #include "rtc.h"
@@ -63,10 +64,13 @@
 #include "list_menu.h"
 #include "malloc.h"
 #include "battle.h"
-#include "constants/comparison_operators.h"
+#include "challenge_menu.h"
+#include "starter_choose.h"
 #include "constants/event_objects.h"
 #include "constants/map_types.h"
-#include "constants/party_menu.h"
+#include "constants/battle_frontier.h"
+#include "constants/easy_chat.h"
+#include "mail.h"
 
 typedef u16 (*SpecialFunc)(void);
 typedef void (*NativeFunc)(struct ScriptContext *ctx);
@@ -89,17 +93,27 @@ extern const u8 *gStdScripts_End[];
 static void CloseBrailleWindow(void);
 static void DynamicMultichoiceSortList(struct ListMenuItem *items, u32 count);
 
-static const u8 sScriptConditionTable[COMPARISON_OPERATORS_COUNT][3] =
+// This is defined in here so the optimizer can't see its value when compiling
+// script.c.
+void *const gNullScriptPtr = NULL;
+
+static const u8 sScriptConditionTable[6][3] =
 {
-//                              <  =  >
-    [LESS_THAN] =              {1, 0, 0},
-    [EQUAL] =                  {0, 1, 0},
-    [GREATER_THAN] =           {0, 0, 1},
-    [LESS_THAN_OR_EQUAL] =     {1, 1, 0},
-    [GREATER_THAN_OR_EQUAL] =  {0, 1, 1},
-    [NOT_EQUAL] =              {1, 0, 1},
+//  <  =  >
+    {1, 0, 0}, // <
+    {0, 1, 0}, // =
+    {0, 0, 1}, // >
+    {1, 1, 0}, // <=
+    {0, 1, 1}, // >=
+    {1, 0, 1}, // !=
 };
 
+static u8 *const sScriptStringVars[] =
+{
+    gStringVar1,
+    gStringVar2,
+    gStringVar3,
+};
 
 bool8 ScrCmd_nop(struct ScriptContext *ctx)
 {
@@ -210,7 +224,7 @@ bool8 ScrCmd_call(struct ScriptContext *ctx)
 
 bool8 ScrCmd_goto_if(struct ScriptContext *ctx)
 {
-    enum ComparisonOperators condition = ScriptReadByte(ctx);
+    u8 condition = ScriptReadByte(ctx);
     const u8 *ptr = (const u8 *)ScriptReadWord(ctx);
 
     Script_RequestEffects(SCREFF_V1);
@@ -222,7 +236,7 @@ bool8 ScrCmd_goto_if(struct ScriptContext *ctx)
 
 bool8 ScrCmd_call_if(struct ScriptContext *ctx)
 {
-    enum ComparisonOperators condition = ScriptReadByte(ctx);
+    u8 condition = ScriptReadByte(ctx);
     const u8 *ptr = (const u8 *)ScriptReadWord(ctx);
 
     Script_RequestEffects(SCREFF_V1);
@@ -265,7 +279,7 @@ bool8 ScrCmd_vcall(struct ScriptContext *ctx)
 
 bool8 ScrCmd_vgoto_if(struct ScriptContext *ctx)
 {
-    enum ComparisonOperators condition = ScriptReadByte(ctx);
+    u8 condition = ScriptReadByte(ctx);
     const u8 *ptr = (const u8 *)(ScriptReadWord(ctx) - sAddressOffset);
 
     Script_RequestEffects(SCREFF_V1);
@@ -277,7 +291,7 @@ bool8 ScrCmd_vgoto_if(struct ScriptContext *ctx)
 
 bool8 ScrCmd_vcall_if(struct ScriptContext *ctx)
 {
-    enum ComparisonOperators condition = ScriptReadByte(ctx);
+    u8 condition = ScriptReadByte(ctx);
     const u8 *ptr = (const u8 *)(ScriptReadWord(ctx) - sAddressOffset);
 
     Script_RequestEffects(SCREFF_V1);
@@ -313,7 +327,7 @@ bool8 ScrCmd_callstd(struct ScriptContext *ctx)
 
 bool8 ScrCmd_gotostd_if(struct ScriptContext *ctx)
 {
-    enum ComparisonOperators condition = ScriptReadByte(ctx);
+    u8 condition = ScriptReadByte(ctx);
     u8 index = ScriptReadByte(ctx);
 
     Script_RequestEffects(SCREFF_V1);
@@ -329,7 +343,7 @@ bool8 ScrCmd_gotostd_if(struct ScriptContext *ctx)
 
 bool8 ScrCmd_callstd_if(struct ScriptContext *ctx)
 {
-    enum ComparisonOperators condition = ScriptReadByte(ctx);
+    u8 condition = ScriptReadByte(ctx);
     u8 index = ScriptReadByte(ctx);
 
     Script_RequestEffects(SCREFF_V1);
@@ -796,6 +810,13 @@ static bool8 IsPaletteNotActive(void)
         return TRUE;
     else
         return FALSE;
+}
+
+// pauses script until palette fade inactive
+bool8 ScrFunc_WaitPaletteNotActive(struct ScriptContext *ctx)
+{
+    SetupNativeScript(ctx, IsPaletteNotActive);
+    return TRUE;
 }
 
 bool8 ScrCmd_fadescreen(struct ScriptContext *ctx)
@@ -1299,6 +1320,639 @@ bool8 ScrCmd_applymovement(struct ScriptContext *ctx)
     {
         ScriptHideFollower();
     }
+    return FALSE;
+}
+
+bool8 ScrCmd_applymovementnofollower(struct ScriptContext *ctx)
+{
+    u16 localId = VarGet(ScriptReadHalfword(ctx));
+    const u8 *movementScript = (const u8 *)ScriptReadWord(ctx);
+    struct ObjectEvent *objEvent;
+
+    Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
+
+    if ((localId == OBJ_EVENT_ID_FOLLOWER && (objEvent = GetFollowerObject()) && objEvent->frozen)
+            || ((objEvent = &gObjectEvents[GetObjectEventIdByLocalId(localId)]) && IS_OW_MON_OBJ(objEvent)))
+    {
+        ClearObjectEventMovement(objEvent, &gSprites[objEvent->spriteId]);
+        gSprites[objEvent->spriteId].animCmdIndex = 0;
+    }
+
+    gObjectEvents[GetObjectEventIdByLocalId(localId)].directionOverwrite = DIR_NONE;
+    ScriptMovement_StartObjectMovementScript(localId, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, movementScript);
+    sMovingNpcId = localId;
+    return FALSE;
+}
+
+static u32 MakeShinyPidWithNature(u16 tid, u16 sid, u8 nature)
+{
+    const u16 s = tid ^ sid;
+    for (u32 lo = 0; lo < 65536; lo++)
+    {
+        u16 hi = s ^ (u16)lo;
+        u32 pid = ((u32)hi << 16) | (u32)lo;
+        if (pid % 25 == nature)
+            return pid;
+    }
+    return ((u32)(s ^ 0) << 16) | 0;
+}
+
+bool8 ScrCmd_givenamedmon(struct ScriptContext *ctx)
+{
+    u16 giftId = ScriptReadHalfword(ctx);
+    struct Pokemon *mon;
+    u16 species;
+    u8 level;
+    u16 item;
+    u32 personality = 0x12345678;
+    u32 otId;
+    const u8 *nickname;
+    const u8 *otName;
+    u8 heldItem[2];
+    u8 mailIndex = 0;
+
+    static const u8 sKenyaNickname[] = _("KENYA");
+    static const u8 sKenyaOtName[]   = _("RUDY");
+    static const u8 sShuckieNickname[] = _("SHUCKIE");
+    static const u8 sShuckieOtName[]   = _("KIRK");
+    static const u8 sEeveeOtName[]     = _("BILL");
+
+    static const u16 sKenyaMailWords[MAIL_WORDS_COUNT] = {
+        EC_WORD_YUP,
+        EC_WORD_MAIL,
+        EC_WORD_TIME,
+        EC_WORD_TAKE,
+        EC_WORD_THIS,
+        EC_WORD_POKEMON,
+        EC_WORD_DON_T,
+        EC_WORD_LOSE,
+        EC_WORD_IT
+    };
+
+    switch (giftId)
+    {
+    case 1: // KENYA
+        species = SPECIES_SPEAROW;
+        level = 20;
+        item = ITEM_RETRO_MAIL;
+        nickname = sKenyaNickname;
+        otName = sKenyaOtName;
+        otId = 61225;
+        personality = Random32();
+        break;
+    case 2: // SHUCKIE
+        species = SPECIES_SHUCKLE;
+        level = 20;
+        item = ITEM_BERRY_JUICE;
+        nickname = sShuckieNickname;
+        otName = sShuckieOtName;
+        otId = 4336;
+        personality = Random32();
+        break;
+    case 3: // EEVEE
+        species = SPECIES_EEVEE;
+        level = 20;
+        item = ITEM_NONE;
+        nickname = NULL;
+        otName = sEeveeOtName;
+        otId = 5231;
+        personality = Random32();
+        break;
+    case 4: // DRATINI (always shiny + Adamant)
+    {
+        species  = SPECIES_DRATINI;
+        level    = 15;
+        item     = ITEM_NONE;
+        nickname = NULL;
+        otName   = gSaveBlock2Ptr->playerName;
+
+        u32 fullId = ((u32)gSaveBlock2Ptr->playerTrainerId[3] << 24)
+                   | ((u32)gSaveBlock2Ptr->playerTrainerId[2] << 16)
+                   | ((u32)gSaveBlock2Ptr->playerTrainerId[1] <<  8)
+                   | ((u32)gSaveBlock2Ptr->playerTrainerId[0]);
+        u16 tid = (u16)(fullId & 0xFFFF);
+        u16 sid = (u16)(fullId >> 16);
+
+        personality = MakeShinyPidWithNature(tid, sid, NATURE_ADAMANT);
+        otId = fullId;
+        break;
+    }
+    default:
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return FALSE;
+    }
+
+    heldItem[0] = item & 0xFF;
+    heldItem[1] = item >> 8;
+
+    for (u8 i = 0; i < GetMaxPartySize(); i++) // tx_randomizer_and_challenges: party limit
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE)
+        {
+            mon = &gPlayerParty[i];
+            ZeroMonData(mon);
+            CreateBoxMon(&mon->box, species, level, personality, OTID_STRUCT_PRESET(otId));
+            SetBoxMonIVs(&mon->box, USE_RANDOM_IVS);
+            GiveBoxMonInitialMoveset(&mon->box);
+
+            if (nickname != NULL)
+                SetMonData(mon, MON_DATA_NICKNAME, nickname);
+            SetMonData(mon, MON_DATA_OT_NAME, otName);
+            SetMonData(mon, MON_DATA_HELD_ITEM, heldItem);
+
+            if (giftId == 1)
+            {
+                struct Mail *mailPtr = &gSaveBlock1Ptr->mail[mailIndex];
+                memset(mailPtr, 0, sizeof(*mailPtr));
+                memcpy(mailPtr->words, sKenyaMailWords, sizeof(sKenyaMailWords));
+                StringCopy(mailPtr->playerName, sKenyaOtName);
+                mailPtr->trainerId[0] = (otId >> 0) & 0xFF;
+                mailPtr->trainerId[1] = (otId >> 8) & 0xFF;
+                mailPtr->trainerId[2] = (otId >> 16) & 0xFF;
+                mailPtr->trainerId[3] = (otId >> 24) & 0xFF;
+                mailPtr->species = species;
+                mailPtr->itemId = item;
+                SetMonData(mon, MON_DATA_MAIL, &mailIndex);
+            }
+            if (giftId == 4)
+            {
+                u16 move = MOVE_EXTREME_SPEED;
+                SetMonData(mon, MON_DATA_MOVE1, &move);
+                SetMonData(mon, MON_DATA_PP1, &gMovesInfo[move].pp);
+            }
+
+            CalculateMonStats(mon);
+
+            u16 dexNum = SpeciesToNationalPokedexNum(species);
+            HandleSetPokedexFlag(dexNum, FLAG_SET_SEEN, personality);
+            HandleSetPokedexFlag(dexNum, FLAG_SET_CAUGHT, personality);
+
+            gSpecialVar_Result = MON_GIVEN_TO_PARTY;
+            return FALSE;
+        }
+    }
+
+    gSpecialVar_Result = MON_CANT_GIVE;
+    return FALSE;
+}
+
+bool8 ScrCmd_removenamedmon(struct ScriptContext *ctx)
+{
+    u16 giftId = ScriptReadHalfword(ctx);
+    const u8 *targetNickname;
+
+    static const u8 sKenyaNickname[]   = _("KENYA");
+    static const u8 sShuckieNickname[] = _("SHUCKIE");
+
+    switch (giftId)
+    {
+    case 1:
+        targetNickname = sKenyaNickname;
+        break;
+    case 2:
+        targetNickname = sShuckieNickname;
+        break;
+    default:
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return FALSE;
+    }
+
+    u8 partyCount = 0;
+    for (u8 i = 0; i < GetMaxPartySize(); i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE)
+            partyCount++;
+    }
+
+    if (partyCount <= 1)
+    {
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return FALSE;
+    }
+
+    for (u8 i = 0; i < GetMaxPartySize(); i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE)
+        {
+            u8 nickname[POKEMON_NAME_LENGTH + 1];
+            GetMonData(&gPlayerParty[i], MON_DATA_NICKNAME, nickname);
+
+            if (StringCompare(nickname, targetNickname) == 0)
+            {
+                u16 heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+
+                if (giftId == 1 && !ItemIsMail(heldItem))
+                {
+                    gSpecialVar_Result = MON_CANT_GIVE;
+                    return FALSE;
+                }
+
+                if (giftId == 2)
+                {
+                    u8 friendship = GetMonData(&gPlayerParty[i], MON_DATA_FRIENDSHIP);
+                    if (friendship > 200)
+                    {
+                        gSpecialVar_Result = 3;
+                        return FALSE;
+                    }
+                }
+
+                ZeroMonData(&gPlayerParty[i]);
+                CompactPartySlots();
+                gSpecialVar_Result = MON_GIVEN_TO_PARTY;
+                return FALSE;
+            }
+        }
+    }
+
+    gSpecialVar_Result = MON_CANT_GIVE;
+    return FALSE;
+}
+
+bool8 ScrCmd_remove5mons(struct ScriptContext *ctx)
+{
+    u8 removedCount = 0;
+
+    if (GetMonData(&gPlayerParty[0], MON_DATA_HP) == 0)
+    {
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return FALSE;
+    }
+
+    if (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG) == SPECIES_EGG)
+    {
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return FALSE;
+    }
+
+    for (u8 i = 1; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE)
+        {
+            ZeroMonData(&gPlayerParty[i]);
+            removedCount++;
+        }
+    }
+
+    if (removedCount > 0)
+        CompactPartySlots();
+
+    gSpecialVar_Result = MON_GIVEN_TO_PARTY;
+    return FALSE;
+}
+
+bool8 ScrCmd_baobacheckmon(struct ScriptContext *ctx)
+{
+    u16 checkId = ScriptReadHalfword(ctx);
+    u16 partyIndex = VarGet(VAR_0x8004);
+    u16 species;
+
+    gSpecialVar_Result = FALSE;
+
+    if (partyIndex >= GetMaxPartySize())
+        return FALSE;
+
+    if (GetMonData(&gPlayerParty[partyIndex], MON_DATA_SPECIES, NULL) == SPECIES_NONE)
+        return FALSE;
+    if (GetMonData(&gPlayerParty[partyIndex], MON_DATA_IS_EGG, NULL))
+        return FALSE;
+
+    species = GetMonData(&gPlayerParty[partyIndex], MON_DATA_SPECIES, NULL);
+
+    switch (checkId)
+    {
+    case 1:
+        gSpecialVar_Result =
+            (species == SPECIES_CACNEA ||
+             species == SPECIES_LOTAD ||
+             species == SPECIES_MAKUHITA ||
+             species == SPECIES_LOMBRE ||
+             species == SPECIES_TRAPINCH ||
+             species == SPECIES_BELDUM ||
+             species == SPECIES_VIBRAVA);
+        break;
+    case 2:
+        gSpecialVar_Result =
+            (species == SPECIES_TROPIUS ||
+             species == SPECIES_CHIMECHO ||
+             species == SPECIES_ABSOL ||
+             species == SPECIES_CASTFORM);
+        break;
+    case 3:
+        gSpecialVar_Result =
+            (species == SPECIES_BARBOACH ||
+             species == SPECIES_WHISCASH ||
+             species == SPECIES_MEDITITE ||
+             species == SPECIES_NUMEL ||
+             species == SPECIES_BALTOY ||
+             species == SPECIES_ABSOL ||
+             species == SPECIES_MEDICHAM ||
+             species == SPECIES_CAMERUPT);
+        break;
+    case 4:
+        gSpecialVar_Result =
+            (species == SPECIES_WHISMUR ||
+             species == SPECIES_NOSEPASS ||
+             species == SPECIES_BAGON ||
+             species == SPECIES_RELICANTH ||
+             species == SPECIES_FEEBAS);
+        break;
+    default:
+        gSpecialVar_Result = FALSE;
+        break;
+    }
+
+    return FALSE;
+}
+
+bool8 ScrCmd_givebp(struct ScriptContext *ctx)
+{
+    u16 add = VarGet(ScriptReadHalfword(ctx));
+    u32 total;
+
+    total = gSaveBlock2Ptr->frontier.battlePoints;
+    if (total + add > MAX_BATTLE_FRONTIER_POINTS)
+        total = MAX_BATTLE_FRONTIER_POINTS;
+    else
+        total += add;
+    gSaveBlock2Ptr->frontier.battlePoints = total;
+
+    ConvertIntToDecimalStringN(gStringVar1, add, STR_CONV_MODE_LEFT_ALIGN, 3);
+
+    {
+        u32 card = gSaveBlock2Ptr->frontier.cardBattlePoints + add;
+        if (card > 0xFFFF)
+            card = 0xFFFF;
+        gSaveBlock2Ptr->frontier.cardBattlePoints = card;
+    }
+    IncrementDailyBattlePoints(add);
+
+    return FALSE;
+}
+
+bool8 ScrCmd_setwildbattleshiny(struct ScriptContext *ctx)
+{
+    u16 species = ScriptReadHalfword(ctx);
+    u8 level = ScriptReadByte(ctx);
+    u16 item = ScriptReadHalfword(ctx);
+
+    CreateShinyScriptedMon(species, level, item);
+    return FALSE;
+}
+
+bool8 ScrCmd_removegenericmon(struct ScriptContext *ctx)
+{
+    u16 targetSpecies = ScriptReadHalfword(ctx);
+    u8 monIndex = VarGet(VAR_0x8004);
+
+    if (monIndex >= PARTY_SIZE)
+    {
+        gSpecialVar_Result = FALSE;
+        return FALSE;
+    }
+
+    struct Pokemon *mon = &gPlayerParty[monIndex];
+    u16 species = GetMonData(mon, MON_DATA_SPECIES);
+
+    if (species == SPECIES_NONE || species != targetSpecies)
+    {
+        gSpecialVar_Result = FALSE;
+        return FALSE;
+    }
+
+    if (species == SPECIES_MAGIKARP)
+    {
+        u8 level = GetMonData(mon, MON_DATA_LEVEL);
+        if (level == 100)
+        {
+            ZeroMonData(mon);
+            CompactPartySlots();
+            gSpecialVar_Result = MON_SATISFACTORY;
+            return FALSE;
+        }
+    }
+
+    ZeroMonData(mon);
+    CompactPartySlots();
+    gSpecialVar_Result = MON_UNSATISFACTORY;
+    return FALSE;
+}
+
+static const u16 sOddEggSpecies[12] = {
+    SPECIES_NONE,        // [0] unused
+    SPECIES_PICHU,       // 1
+    SPECIES_CLEFFA,      // 2
+    SPECIES_IGGLYBUFF,   // 3
+    SPECIES_TYROGUE,     // 4
+    SPECIES_SMOOCHUM,    // 5
+    SPECIES_ELEKID,      // 6
+    SPECIES_MAGBY,       // 7
+    SPECIES_MANTYKE,     // 8
+    SPECIES_BONSLY,      // 9
+    SPECIES_HAPPINY,     // 10
+    SPECIES_MIME_JR,     // 11
+};
+
+static const u8 sOddEggShinyNameList[][PLAYER_NAME_LENGTH + 1] = {
+    _("DYLAN"),
+    _("Zee"),
+    _("Meara"),
+    _("Anthony"),
+    _("RAINBOW"),
+    _("FERRO"),
+    _("Kris"),
+    _("Chad"),
+    _("Bacon"),
+    _("Excl"),
+    _("Liquid"),
+    _("Dyn"),
+    _("Fabian"),
+    _("peepy"),
+    _("Cameron"),
+    _("Joe"),
+    _("Andrew"),
+    _("Nova"),
+    _("Cromlnt"),
+    _("Phant"),
+    _("Papito"),
+    _("Casper"),
+    _("ELLI"),
+    _("Grey"),
+    _("Necro"),
+    _("Penka"),
+    _("Emmam"),
+    _("Casper"),
+    _("MARZ"),
+    _("leob050"),
+    _("Sayu"),
+    _("Brick"),
+    _("Kino"),
+    _("JIRAIYA"),
+};
+
+static bool8 IsPlayerNameInShinyList(void)
+{
+    for (u32 i = 0; i < ARRAY_COUNT(sOddEggShinyNameList); i++)
+    {
+        if (StringCompare(gSaveBlock2Ptr->playerName, sOddEggShinyNameList[i]) == 0)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static u32 MakeShinyPidForOt(u32 otId)
+{
+    u16 tid = (u16)(otId & 0xFFFF);
+    u16 sid = (u16)(otId >> 16);
+    u16 hi  = (u16)Random();
+    u16 s   = (u16)(Random() % 8);
+    u16 lo  = tid ^ sid ^ hi ^ s;
+    return ((u32)hi << 16) | lo;
+}
+
+static u32 MakeNonShinyPidForOt(u32 otId)
+{
+    u16 tid = (u16)(otId & 0xFFFF);
+    u16 sid = (u16)(otId >> 16);
+    while (TRUE) {
+        u16 hi = (u16)Random();
+        u16 lo = (u16)Random();
+        if ((tid ^ sid ^ hi ^ lo) >= 8)
+            return ((u32)hi << 16) | lo;
+    }
+}
+
+static u32 GetPlayerOtId32(void)
+{
+    return ((u32)gSaveBlock2Ptr->playerTrainerId[0])
+         | ((u32)gSaveBlock2Ptr->playerTrainerId[1] <<  8)
+         | ((u32)gSaveBlock2Ptr->playerTrainerId[2] << 16)
+         | ((u32)gSaveBlock2Ptr->playerTrainerId[3] << 24);
+}
+
+#define ODD_EGG_START_CYCLES 2
+
+static bool8 GiveOddEgg_Internal(u16 species, bool8 forceShiny, bool8 allow14PercentShiny)
+{
+    for (u8 i = 0; i < GetMaxPartySize(); i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE)
+        {
+            struct Pokemon *mon = &gPlayerParty[i];
+            ZeroMonData(mon);
+
+            u32 otId = GetPlayerOtId32();
+            bool8 makeShiny = forceShiny;
+            if (!makeShiny && allow14PercentShiny)
+                makeShiny = ((Random() % 100) < 14);
+
+            u32 pid = makeShiny ? MakeShinyPidForOt(otId) : MakeNonShinyPidForOt(otId);
+
+            CreateBoxMon(&mon->box, species, 5, pid, OTID_STRUCT_PLAYER_ID);
+            SetBoxMonIVs(&mon->box, USE_RANDOM_IVS);
+            GiveBoxMonInitialMoveset(&mon->box);
+
+            {
+                bool8 isEgg = TRUE;
+                SetMonData(mon, MON_DATA_IS_EGG, &isEgg);
+            }
+            {
+                u8 cycles = gSpeciesInfo[species].eggCycles;
+                if (cycles > ODD_EGG_START_CYCLES)
+                    cycles = ODD_EGG_START_CYCLES;
+                SetMonData(mon, MON_DATA_FRIENDSHIP, &cycles);
+            }
+
+            SetMonMoveSlot(mon, MOVE_DIZZY_PUNCH, 1);
+            CalculateMonStats(mon);
+            gSpecialVar_Result = MON_GIVEN_TO_PARTY;
+            return TRUE;
+        }
+    }
+    gSpecialVar_Result = MON_CANT_GIVE;
+    return FALSE;
+}
+
+bool8 ScrCmd_giveoddegg(struct ScriptContext *ctx)
+{
+    u16 which = VarGet(ScriptReadHalfword(ctx));
+    if (which == 0 || which >= ARRAY_COUNT(sOddEggSpecies))
+    {
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return FALSE;
+    }
+
+    u16 species = sOddEggSpecies[which];
+    if (species == SPECIES_NONE)
+    {
+        gSpecialVar_Result = MON_CANT_GIVE;
+        return FALSE;
+    }
+
+    bool8 forceShiny = IsPlayerNameInShinyList();
+    (void)GiveOddEgg_Internal(species, forceShiny, TRUE);
+    return FALSE;
+}
+
+bool8 ScrCmd_buffermoncategory(struct ScriptContext *ctx)
+{
+    u8 stringVarIndex = ScriptReadByte(ctx);
+    u16 species = VarGet(ScriptReadHalfword(ctx));
+
+    StringCopy(sScriptStringVars[stringVarIndex], GetSpeciesCategory(species));
+    return FALSE;
+}
+
+bool8 ScrCmd_checknuzlocke(struct ScriptContext *ctx)
+{
+    gSpecialVar_Result = IsNuzlockeActive();
+    return FALSE;
+}
+
+bool8 ScrCmd_checkrandomizer(struct ScriptContext *ctx)
+{
+    #if RANDOMIZER_AVAILABLE == TRUE
+    struct ChallengeSettings *settings = &gSaveBlock3Ptr->challengeSettings;
+    gSpecialVar_Result = settings->tx_Random_WildPokemon
+        || settings->tx_Random_Trainer
+        || settings->tx_Random_Static
+        || settings->tx_Random_Starter
+        || settings->tx_Random_Items
+        || settings->tx_Random_Abilities
+        || settings->tx_Random_Type
+        || settings->tx_Random_Moves
+        || settings->tx_Random_Chaos;
+    #else
+    gSpecialVar_Result = FALSE;
+    #endif
+    return FALSE;
+}
+
+bool8 ScrCmd_checkpartymonlevel(struct ScriptContext *ctx)
+{
+    u16 level = ScriptReadHalfword(ctx);
+    (void)level;
+    struct Pokemon *pokemon = &gPlayerParty[gSpecialVar_0x8004];
+    if (GetMonData(pokemon, MON_DATA_LEVEL) == 100)
+        gSpecialVar_Result = TRUE;
+    else
+        gSpecialVar_Result = FALSE;
+    return FALSE;
+}
+
+bool8 ScrCmd_calculatemonstats(struct ScriptContext *ctx)
+{
+    s32 i;
+    for (i = 0; i < PARTY_SIZE; i++)
+        CalculateMonStats(&gPlayerParty[i]);
+    return FALSE;
+}
+
+bool8 ScrCmd_deleteparty(struct ScriptContext *ctx)
+{
+    s32 i;
+    for (i = 0; i < PARTY_SIZE; i++)
+        ZeroMonData(&gPlayerParty[i]);
     return FALSE;
 }
 
@@ -1985,13 +2639,101 @@ bool8 ScrCmd_drawboxtext(struct ScriptContext *ctx)
 
 bool8 ScrCmd_showmonpic(struct ScriptContext *ctx)
 {
-    enum Species species = VarGet(ScriptReadHalfword(ctx));
+    u16 varId = ScriptReadHalfword(ctx);
+    u16 species = VarGet(varId);
     u8 x = ScriptReadByte(ctx);
     u8 y = ScriptReadByte(ctx);
+    bool8 shinyStarter = FALSE;
 
     Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
 
-    ScriptMenu_ShowPokemonPic(species, x, y);
+    // If we have not gotten a pokemon yet, assume this is the starter preview
+    if (!FlagGet(FLAG_SYS_POKEMON_GET))
+    {
+        u8 starter = VarGet(VAR_STARTER_MON);
+
+        u32 flagPreviewChecked = 0;
+        u32 flagShinyPreview = 0;
+
+        if (starter == 0)
+        {
+            flagPreviewChecked = FLAG_STARTER_PREVIEW_CHECKED_1;
+            flagShinyPreview = FLAG_SHINY_STARTER_1;
+        }
+        else if (starter == 1)
+        {
+            flagPreviewChecked = FLAG_STARTER_PREVIEW_CHECKED_2;
+            flagShinyPreview = FLAG_SHINY_STARTER_2;
+        }
+        else if (starter == 2)
+        {
+            flagPreviewChecked = FLAG_STARTER_PREVIEW_CHECKED_3;
+            flagShinyPreview = FLAG_SHINY_STARTER_3;
+        }
+
+        #ifndef NDEBUG
+            DebugPrintfLevel(MGBA_LOG_DEBUG, "******** Possible Temp Flags: %x, %x, %x ********", FLAG_TEMP_1, FLAG_TEMP_2, FLAG_TEMP_3);
+            DebugPrintfLevel(MGBA_LOG_DEBUG, "******** Possible Shiny Starter Flags: %x, %x, %x ********", FLAG_SHINY_STARTER_1, FLAG_SHINY_STARTER_2, FLAG_SHINY_STARTER_3);
+            DebugPrintfLevel(MGBA_LOG_DEBUG, "******** Actual Temp and Shiny Flags: %x, %x ********", flagPreviewChecked, flagShinyPreview);
+        #endif
+
+        // if FLAG_TEMP_X not set for this starter preview, roll for shininess,
+        // then set FLAG_TEMP_X to prevent re-rolls
+        if (!FlagGet(flagPreviewChecked))
+        {
+            #ifndef NDEBUG
+                DebugPrintfLevel(MGBA_LOG_DEBUG, "\n******** Rolling Starter Preview Shininess ********");
+                DebugPrintfLevel(MGBA_LOG_DEBUG, "******** Flag Values Before: %d, %d ********", FlagGet(flagPreviewChecked), FlagGet(flagShinyPreview));
+            #endif
+
+            u32 value = READ_OTID_FROM_SAVE;
+            u32 shinyPersonality = Random32();
+
+            // this is technically unnecessary right now, but will replace GetShinyOdds in terms of implementing user-defined shiny odds
+            u32 totalRerolls = 0;
+            if (CheckBagHasItem(ITEM_SHINY_CHARM, 1))
+                totalRerolls += I_SHINY_CHARM_ADDITIONAL_ROLLS;
+            
+            while (GET_SHINY_VALUE(value, shinyPersonality) >= GetShinyOdds() && totalRerolls > 0)
+            {
+                shinyPersonality = Random32();
+                totalRerolls--;
+            }
+
+            if (GET_SHINY_VALUE(value, shinyPersonality) < GetShinyOdds())
+                FlagSet(flagShinyPreview);
+
+            FlagSet(flagPreviewChecked);
+        }
+
+        shinyStarter = FlagGet(flagShinyPreview);
+
+        #ifndef NDEBUG
+            DebugPrintfLevel(MGBA_LOG_DEBUG, "******** Flag Values: %d, %d ********", FlagGet(flagPreviewChecked), FlagGet(flagShinyPreview));
+            DebugPrintfLevel(MGBA_LOG_DEBUG, "******** Preview Should be Shiny: %d ********", shinyStarter);
+        #endif
+
+        #if RANDOMIZER_AVAILABLE
+        if (RandomizerFeatureEnabled(RANDOMIZE_STARTER_AND_GIFT_MON))
+        {
+            species = RandomizeMon(RANDOMIZER_REASON_STARTER_AND_GIFT_MON, GetRandomizerOption(RANDOMIZER_OPTION_SPECIES_MODE), GetRandomizerSeed() ^ species, species);
+            if (varId >= VARS_START)
+                VarSet(varId, species);
+        }
+        #endif
+
+        if (IsOneTypeChallengeActive())
+        {
+            species = GetStarterPokemon(VarGet(VAR_STARTER_MON));
+            if (varId >= VARS_START)
+                VarSet(varId, species);
+        }
+    }
+
+    if (shinyStarter)
+        ScriptMenu_ShowShinyPokemonPic(species, x, y);
+    else
+        ScriptMenu_ShowPokemonPic(species, x, y);
     return FALSE;
 }
 
@@ -2102,11 +2844,11 @@ bool8 ScrCmd_vmessage(struct ScriptContext *ctx)
 bool8 ScrCmd_bufferspeciesname(struct ScriptContext *ctx)
 {
     u8 stringVarIndex = ScriptReadByte(ctx);
-    enum Species species = VarGet(ScriptReadHalfword(ctx)) & OBJ_EVENT_MON_SPECIES_MASK; // ignore possible shiny / form bits
+    u16 species = VarGet(ScriptReadHalfword(ctx)) & OBJ_EVENT_MON_SPECIES_MASK; // ignore possible shiny / form bits
 
     Script_RequestEffects(SCREFF_V1);
 
-    StringCopy(GetStringVar(stringVarIndex), GetSpeciesName(species));
+    StringCopy(sScriptStringVars[stringVarIndex], GetSpeciesName(species));
     return FALSE;
 }
 
@@ -2116,9 +2858,9 @@ bool8 ScrCmd_bufferleadmonspeciesname(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    u8 *dest = GetStringVar(stringVarIndex);
+    u8 *dest = sScriptStringVars[stringVarIndex];
     u8 partyIndex = GetLeadMonIndex();
-    enum Species species = GetMonData(&gParties[B_TRAINER_PLAYER][partyIndex], MON_DATA_SPECIES);
+    u32 species = GetMonData(&gPlayerParty[partyIndex], MON_DATA_SPECIES);
     StringCopy(dest, GetSpeciesName(species));
     return FALSE;
 }
@@ -2129,8 +2871,8 @@ void BufferFirstLiveMonNickname(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    GetMonData(GetFirstLiveMon(), MON_DATA_NICKNAME, GetStringVar(stringVarIndex));
-    StringGet_Nickname(GetStringVar(stringVarIndex));
+    GetMonData(GetFirstLiveMon(), MON_DATA_NICKNAME, sScriptStringVars[stringVarIndex]);
+    StringGet_Nickname(sScriptStringVars[stringVarIndex]);
 }
 
 bool8 ScrCmd_bufferpartymonnick(struct ScriptContext *ctx)
@@ -2140,8 +2882,8 @@ bool8 ScrCmd_bufferpartymonnick(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    GetMonData(&gParties[B_TRAINER_PLAYER][partyIndex], MON_DATA_NICKNAME, GetStringVar(stringVarIndex));
-    StringGet_Nickname(GetStringVar(stringVarIndex));
+    GetMonData(&gPlayerParty[partyIndex], MON_DATA_NICKNAME, sScriptStringVars[stringVarIndex]);
+    StringGet_Nickname(sScriptStringVars[stringVarIndex]);
     return FALSE;
 }
 
@@ -2152,7 +2894,7 @@ bool8 ScrCmd_bufferitemname(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    CopyItemName(itemId, GetStringVar(stringVarIndex));
+    CopyItemName(itemId, sScriptStringVars[stringVarIndex]);
     return FALSE;
 }
 
@@ -2164,7 +2906,7 @@ bool8 ScrCmd_bufferitemnameplural(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    CopyItemNameHandlePlural(itemId, GetStringVar(stringVarIndex), quantity);
+    CopyItemNameHandlePlural(itemId, sScriptStringVars[stringVarIndex], quantity);
     return FALSE;
 }
 
@@ -2175,7 +2917,7 @@ bool8 ScrCmd_bufferdecorationname(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    StringCopy(GetStringVar(stringVarIndex), gDecorations[decorId].name);
+    StringCopy(sScriptStringVars[stringVarIndex], gDecorations[decorId].name);
     return FALSE;
 }
 
@@ -2186,7 +2928,7 @@ bool8 ScrCmd_buffermovename(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    StringCopy(GetStringVar(stringVarIndex), GetMoveName(move));
+    StringCopy(sScriptStringVars[stringVarIndex], GetMoveName(move));
     return FALSE;
 }
 
@@ -2198,7 +2940,7 @@ bool8 ScrCmd_buffernumberstring(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    ConvertIntToDecimalStringN(GetStringVar(stringVarIndex), num, STR_CONV_MODE_LEFT_ALIGN, numDigits);
+    ConvertIntToDecimalStringN(sScriptStringVars[stringVarIndex], num, STR_CONV_MODE_LEFT_ALIGN, numDigits);
     return FALSE;
 }
 
@@ -2209,7 +2951,7 @@ bool8 ScrCmd_bufferstdstring(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    StringCopy(GetStringVar(stringVarIndex), gStdStrings[index]);
+    StringCopy(sScriptStringVars[stringVarIndex], gStdStrings[index]);
     return FALSE;
 }
 
@@ -2220,7 +2962,7 @@ bool8 ScrCmd_buffercontestname(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    BufferContestName(GetStringVar(stringVarIndex), category);
+    BufferContestName(sScriptStringVars[stringVarIndex], category);
     return FALSE;
 }
 
@@ -2231,7 +2973,7 @@ bool8 ScrCmd_bufferstring(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    StringCopy(GetStringVar(stringVarIndex), text);
+    StringCopy(sScriptStringVars[stringVarIndex], text);
     return FALSE;
 }
 
@@ -2253,7 +2995,7 @@ bool8 ScrCmd_vbufferstring(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1);
 
     const u8 *src = (u8 *)(addr - sAddressOffset);
-    u8 *dest = GetStringVar(stringVarIndex);
+    u8 *dest = sScriptStringVars[stringVarIndex];
     StringCopy(dest, src);
     return FALSE;
 }
@@ -2265,13 +3007,13 @@ bool8 ScrCmd_bufferboxname(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    StringCopy(GetStringVar(stringVarIndex), GetBoxNamePtr(boxId));
+    StringCopy(sScriptStringVars[stringVarIndex], GetBoxNamePtr(boxId));
     return FALSE;
 }
 
 bool8 ScrCmd_giveegg(struct ScriptContext *ctx)
 {
-    enum Species species = VarGet(ScriptReadHalfword(ctx));
+    u16 species = VarGet(ScriptReadHalfword(ctx));
 
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
@@ -2304,50 +3046,166 @@ bool8 ScrCmd_checkfieldmove(struct ScriptContext *ctx)
         return FALSE;
 
     move = FieldMove_GetMoveId(fieldMove);
-    for (u32 i = 0; i < PARTY_SIZE; i++)
+    for (u32 i = 0; i < GetMaxPartySize(); i++)
     {
-        enum Species species = GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES);
+        u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
         if (!species)
             break;
-        if (!GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_IS_EGG) && MonKnowsMove(&gParties[B_TRAINER_PLAYER][i], move) == TRUE)
+        if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) && MonKnowsMove(&gPlayerParty[i], move) == TRUE)
         {
             gSpecialVar_Result = i;
             gSpecialVar_0x8004 = species;
             break;
         }
     }
+    if (gSpecialVar_Result == PARTY_SIZE)
+    {
+        u16 itemId = GetTMHMItemIdFromMoveId(move);
+        if (itemId != ITEM_NONE && CheckBagHasItem(itemId, 1))
+        {
+            for (u32 i = 0; i < GetMaxPartySize(); i++)
+            {
+                u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+                if (!species)
+                    break;
+                if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) && CanLearnTeachableMove(species, move))
+                {
+                    gSpecialVar_Result = i;
+                    gSpecialVar_0x8004 = species;
+                    break;
+                }
+            }
+        }
+    }
+    if (gSpecialVar_Result == PARTY_SIZE && HMsOverwriteOptionActive())
+    {
+        // No party mon knows the move or can learn it, which a challenge run (mono-type,
+        // randomized moves, etc.) can make permanent. Owning the TM/HM is enough: let the first
+        // non-egg mon use it regardless of its learnset.
+        enum Item itemId = GetTMHMItemIdFromMoveId(move);
+        if (itemId != ITEM_NONE && CheckBagHasItem(itemId, 1))
+        {
+            for (u32 i = 0; i < GetMaxPartySize(); i++)
+            {
+                u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+                if (!species)
+                    break;
+                if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
+                {
+                    gSpecialVar_Result = i;
+                    gSpecialVar_0x8004 = species;
+                    break;
+                }
+            }
+        }
+    }
 
+    return FALSE;
+}
+
+bool8 ScrCmd_checkpartymove(struct ScriptContext *ctx)
+{
+    u16 moveId = ScriptReadHalfword(ctx);
+
+    gSpecialVar_Result = PARTY_SIZE;
+    for (u32 i = 0; i < GetMaxPartySize(); i++)
+    {
+        u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+        if (!species)
+            break;
+        if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) && MonKnowsMove(&gPlayerParty[i], moveId) == TRUE)
+        {
+            gSpecialVar_Result = i;
+            gSpecialVar_0x8004 = species;
+            break;
+        }
+    }
+    if (gSpecialVar_Result == PARTY_SIZE)
+    {
+        // A mon that can learn the move may use it without knowing it, but only while the
+        // player actually carries the TM/HM. Moves with no machine at all (Headbutt) have no
+        // item to require, so party learnability alone is enough there.
+        enum Item itemId = GetTMHMItemIdFromMoveId(moveId);
+        if (itemId == ITEM_NONE || CheckBagHasItem(itemId, 1))
+        {
+            for (u32 i = 0; i < GetMaxPartySize(); i++)
+            {
+                u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+                if (!species)
+                    break;
+                if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) && CanLearnTeachableMove(species, moveId))
+                {
+                    gSpecialVar_Result = i;
+                    gSpecialVar_0x8004 = species;
+                    break;
+                }
+            }
+        }
+    }
+    if (gSpecialVar_Result == PARTY_SIZE && HMsOverwriteOptionActive())
+    {
+        // No party mon knows the move or can learn it, which a challenge run (mono-type,
+        // randomized moves, etc.) can make permanent. Owning the TM/HM is enough: let the first
+        // non-egg mon use it regardless of its learnset.
+        enum Item itemId = GetTMHMItemIdFromMoveId(moveId);
+        if (itemId != ITEM_NONE && CheckBagHasItem(itemId, 1))
+        {
+            for (u32 i = 0; i < GetMaxPartySize(); i++)
+            {
+                u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+                if (!species)
+                    break;
+                if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
+                {
+                    gSpecialVar_Result = i;
+                    gSpecialVar_0x8004 = species;
+                    break;
+                }
+            }
+        }
+    }
     return FALSE;
 }
 
 bool8 ScrCmd_addmoney(struct ScriptContext *ctx)
 {
     u32 amount = ScriptReadWord(ctx);
+    u8 ignore = ScriptReadByte(ctx);
 
-    Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
+    if (!ignore)
+    {
+        Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
-    AddMoney(&gSaveBlock1Ptr->money, amount);
+        AddMoney(&gSaveBlock1Ptr->money, amount);
+    }
     return FALSE;
 }
 
 bool8 ScrCmd_removemoney(struct ScriptContext *ctx)
 {
     u32 amount = ScriptReadWord(ctx);
+    u8 ignore = ScriptReadByte(ctx);
 
-    Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
+    if (!ignore)
+    {
+        Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
-    RemoveMoney(&gSaveBlock1Ptr->money, amount);
+        RemoveMoney(&gSaveBlock1Ptr->money, amount);
+    }
     return FALSE;
 }
 
 bool8 ScrCmd_checkmoney(struct ScriptContext *ctx)
 {
     u32 amount = ScriptReadWord(ctx);
+    u8 ignore = ScriptReadByte(ctx);
 
-    Script_RequestEffects(SCREFF_V1);
+    if (!ignore)
+    {
+        Script_RequestEffects(SCREFF_V1);
 
-    gSpecialVar_Result = IsEnoughMoney(&gSaveBlock1Ptr->money, amount);
-
+        gSpecialVar_Result = IsEnoughMoney(&gSaveBlock1Ptr->money, amount);
+    }
     return FALSE;
 }
 
@@ -2355,10 +3213,14 @@ bool8 ScrCmd_showmoneybox(struct ScriptContext *ctx)
 {
     u8 x = ScriptReadByte(ctx);
     u8 y = ScriptReadByte(ctx);
+    u8 ignore = ScriptReadByte(ctx);
 
-    Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
+    if (!ignore)
+    {
+        Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
 
-    DrawMoneyBox(GetMoney(&gSaveBlock1Ptr->money), x, y);
+        DrawMoneyBox(GetMoney(&gSaveBlock1Ptr->money), x, y);
+    }
     return FALSE;
 }
 
@@ -2366,15 +3228,25 @@ bool8 ScrCmd_hidemoneybox(struct ScriptContext *ctx)
 {
     Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
 
+    /*u8 x = ScriptReadByte(ctx);
+    u8 y = ScriptReadByte(ctx);*/
+
     HideMoneyBox();
     return FALSE;
 }
 
 bool8 ScrCmd_updatemoneybox(struct ScriptContext *ctx)
 {
-    Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
+    u8 UNUSED x = ScriptReadByte(ctx);
+    u8 UNUSED y = ScriptReadByte(ctx);
+    u8 ignore = ScriptReadByte(ctx);
 
-    ChangeAmountInMoneyBox(GetMoney(&gSaveBlock1Ptr->money));
+    if (!ignore)
+    {
+        Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
+
+        ChangeAmountInMoneyBox(GetMoney(&gSaveBlock1Ptr->money));
+    }
     return FALSE;
 }
 
@@ -2391,6 +3263,9 @@ bool8 ScrCmd_showcoinsbox(struct ScriptContext *ctx)
 
 bool8 ScrCmd_hidecoinsbox(struct ScriptContext *ctx)
 {
+    u8 UNUSED x = ScriptReadByte(ctx);
+    u8 UNUSED y = ScriptReadByte(ctx);
+
     Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
 
     HideCoinsWindow();
@@ -2399,6 +3274,9 @@ bool8 ScrCmd_hidecoinsbox(struct ScriptContext *ctx)
 
 bool8 ScrCmd_updatecoinsbox(struct ScriptContext *ctx)
 {
+    u8 UNUSED x = ScriptReadByte(ctx);
+    u8 UNUSED y = ScriptReadByte(ctx);
+
     Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
 
     PrintCoinsString(GetCoins());
@@ -2409,7 +3287,8 @@ bool8 ScrCmd_trainerbattle(struct ScriptContext *ctx)
 {
     Script_RequestEffects(SCREFF_V1 | SCREFF_TRAINERBATTLE);
 
-    ConfigureTrainerBattle(ctx);
+    TrainerBattleLoadArgs(ctx->scriptPtr);
+    ctx->scriptPtr = BattleSetup_ConfigureTrainerBattle(ctx->scriptPtr);
     return FALSE;
 }
 
@@ -2469,10 +3348,10 @@ bool8 ScrCmd_cleartrainerflag(struct ScriptContext *ctx)
 
 bool8 ScrCmd_setwildbattle(struct ScriptContext *ctx)
 {
-    enum Species species = ScriptReadHalfword(ctx);
+    u16 species = ScriptReadHalfword(ctx);
     u8 level = ScriptReadByte(ctx);
     enum Item item = ScriptReadHalfword(ctx);
-    enum Species species2 = ScriptReadHalfword(ctx);
+    u16 species2 = ScriptReadHalfword(ctx);
     u8 level2 = ScriptReadByte(ctx);
     enum Item item2 = ScriptReadHalfword(ctx);
 
@@ -2486,6 +3365,38 @@ bool8 ScrCmd_setwildbattle(struct ScriptContext *ctx)
     else
     {
         CreateScriptedDoubleWildMon(species, level, item, species2, level2, item2);
+        sIsScriptedWildDouble = TRUE;
+    }
+
+    return FALSE;
+}
+
+bool8 ScrCmd_setwildbossbattle(struct ScriptContext* ctx)
+{
+    u16 species = ScriptReadHalfword(ctx);
+    u8 level = ScriptReadByte(ctx);
+    enum Item item = ScriptReadHalfword(ctx);
+    enum Move moves[MAX_MON_MOVES];
+    for (u32 i = 0; i < MAX_MON_MOVES; i++)
+        moves[i] = ScriptReadHalfword(ctx);
+
+    u16 species2 = ScriptReadHalfword(ctx);
+    u8 level2 = ScriptReadByte(ctx);
+    enum Item item2 = ScriptReadHalfword(ctx);
+    enum Move moves2[MAX_MON_MOVES];
+    for (u32 i = 0; i < MAX_MON_MOVES; i++)
+        moves2[i] = ScriptReadHalfword(ctx);
+
+    Script_RequestEffects(SCREFF_V1);
+
+    if (species2 == SPECIES_NONE)
+    {
+        CreateScriptedWildBossMon(species, level, item, moves);
+        sIsScriptedWildDouble = FALSE;
+    }
+    else
+    {
+        CreateScriptedDoubleWildBossMon(species, level, item, moves, species2, level2, item2, moves2);
         sIsScriptedWildDouble = TRUE;
     }
 
@@ -2516,6 +3427,7 @@ bool8 ScrCmd_pokemart(struct ScriptContext *ctx)
     ScriptContext_Stop();
     return TRUE;
 }
+
 
 bool8 ScrCmd_pokemartdecoration(struct ScriptContext *ctx)
 {
@@ -2554,12 +3466,12 @@ bool8 ScrCmd_playslotmachine(struct ScriptContext *ctx)
 bool8 ScrCmd_setberrytree(struct ScriptContext *ctx)
 {
     u8 treeId = ScriptReadByte(ctx);
-    enum BerryId berryId = ScriptReadByte(ctx);
+    u8 berry = ScriptReadByte(ctx);
     u8 growthStage = ScriptReadByte(ctx);
 
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
-    PlantBerryTree(treeId, berryId, growthStage, FALSE);
+    PlantBerryTree(treeId, berry, growthStage, FALSE);
     return FALSE;
 }
 
@@ -2670,7 +3582,7 @@ bool8 ScrCmd_checkplayergender(struct ScriptContext *ctx)
 
 bool8 ScrCmd_playmoncry(struct ScriptContext *ctx)
 {
-    enum Species species = VarGet(ScriptReadHalfword(ctx));
+    u16 species = VarGet(ScriptReadHalfword(ctx));
     u16 mode = VarGet(ScriptReadHalfword(ctx));
 
     Script_RequestEffects(SCREFF_V1 | SCREFF_HARDWARE);
@@ -2710,42 +3622,6 @@ bool8 ScrCmd_setmetatile(struct ScriptContext *ctx)
     else
         MapGridSetMetatileIdAt(x, y, metatileId | MAPGRID_IMPASSABLE);
     return FALSE;
-}
-
-void NativeFunc_SetMetatileInRange(struct ScriptContext *ctx)
-{
-    u8 xmin = ScriptReadByte(ctx);
-    u8 ymin = ScriptReadByte(ctx);
-    u8 xmax = ScriptReadByte(ctx);
-    u8 ymax = ScriptReadByte(ctx);
-    u16 metatileId = VarGet(ScriptReadHalfword(ctx));
-    bool8 hasCollision = ScriptReadByte(ctx);
-    u8 elevation = ScriptReadByte(ctx);
-    u32 temp;
-
-    if (xmin > xmax)
-        SWAP(xmin, xmax, temp);
-
-    if (ymin > ymax)
-        SWAP(ymin, ymax, temp);
-    xmin += MAP_OFFSET;
-    ymin += MAP_OFFSET;
-    xmax += MAP_OFFSET;
-    ymax += MAP_OFFSET;
-
-    // try set impassable
-    if (hasCollision)
-        metatileId |= MAPGRID_COLLISION_MASK;
-
-    // set elevation
-    if (elevation < 15)
-        metatileId |= (elevation << MAPGRID_ELEVATION_SHIFT);
-
-    for (u32 i = xmin; i <= xmax; i++)
-    {
-        for (u32 j = ymin; j <= ymax; j++)
-            MapGridSetMetatileEntryAt(i, j, metatileId);
-    }
 }
 
 bool8 ScrCmd_opendoor(struct ScriptContext *ctx)
@@ -2946,7 +3822,7 @@ bool8 ScrCmd_setmodernfatefulencounter(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
-    SetMonData(&gParties[B_TRAINER_PLAYER][partyIndex], MON_DATA_MODERN_FATEFUL_ENCOUNTER, &isModernFatefulEncounter);
+    SetMonData(&gPlayerParty[partyIndex], MON_DATA_MODERN_FATEFUL_ENCOUNTER, &isModernFatefulEncounter);
     return FALSE;
 }
 
@@ -2956,7 +3832,7 @@ bool8 ScrCmd_checkmodernfatefulencounter(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    gSpecialVar_Result = GetMonData(&gParties[B_TRAINER_PLAYER][partyIndex], MON_DATA_MODERN_FATEFUL_ENCOUNTER);
+    gSpecialVar_Result = GetMonData(&gPlayerParty[partyIndex], MON_DATA_MODERN_FATEFUL_ENCOUNTER);
     return FALSE;
 }
 
@@ -3001,7 +3877,7 @@ bool8 ScrCmd_setmonmetlocation(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 
     if (partyIndex < PARTY_SIZE)
-        SetMonData(&gParties[B_TRAINER_PLAYER][partyIndex], MON_DATA_MET_LOCATION, &location);
+        SetMonData(&gPlayerParty[partyIndex], MON_DATA_MET_LOCATION, &location);
     return FALSE;
 }
 
@@ -3018,7 +3894,7 @@ bool8 ScrCmd_buffertrainerclassname(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    StringCopy(GetStringVar(stringVarIndex), GetTrainerClassNameFromId(trainerClassId));
+    StringCopy(sScriptStringVars[stringVarIndex], GetTrainerClassNameFromId(trainerClassId));
     return FALSE;
 }
 
@@ -3029,7 +3905,7 @@ bool8 ScrCmd_buffertrainername(struct ScriptContext *ctx)
 
     Script_RequestEffects(SCREFF_V1);
 
-    StringCopy(GetStringVar(stringVarIndex), GetTrainerNameFromId(trainerClassId));
+    StringCopy(sScriptStringVars[stringVarIndex], GetTrainerNameFromId(trainerClassId));
     return FALSE;
 }
 
@@ -3128,7 +4004,7 @@ bool8 Scrcmd_getsetpokedexflag(struct ScriptContext *ctx)
 
 bool8 Scrcmd_checkspecies(struct ScriptContext *ctx)
 {
-    enum Species givenSpecies = VarGet(ScriptReadHalfword(ctx));
+    u32 givenSpecies = VarGet(ScriptReadHalfword(ctx));
 
     Script_RequestEffects(SCREFF_V1);
 
@@ -3139,11 +4015,11 @@ bool8 Scrcmd_checkspecies(struct ScriptContext *ctx)
 
 bool8 Scrcmd_checkspecies_choose(struct ScriptContext *ctx)
 {
-    enum Species givenSpecies = VarGet(ScriptReadHalfword(ctx));
+    u32 givenSpecies = VarGet(ScriptReadHalfword(ctx));
 
     Script_RequestEffects(SCREFF_V1);
 
-    gSpecialVar_Result = (GetMonData(&gParties[B_TRAINER_PLAYER][gSpecialVar_0x8004], MON_DATA_SPECIES) == givenSpecies);
+    gSpecialVar_Result = (GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPECIES_OR_EGG) == givenSpecies);
 
     return FALSE;
 }
@@ -3247,7 +4123,7 @@ bool8 ScrCmd_fwdtime(struct ScriptContext *ctx)
 
 bool8 ScrCmd_fwdweekday(struct ScriptContext *ctx)
 {
-    if (!OW_USE_FAKE_RTC)
+    if (!UseFakeRtc())
         return FALSE;
 
     struct SiiRtcInfo *rtc = FakeRtc_GetCurrentTime();
@@ -3261,69 +4137,9 @@ bool8 ScrCmd_fwdweekday(struct ScriptContext *ctx)
     return FALSE;
 }
 
-static bool32 EventEvolution(u32 partyIndex)
-{
-    bool32 canStopEvo = gSpecialVar_0x8000;
-    enum Species targetSpecies = GetEvolutionTargetSpecies(&gParties[B_TRAINER_PLAYER][partyIndex], EVO_MODE_SCRIPT_TRIGGER, gSpecialVar_0x8005, NULL, &canStopEvo, CHECK_EVO);
-    if (targetSpecies == SPECIES_NONE)
-    {
-        gSpecialVar_Result = EVO_EVENT_IMPOSSIBLE;
-        return FALSE;
-    }
-    gSpecialVar_Result = EVO_EVENT_SUCCESSFUL;
-    GetEvolutionTargetSpecies(&gParties[B_TRAINER_PLAYER][partyIndex], EVO_MODE_SCRIPT_TRIGGER, gSpecialVar_0x8005, NULL, &canStopEvo, DO_EVO);
-    BeginEvolutionScene(&gParties[B_TRAINER_PLAYER][partyIndex], targetSpecies, canStopEvo, partyIndex);
-    ScriptContext_Stop();
-    return TRUE;
-}
-
-static void TriggerMultipleEvolutions_Repeatable(void)
-{
-    if (gSpecialVar_Result == EVO_EVENT_SUCCESSFUL)
-        gSpecialVar_0x8006++;
-
-    gCB2_AfterEvolution = TriggerMultipleEvolutions_Repeatable;
-    for (u32 i = 0; i < gPartiesCount[B_TRAINER_PLAYER]; i++)
-    {
-        if (!(gTriedEvolving & (1u << i)))
-        {
-            gTriedEvolving |= 1u << i;
-            if (EventEvolution(i))
-                return;
-        }
-    }
-
-    gTriedEvolving = 0;
-    gSpecialVar_Result = gSpecialVar_0x8006;
-    SetMainCallback2(CB2_ReturnToFieldContinueScript);
-}
-
-void Script_TriggerMultipleEvolutions(struct ScriptContext *ctx)
-{
-    ctx->waitAfterCallNative = TRUE;
-    TriggerMultipleEvolutions_Repeatable();
-}
-
-void Script_TriggerUniqueEvolution(struct ScriptContext *ctx)
-{
-    ctx->waitAfterCallNative = TRUE;
-    if (gSpecialVar_0x8004 == PARTY_NOTHING_CHOSEN)
-    {
-        gSpecialVar_Result = EVO_EVENT_IMPOSSIBLE;
-        return;
-    }
-    assertf(gSpecialVar_0x8004 <= PARTY_SIZE, "TriggerEvolution script called with invalid partyIndex %d", gSpecialVar_0x8004)
-    {
-        gSpecialVar_Result = EVO_EVENT_IMPOSSIBLE;
-        return;
-    }
-    gCB2_AfterEvolution = CB2_ReturnToFieldContinueScript;
-    EventEvolution(gSpecialVar_0x8004);
-}
-
 void Script_EndTrainerCanSeeIf(struct ScriptContext *ctx)
 {
-    enum ComparisonOperators condition = ScriptReadByte(ctx);
+    u8 condition = ScriptReadByte(ctx);
     if (ctx->breakOnTrainerBattle && sScriptConditionTable[condition][ctx->comparisonResult] == 1)
         StopScript(ctx);
 }
@@ -3335,6 +4151,31 @@ bool8 ScrCmd_setmoverelearnerstate(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1);
 
     gMoveRelearnerState = state;
+    return FALSE;
+}
+
+bool8 ScrCmd_getmoverelearnerstate(struct ScriptContext *ctx)
+{
+    u32 varId = ScriptReadHalfword(ctx);
+
+    Script_RequestEffects(SCREFF_V1);
+    Script_RequestWriteVar(varId);
+
+    u16 *varPointer = GetVarPointer(varId);
+    *varPointer = gMoveRelearnerState;
+    return FALSE;
+}
+
+bool8 ScrCmd_istmrelearneractive(struct ScriptContext *ctx)
+{
+    const u8 *ptr = (const u8 *)ScriptReadWord(ctx);
+
+    Script_RequestEffects(SCREFF_V1);
+
+    if ((P_TM_MOVES_RELEARNER || P_ENABLE_MOVE_RELEARNERS)
+     && (P_ENABLE_ALL_TM_MOVES || IsBagPocketNonEmpty(POCKET_TM_HM)))
+        ScriptCall(ctx, ptr);
+
     return FALSE;
 }
 
@@ -3376,21 +4217,5 @@ bool8 ScrCmd_getbraillestringwidth(struct ScriptContext * ctx)
         msg = (u8 *)ctx->data[0];
 
     gSpecialVar_0x8004 = GetStringWidth(FONT_BRAILLE, msg, -1);
-    return FALSE;
-}
-
-bool8 ScrCmd_signmsg(struct ScriptContext *ctx)
-{
-    Script_RequestEffects(SCREFF_V1);
-
-    gMsgIsSignPost = TRUE;
-    return FALSE;
-}
-
-bool8 ScrCmd_normalmsg(struct ScriptContext *ctx)
-{
-    Script_RequestEffects(SCREFF_V1);
-
-    gMsgIsSignPost = FALSE;
     return FALSE;
 }

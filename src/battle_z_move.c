@@ -2,13 +2,13 @@
 #include "malloc.h"
 #include "battle.h"
 #include "pokemon.h"
-#include "battle_ai_record.h"
+#include "battle_ai_main.h"
+#include "battle_ai_util.h"
 #include "battle_controllers.h"
 #include "battle_interface.h"
 #include "battle_message.h"
 #include "battle_z_move.h"
 #include "battle_scripts.h"
-#include "battle_stat_change.h"
 #include "graphics.h"
 #include "sprite.h"
 #include "window.h"
@@ -228,7 +228,7 @@ bool32 TryChangeZTrigger(enum BattlerId battler, u32 moveIndex)
     return viableZMove;
 }
 
-enum Move GetSignatureZMove(enum Move move, enum Species species, enum Item item)
+enum Move GetSignatureZMove(enum Move move, u32 species, enum Item item)
 {
     u32 i;
 
@@ -251,7 +251,7 @@ enum Move GetTypeBasedZMove(enum Move move)
 
     // Z-Weather Ball changes types, however Revelation Dance, -ate ability affected moves, and Hidden Power do not
     if (gBattleStruct->dynamicMoveType && GetMoveEffect(move) == EFFECT_WEATHER_BALL)
-        moveType = gBattleStruct->dynamicMoveType;
+        moveType = gBattleStruct->dynamicMoveType & DYNAMIC_TYPE_MASK;
 
     // Get Z-Move from type
     if (gTypesInfo[moveType].zMove == MOVE_NONE) // failsafe
@@ -366,6 +366,7 @@ bool32 MoveSelectionDisplayZMove(enum Move zmove, enum BattlerId battler)
         }
         else if (GetMoveEffect(zmove) == EFFECT_EXTREME_EVOBOOST)
         {
+            // Damaging move -> status z move
             StringCopy(gDisplayedStringBattle, sText_StatsPlus2);
             BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_MOVE_NAME_3);
             StringCopy(gDisplayedStringBattle, GetMoveName(zmove));
@@ -409,7 +410,7 @@ static void ZMoveSelectionDisplayPpNumber(enum BattlerId battler)
     if (gBattleResources->bufferA[battler][2] == TRUE) // Check if we didn't want to display pp number
         return;
 
-    SetPPNumbersPaletteInMoveSelection(battler);
+    SetPpNumbersPaletteInMoveSelection(battler);
     txtPtr = ConvertIntToDecimalStringN(gDisplayedStringBattle, 1, STR_CONV_MODE_RIGHT_ALIGN, 2);
     *(txtPtr)++ = CHAR_SLASH;
     ConvertIntToDecimalStringN(txtPtr, 1, STR_CONV_MODE_RIGHT_ALIGN, 2);
@@ -434,10 +435,9 @@ static void ZMoveSelectionDisplayMoveType(enum Move zMove, enum BattlerId battle
 #define Z_EFFECT_BS_LENGTH  5
 // This function kinda cheats by setting a return battle script to after the setzeffect various command
 // and then jumping to a z effect script
-void SetZEffect(const u8 *nextInstr)
+void SetZEffect(void)
 {
     u32 i;
-    s32 stage = 0;
     enum ZEffect effect = GetMoveZEffect(gChosenMove);
 
     if (effect == Z_EFFECT_CURSE)
@@ -448,6 +448,9 @@ void SetZEffect(const u8 *nextInstr)
             effect = Z_EFFECT_ATK_UP_1;
     }
 
+    gBattleScripting.savedStatChanger = gBattleScripting.statChanger;   // Save used move's stat changer (e.g. for Z-Growl)
+    gBattleScripting.battler = gBattlerAttacker;
+
     switch (effect)
     {
     case Z_EFFECT_RESET_STATS:
@@ -457,7 +460,7 @@ void SetZEffect(const u8 *nextInstr)
                 gBattleMons[gBattlerAttacker].statStages[i] = DEFAULT_STAT_STAGE;
         }
         gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_Z_RESET_STATS;
-        BattleScriptPush(nextInstr);
+        BattleScriptPush(gBattlescriptCurrInstr + Z_EFFECT_BS_LENGTH);
         gBattlescriptCurrInstr = BattleScript_ZEffectPrintString;
         break;
     case Z_EFFECT_ALL_STATS_UP_1:
@@ -472,14 +475,8 @@ void SetZEffect(const u8 *nextInstr)
         }
         if (canBoost)
         {
-            SetStatChange(gBattlerAttacker, STAT_ATK, 1);
-            SetStatChange(gBattlerAttacker, STAT_DEF, 1);
-            SetStatChange(gBattlerAttacker, STAT_SPATK, 1);
-            SetStatChange(gBattlerAttacker, STAT_SPDEF, 1);
-            SetStatChange(gBattlerAttacker, STAT_SPEED, 1);
-
             gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_Z_ALL_STATS_UP;
-            BattleScriptPush(nextInstr);
+            BattleScriptPush(gBattlescriptCurrInstr + Z_EFFECT_BS_LENGTH);
             gBattlescriptCurrInstr = BattleScript_AllStatsUpZMove;
         }
         else
@@ -493,7 +490,7 @@ void SetZEffect(const u8 *nextInstr)
         {
             gBattleMons[gBattlerAttacker].volatiles.focusEnergy = TRUE;
             gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_Z_BOOST_CRITS;
-            BattleScriptPush(nextInstr);
+            BattleScriptPush(gBattlescriptCurrInstr + Z_EFFECT_BS_LENGTH);
             gBattlescriptCurrInstr = BattleScript_ZEffectPrintString;
         }
         else
@@ -505,7 +502,7 @@ void SetZEffect(const u8 *nextInstr)
         gSideTimers[GetBattlerSide(gBattlerAttacker)].followmeTimer = 1;
         gSideTimers[GetBattlerSide(gBattlerAttacker)].followmeTarget = gBattlerAttacker;
         gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_Z_FOLLOW_ME;
-        BattleScriptPush(nextInstr);
+        BattleScriptPush(gBattlescriptCurrInstr + Z_EFFECT_BS_LENGTH);
         gBattlescriptCurrInstr = BattleScript_ZEffectPrintString;
         break;
     case Z_EFFECT_RECOVER_HP:
@@ -513,7 +510,7 @@ void SetZEffect(const u8 *nextInstr)
         {
             SetHealAmount(gBattlerAttacker, gBattleMons[gBattlerAttacker].maxHP);
             gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_Z_RECOVER_HP;
-            BattleScriptPush(nextInstr);
+            BattleScriptPush(gBattlescriptCurrInstr + Z_EFFECT_BS_LENGTH);
             gBattlescriptCurrInstr = BattleScript_RecoverHPZMove;
         }
         else
@@ -523,69 +520,27 @@ void SetZEffect(const u8 *nextInstr)
         break;
     case Z_EFFECT_RESTORE_REPLACEMENT_HP:
         gBattleStruct->zmove.healReplacement |= 1u << gBattlerAttacker;
-        BattleScriptPush(nextInstr);
+        BattleScriptPush(gBattlescriptCurrInstr + Z_EFFECT_BS_LENGTH);
         gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_Z_HP_TRAP;
         gBattlescriptCurrInstr = BattleScript_ZEffectPrintString;
         break;
-    case Z_EFFECT_ATK_UP_1:
-    case Z_EFFECT_ATK_UP_2:
-    case Z_EFFECT_ATK_UP_3:
-        stage = effect - Z_EFFECT_ATK_UP_1 + 1;
-        SetStatChange(gBattlerAttacker, STAT_ATK, stage);
-        BattleScriptPush(nextInstr);
-        gBattlescriptCurrInstr = BattleScript_MoveEffectStatChange;
+    case Z_EFFECT_ATK_UP_1 ... Z_EFFECT_EVSN_UP_1:
+        SET_STATCHANGER(effect - Z_EFFECT_ATK_UP_1 + 1, 1, FALSE);
+        BattleScriptPush(gBattlescriptCurrInstr + Z_EFFECT_BS_LENGTH);
+        gBattlescriptCurrInstr = BattleScript_StatUpZMove;
         break;
-    case Z_EFFECT_DEF_UP_1:
-    case Z_EFFECT_DEF_UP_2:
-    case Z_EFFECT_DEF_UP_3:
-        stage = effect - Z_EFFECT_DEF_UP_1 + 1;
-        SetStatChange(gBattlerAttacker, STAT_DEF, stage);
-        BattleScriptPush(nextInstr);
-        gBattlescriptCurrInstr = BattleScript_MoveEffectStatChange;
+    case Z_EFFECT_ATK_UP_2 ... Z_EFFECT_EVSN_UP_2:
+        SET_STATCHANGER(effect - Z_EFFECT_ATK_UP_2 + 1, 2, FALSE);
+        BattleScriptPush(gBattlescriptCurrInstr + Z_EFFECT_BS_LENGTH);
+        gBattlescriptCurrInstr = BattleScript_StatUpZMove;
         break;
-    case Z_EFFECT_SPD_UP_1:
-    case Z_EFFECT_SPD_UP_2:
-    case Z_EFFECT_SPD_UP_3:
-        stage = effect - Z_EFFECT_SPD_UP_1 + 1;
-        SetStatChange(gBattlerAttacker, STAT_SPEED, stage);
-        BattleScriptPush(nextInstr);
-        gBattlescriptCurrInstr = BattleScript_MoveEffectStatChange;
-        break;
-    case Z_EFFECT_SPATK_UP_1:
-    case Z_EFFECT_SPATK_UP_2:
-    case Z_EFFECT_SPATK_UP_3:
-        stage = effect - Z_EFFECT_SPATK_UP_1 + 1;
-        SetStatChange(gBattlerAttacker, STAT_SPATK, stage);
-        BattleScriptPush(nextInstr);
-        gBattlescriptCurrInstr = BattleScript_MoveEffectStatChange;
-        break;
-    case Z_EFFECT_SPDEF_UP_1:
-    case Z_EFFECT_SPDEF_UP_2:
-    case Z_EFFECT_SPDEF_UP_3:
-        stage = effect - Z_EFFECT_SPDEF_UP_1 + 1;
-        SetStatChange(gBattlerAttacker, STAT_SPDEF, stage);
-        BattleScriptPush(nextInstr);
-        gBattlescriptCurrInstr = BattleScript_MoveEffectStatChange;
-        break;
-
-    case Z_EFFECT_ACC_UP_1:
-    case Z_EFFECT_ACC_UP_2:
-    case Z_EFFECT_ACC_UP_3:
-        stage = effect - Z_EFFECT_ACC_UP_1 + 1;
-        SetStatChange(gBattlerAttacker, STAT_ACC, stage);
-        BattleScriptPush(nextInstr);
-        gBattlescriptCurrInstr = BattleScript_MoveEffectStatChange;
-        break;
-    case Z_EFFECT_EVSN_UP_1:
-    case Z_EFFECT_EVSN_UP_2:
-    case Z_EFFECT_EVSN_UP_3:
-        stage = effect - Z_EFFECT_EVSN_UP_1 + 1;
-        SetStatChange(gBattlerAttacker, STAT_EVASION, stage);
-        BattleScriptPush(nextInstr);
-        gBattlescriptCurrInstr = BattleScript_MoveEffectStatChange;
+    case Z_EFFECT_ATK_UP_3 ... Z_EFFECT_EVSN_UP_3:
+        SET_STATCHANGER(effect - Z_EFFECT_ATK_UP_3 + 1, 3, FALSE);
+        BattleScriptPush(gBattlescriptCurrInstr + Z_EFFECT_BS_LENGTH);
+        gBattlescriptCurrInstr = BattleScript_StatUpZMove;
         break;
     default:
-        gBattlescriptCurrInstr = nextInstr;
+        gBattlescriptCurrInstr += Z_EFFECT_BS_LENGTH;
         break;
     }
 }

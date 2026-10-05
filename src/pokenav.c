@@ -49,7 +49,7 @@ static void Task_RunLoopedTask(u8);
 static void Task_Pokenav(u8);
 static void CB2_InitPokenavForTutorial(void);
 
-const struct PokenavCallbacks PokenavMenuCallbacks[15] =
+const struct PokenavCallbacks PokenavMenuCallbacks[17] =
 {
     [POKENAV_MAIN_MENU - POKENAV_MENU_IDS_START] =
     {
@@ -201,6 +201,28 @@ const struct PokenavCallbacks PokenavMenuCallbacks[15] =
         .free1 = FreeRibbonsMonList,
         .free2 = FreeRibbonsMonMenu,
     },
+#if IS_HNS
+    [POKENAV_RADIO - POKENAV_MENU_IDS_START] =
+    {
+        .init = PokenavCallback_Init_Radio,
+        .callback = GetRadioCallback,
+        .open = OpenPokenavRadio,
+        .createLoopTask = CreateRadioLoopedTask,
+        .isLoopTaskActive = IsRadioLoopedTaskActive,
+        .free1 = FreeRadioSubstruct1,
+        .free2 = FreeRadioSubstruct2,
+    },
+    [POKENAV_MAIN_MENU_CURSOR_ON_RADIO - POKENAV_MENU_IDS_START] =
+    {
+        .init = PokenavCallback_Init_MainMenuCursorOnRadio,
+        .callback = GetMenuHandlerCallback,
+        .open = OpenPokenavMenuNotInitial,
+        .createLoopTask = CreateMenuHandlerLoopedTask,
+        .isLoopTaskActive = IsMenuHandlerLoopedTaskActive,
+        .free1 = FreeMenuHandlerSubstruct1,
+        .free2 = FreeMenuHandlerSubstruct2,
+    },
+#endif
 };
 
 EWRAM_DATA u8 gNextLoopedTaskId = 0;
@@ -391,9 +413,9 @@ static bool32 AnyMonHasRibbon(void)
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gParties[B_TRAINER_PLAYER][i],  MON_DATA_SANITY_HAS_SPECIES)
-            && !GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SANITY_IS_EGG)
-            && GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_RIBBON_COUNT) != 0)
+        if (GetMonData(&gPlayerParty[i],  MON_DATA_SANITY_HAS_SPECIES)
+            && !GetMonData(&gPlayerParty[i], MON_DATA_SANITY_IS_EGG)
+            && GetMonData(&gPlayerParty[i], MON_DATA_RIBBON_COUNT) != 0)
         {
             return TRUE;
         }

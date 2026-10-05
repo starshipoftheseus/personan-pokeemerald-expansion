@@ -4,7 +4,6 @@
 #include "decompress.h"
 #include "decompress_error_handler.h"
 #include "pokemon.h"
-#include "pokemon_spots.h"
 #include "pokemon_sprite_visualizer.h"
 #include "text.h"
 #include "menu.h"
@@ -245,12 +244,17 @@ u32 LoadCompressedSpriteSheetByTemplate(const struct SpriteTemplate *template, s
 
 }
 
-void HandleLoadSpecialPokePic(bool32 isFrontPic, void *dest, enum Species species, u32 personality)
+void DecompressPicFromTable(const struct CompressedSpriteSheet *src, void *buffer)
+{
+    DecompressDataWithHeaderWram(src->data, buffer);
+}
+
+void HandleLoadSpecialPokePic(bool32 isFrontPic, void *dest, s32 species, u32 personality)
 {
     LoadSpecialPokePicIsEgg(dest, species, personality, isFrontPic, FALSE);
 }
 
-void HandleLoadSpecialPokePicIsEgg(bool32 isFrontPic, void *dest, enum Species species, u32 personality, bool32 isEgg)
+void HandleLoadSpecialPokePicIsEgg(bool32 isFrontPic, void *dest, s32 species, u32 personality, bool32 isEgg)
 {
     LoadSpecialPokePicIsEgg(dest, species, personality, isFrontPic, isEgg);
 }
@@ -1125,12 +1129,12 @@ static bool32 isModeSymDelta(enum CompressionMode mode)
     return FALSE;
 }
 
-void LoadSpecialPokePic(void *dest, enum Species species, u32 personality, bool8 isFrontPic)
+void LoadSpecialPokePic(void *dest, s32 species, u32 personality, bool8 isFrontPic)
 {
     LoadSpecialPokePicIsEgg(dest, species, personality, isFrontPic, FALSE);
 }
 
-void LoadSpecialPokePicIsEgg(void *dest, enum Species species, u32 personality, bool8 isFrontPic, bool32 isEgg)
+void LoadSpecialPokePicIsEgg(void *dest, s32 species, u32 personality, bool8 isFrontPic, bool32 isEgg)
 {
     species = SanitizeSpeciesId(species);
     if (species == SPECIES_UNOWN)
@@ -1145,7 +1149,7 @@ void LoadSpecialPokePicIsEgg(void *dest, enum Species species, u32 personality, 
     }
     else if (isFrontPic)
     {
-    #if P_GENDER_DIFFERENCES
+    #if P_GENDER_DIFFERENCES && !P_GBA_STYLE_SPECIES_GFX
         if (gSpeciesInfo[species].frontPicFemale != NULL && IsPersonalityFemale(species, personality))
             DecompressDataWithHeaderWram(gSpeciesInfo[species].frontPicFemale, dest);
         else
@@ -1157,7 +1161,7 @@ void LoadSpecialPokePicIsEgg(void *dest, enum Species species, u32 personality, 
     }
     else
     {
-    #if P_GENDER_DIFFERENCES
+    #if P_GENDER_DIFFERENCES && !P_GBA_STYLE_SPECIES_GFX
         if (gSpeciesInfo[species].backPicFemale != NULL && IsPersonalityFemale(species, personality))
             DecompressDataWithHeaderWram(gSpeciesInfo[species].backPicFemale, dest);
         else
@@ -1168,9 +1172,10 @@ void LoadSpecialPokePicIsEgg(void *dest, enum Species species, u32 personality, 
             DecompressDataWithHeaderWram(gSpeciesInfo[SPECIES_NONE].backPic, dest);
     }
 
-    if (ShouldDrawSpotsOnSpecies(species) && isFrontPic && !isEgg)
+    if (species == SPECIES_SPINDA && isFrontPic)
     {
-        DrawPokemonSpotsBothFrames(personality, species, dest);
+        DrawSpindaSpots(personality, dest, FALSE);
+        DrawSpindaSpots(personality, dest, TRUE);
     }
 }
 
@@ -1220,7 +1225,7 @@ static void UNUSED StitchObjectsOn8x8Canvas(s32 object_size, s32 object_count, u
                 }
             }
 
-            // Clear the columns to the left and right that won't be used completely
+            // Clear the columns to the left and right that wont be used completely
             // Unlike the previous loops, this will clear the later used space as well
             for (j = 0; j < 2; j++)
             {

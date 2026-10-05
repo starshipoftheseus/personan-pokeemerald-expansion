@@ -46,12 +46,23 @@
 
 struct FrontierBrainMon
 {
-    enum Species species;
-    enum Item heldItem;
+    u16 species;
+    u16 heldItem;
     u8 fixedIV;
     u8 nature;
     u8 evs[NUM_STATS];
-    enum Move moves[MAX_MON_MOVES];
+    u16 moves[MAX_MON_MOVES];
+};
+
+struct FrontierBrain
+{
+    u16 trainerId;
+    u16 objEventGfx;
+    u8 isFemale;
+    const u8 *lostTexts[2];
+    const u8 *wonTexts[2];
+    u16 battledBit[2];
+    u8 streakAppearances[4];
 };
 
 // This file's functions.
@@ -87,7 +98,7 @@ static void ShowArenaResultsWindow(void);
 static void ShowPyramidResultsWindow(void);
 static void ShowLinkContestResultsWindow(void);
 static void CopyFrontierBrainText(bool8 playerWonText);
-static u16 *MakeCaughtBannedSpeciesList(u32 totalBannedSpecies);
+static u16 *MakeCaughtBannesSpeciesList(u32 totalBannedSpecies);
 static void PrintBannedSpeciesName(u8 windowId, u32 itemId, u8 y);
 static void Task_BannedSpeciesWindowInput(u8 taskId);
 
@@ -97,8 +108,13 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
 {
     [FRONTIER_FACILITY_TOWER] =
     {
+#if IS_HNS
+        .trainerId = TRAINER_ANABEL_BF_BRAIN_HNS,
+        .objEventGfx = OBJ_EVENT_GFX_ANABEL_HNS,
+#else
         .trainerId = TRAINER_ANABEL,
         .objEventGfx = OBJ_EVENT_GFX_ANABEL,
+#endif
         .isFemale = TRUE,
         .lostTexts = {
             COMPOUND_STRING("Okay, I understand…"), //Silver
@@ -110,13 +126,16 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
         },
         .battledBit = {1 << 0, 1 << 1},
         .streakAppearances = {35, 70, 35, 1},
-        .goldSymbolFlag = FLAG_SYS_TOWER_GOLD,
-        .silverSymbolFlag = FLAG_SYS_TOWER_SILVER,
     },
     [FRONTIER_FACILITY_DOME] =
     {
+#if IS_HNS
+        .trainerId = TRAINER_TUCKER_BF_BRAIN_HNS,
+        .objEventGfx = OBJ_EVENT_GFX_TUCKER_HNS,
+#else
         .trainerId = TRAINER_TUCKER,
         .objEventGfx = OBJ_EVENT_GFX_TUCKER,
+#endif
         .isFemale = FALSE,
         .lostTexts = {
             COMPOUND_STRING(
@@ -134,13 +153,16 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
         },
         .battledBit = {1 << 2, 1 << 3},
         .streakAppearances = {4, 9, 5, 0},
-        .goldSymbolFlag = FLAG_SYS_DOME_GOLD,
-        .silverSymbolFlag = FLAG_SYS_DOME_SILVER,
     },
     [FRONTIER_FACILITY_PALACE] =
     {
+#if IS_HNS
+        .trainerId = TRAINER_SPENSER_BF_BRAIN_HNS,
+        .objEventGfx = OBJ_EVENT_GFX_SPENSER_HNS,
+#else
         .trainerId = TRAINER_SPENSER,
         .objEventGfx = OBJ_EVENT_GFX_SPENSER,
+#endif
         .isFemale = FALSE,
         .lostTexts = {
             COMPOUND_STRING(
@@ -160,13 +182,16 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
         },
         .battledBit = {1 << 4, 1 << 5},
         .streakAppearances = {21, 42, 21, 1},
-        .goldSymbolFlag = FLAG_SYS_PALACE_GOLD,
-        .silverSymbolFlag = FLAG_SYS_PALACE_SILVER,
     },
     [FRONTIER_FACILITY_ARENA] =
     {
+#if IS_HNS
+        .trainerId = TRAINER_GRETA_BF_BRAIN_HNS,
+        .objEventGfx = OBJ_EVENT_GFX_GRETA_HNS,
+#else
         .trainerId = TRAINER_GRETA,
         .objEventGfx = OBJ_EVENT_GFX_GRETA,
+#endif
         .isFemale = TRUE,
         .lostTexts = {
             COMPOUND_STRING(
@@ -186,13 +211,16 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
         },
         .battledBit = {1 << 6, 1 << 7},
         .streakAppearances = {28, 56, 28, 1},
-        .goldSymbolFlag = FLAG_SYS_ARENA_GOLD,
-        .silverSymbolFlag = FLAG_SYS_ARENA_SILVER,
     },
     [FRONTIER_FACILITY_FACTORY] =
     {
+#if IS_HNS
+        .trainerId = TRAINER_NOLAND_BF_BRAIN_HNS,
+        .objEventGfx = OBJ_EVENT_GFX_NOLAND_HNS,
+#else
         .trainerId = TRAINER_NOLAND,
         .objEventGfx = OBJ_EVENT_GFX_NOLAND,
+#endif
         .isFemale = FALSE,
         .lostTexts = {
             COMPOUND_STRING(
@@ -210,13 +238,16 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
         },
         .battledBit = {1 << 8, 1 << 9},
         .streakAppearances = {21, 42, 21, 1},
-        .goldSymbolFlag = FLAG_SYS_FACTORY_GOLD,
-        .silverSymbolFlag = FLAG_SYS_FACTORY_SILVER,
     },
     [FRONTIER_FACILITY_PIKE] =
     {
+#if IS_HNS
+        .trainerId = TRAINER_LUCY_BF_BRAIN_HNS,
+        .objEventGfx = OBJ_EVENT_GFX_LUCY_HNS,
+#else
         .trainerId = TRAINER_LUCY,
         .objEventGfx = OBJ_EVENT_GFX_LUCY,
+#endif
         .isFemale = TRUE,
         .lostTexts = {
             COMPOUND_STRING("Urk…"), //Silver
@@ -228,13 +259,16 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
         },
         .battledBit = {1 << 10, 1 << 11},
         .streakAppearances = {28, 140, 56, 1},
-        .goldSymbolFlag = FLAG_SYS_PIKE_GOLD,
-        .silverSymbolFlag = FLAG_SYS_PIKE_SILVER,
     },
     [FRONTIER_FACILITY_PYRAMID] =
     {
+#if IS_HNS
+        .trainerId = TRAINER_BRANDON_BF_BRAIN_HNS,
+        .objEventGfx = OBJ_EVENT_GFX_BRANDON_HNS,
+#else
         .trainerId = TRAINER_BRANDON,
         .objEventGfx = OBJ_EVENT_GFX_BRANDON,
+#endif
         .isFemale = FALSE,
         .lostTexts = {
             COMPOUND_STRING(
@@ -254,8 +288,6 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
         },
         .battledBit = {1 << 12, 1 << 13},
         .streakAppearances = {21, 70, 35, 0},
-        .goldSymbolFlag = FLAG_SYS_PYRAMID_GOLD,
-        .silverSymbolFlag = FLAG_SYS_PYRAMID_SILVER,
     },
 };
 
@@ -667,37 +699,39 @@ static const u8 sBattlePointAwards[NUM_FRONTIER_FACILITIES][FRONTIER_MODE_COUNT]
     /* facility, mode, tier */
     [FRONTIER_FACILITY_TOWER] = /* Tier: 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 */
     {
-        [FRONTIER_MODE_SINGLES]     = {  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
-        [FRONTIER_MODE_DOUBLES]     = {  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
-        [FRONTIER_MODE_MULTIS]      = {  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
-        [FRONTIER_MODE_LINK_MULTIS] = {  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_SINGLES]     = {  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_DOUBLES]     = {  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_MULTIS]      = {  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_LINK_MULTIS] = {  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
     },
+    // Dome caps lower than the rest: a challenge is a 4-round tournament, not 7 battles.
     [FRONTIER_FACILITY_DOME] =
     {
-        [FRONTIER_MODE_SINGLES]     = {  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 },
-        [FRONTIER_MODE_DOUBLES]     = {  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 },
+        [FRONTIER_MODE_SINGLES]     = {  3,  4,  4,  5,  5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
+        [FRONTIER_MODE_DOUBLES]     = {  3,  4,  4,  5,  5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 },
     },
     [FRONTIER_FACILITY_PALACE] =
     {
-        [FRONTIER_MODE_SINGLES]     = {  4,  4,  5,  5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15 },
-        [FRONTIER_MODE_DOUBLES]     = {  5,  5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_SINGLES]     = {  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_DOUBLES]     = {  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
     },
     [FRONTIER_FACILITY_ARENA] =
     {
-        [FRONTIER_MODE_SINGLES]     = {  1,  1,  1,  2,  2,  2,  3,  3,  4,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_SINGLES]     = {  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
     },
     [FRONTIER_FACILITY_FACTORY] =
     {
-        [FRONTIER_MODE_SINGLES]     = {  3,  3,  4,  4,  5,  5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15, 15, 15 },
-        [FRONTIER_MODE_DOUBLES]     = {  4,  4,  5,  5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_SINGLES]     = {  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_DOUBLES]     = {  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
     },
+    // Pike starts high: a challenge is NUM_PIKE_ROOMS rooms, the longest in the Frontier.
     [FRONTIER_FACILITY_PIKE] =
     {
-        [FRONTIER_MODE_SINGLES]     = {  1,  1,  2,  2,  2,  4,  4,  4,  8,  8,  8,  8, 10, 10, 10, 10, 12, 12, 12, 12, 12, 14, 14, 14, 14, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_SINGLES]     = {  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
     },
     [FRONTIER_FACILITY_PYRAMID] =
     {
-        [FRONTIER_MODE_SINGLES]     = {  5,  5,  6,  6,  7,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
+        [FRONTIER_MODE_SINGLES]     = {  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 },
     },
 };
 
@@ -1001,7 +1035,7 @@ static void SaveSelectedParty(void)
     {
         u16 monId = gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1;
         if (monId < PARTY_SIZE)
-            SavePlayerPartyMon(gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1, &gParties[B_TRAINER_PLAYER][i]);
+            SavePlayerPartyMon(gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1, &gPlayerParty[i]);
     }
 }
 
@@ -1986,10 +2020,24 @@ static void GiveBattlePoints(void)
         challengeNum--;
     if (challengeNum >= ARRAY_COUNT(sBattlePointAwards[0][0]))
         challengeNum = ARRAY_COUNT(sBattlePointAwards[0][0]) - 1;
+    if (facility >= NUM_FRONTIER_FACILITIES)
+        facility = NUM_FRONTIER_FACILITIES - 1;
+    if (battleMode >= FRONTIER_MODE_COUNT)
+        battleMode = FRONTIER_MODE_COUNT - 1;
 
     points = sBattlePointAwards[facility][battleMode][challengeNum];
     if (TRAINER_BATTLE_PARAM.opponentA == TRAINER_FRONTIER_BRAIN)
         points += 10;
+    if ((challengeNum > 10) && (challengeNum <= 20))
+        points *= 1.2;
+    else if ((challengeNum > 20) && (challengeNum <= 30))
+        points *= 1.5;
+    else if ((challengeNum > 30) && (challengeNum <= 40))
+        points *= 1.8;
+    else if ((challengeNum > 40) && (challengeNum <= 50))
+        points *= 2.0;
+    else if (challengeNum > 50)
+        points *= 3.0;
     gSaveBlock2Ptr->frontier.battlePoints += points;
     ConvertIntToDecimalStringN(gStringVar1, points, STR_CONV_MODE_LEFT_ALIGN, 2);
     if (gSaveBlock2Ptr->frontier.battlePoints > MAX_BATTLE_FRONTIER_POINTS)
@@ -2031,7 +2079,7 @@ static void CheckBattleTypeFlag(void)
         gSpecialVar_Result = FALSE;
 }
 
-static void AppendCaughtBannedMonSpeciesName(enum Species species, u8 count, s32 numBannedMonsCaught)
+static void AppendCaughtBannedMonSpeciesName(u16 species, u8 count, s32 numBannedMonsCaught)
 {
     if (count == 1)
         ;
@@ -2046,15 +2094,15 @@ static void AppendCaughtBannedMonSpeciesName(enum Species species, u8 count, s32
     StringAppend(gStringVar1, GetSpeciesName(species));
 }
 
-static void AppendIfValid(enum Species species, enum Item heldItem, u16 hp, enum FrontierLevelMode lvlMode, u8 monLevel, enum Species *speciesArray, enum Item *itemsArray, u8 *count)
+static void AppendIfValid(u16 species, u16 heldItem, u16 hp, enum FrontierLevelMode lvlMode, u8 monLevel, u16 *speciesArray, u16 *itemsArray, u8 *count)
 {
     s32 i = 0;
 
     if (species == SPECIES_EGG || species == SPECIES_NONE)
         return;
-    if (gSpeciesInfo[species].isFrontierBanned)
+    if (gSpeciesInfo[species].isFrontierBanned && !gSaveBlock3Ptr->challengeSettings.tx_Features_FrontierBans)
         return;
-    if (lvlMode == FRONTIER_LVL_50 && monLevel > FRONTIER_MAX_LEVEL_50)
+    if (lvlMode == FRONTIER_LVL_50 && monLevel > FRONTIER_MAX_LEVEL_50_ENTER)
         return;
 
     for (i = 0; i < *count && speciesArray[i] != species; i++)
@@ -2080,7 +2128,7 @@ static void AppendIfValid(enum Species species, enum Item heldItem, u16 hp, enum
 // The names of ineligible Pokémon that have been caught are also buffered to print
 static void CheckPartyIneligibility(void)
 {
-    enum Species speciesArray[PARTY_SIZE];
+    u16 speciesArray[PARTY_SIZE];
     enum Item itemArray[PARTY_SIZE];
     s32 monId = 0;
     s32 toChoose = 0;
@@ -2115,10 +2163,10 @@ static void CheckPartyIneligibility(void)
         numEligibleMons = 0;
         do
         {
-            enum Species species = GetMonData(&gParties[B_TRAINER_PLAYER][monId], MON_DATA_SPECIES_OR_EGG);
-            enum Item heldItem = GetMonData(&gParties[B_TRAINER_PLAYER][monId], MON_DATA_HELD_ITEM);
-            u8 level = GetMonData(&gParties[B_TRAINER_PLAYER][monId], MON_DATA_LEVEL);
-            u16 hp = GetMonData(&gParties[B_TRAINER_PLAYER][monId], MON_DATA_HP);
+            u16 species = GetMonData(&gPlayerParty[monId], MON_DATA_SPECIES_OR_EGG);
+            enum Item heldItem = GetMonData(&gPlayerParty[monId], MON_DATA_HELD_ITEM);
+            u8 level = GetMonData(&gPlayerParty[monId], MON_DATA_LEVEL);
+            u16 hp = GetMonData(&gPlayerParty[monId], MON_DATA_HP);
             if (VarGet(VAR_FRONTIER_FACILITY) == FRONTIER_FACILITY_PYRAMID)
             {
                 if (heldItem == ITEM_NONE)
@@ -2139,7 +2187,7 @@ static void CheckPartyIneligibility(void)
     if (numEligibleMons < toChoose)
     {
         u32 i, j;
-        enum Species baseSpecies = 0;
+        u32 baseSpecies = 0;
         u32 totalCaughtBanned = 0;
         u32 totalPartyBanned = 0;
         u32 partyBanned[PARTY_SIZE] = {0};
@@ -2149,7 +2197,7 @@ static void CheckPartyIneligibility(void)
             if (!IsSpeciesEnabled(i))
                 continue;
             baseSpecies = GET_BASE_SPECIES_ID(i);
-            if (baseSpecies == i && gSpeciesInfo[baseSpecies].isFrontierBanned)
+            if (baseSpecies == i && gSpeciesInfo[baseSpecies].isFrontierBanned && !gSaveBlock3Ptr->challengeSettings.tx_Features_FrontierBans)
             {
                 if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(baseSpecies), FLAG_GET_CAUGHT))
                     totalCaughtBanned++;
@@ -2158,10 +2206,10 @@ static void CheckPartyIneligibility(void)
 
         for (i = 0; i < PARTY_SIZE; i++)
         {
-            enum Species species = GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES_OR_EGG);
+            u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
             if (species == SPECIES_EGG || species == SPECIES_NONE)
                 continue;
-            if (gSpeciesInfo[GET_BASE_SPECIES_ID(species)].isFrontierBanned)
+            if (gSpeciesInfo[GET_BASE_SPECIES_ID(species)].isFrontierBanned && !gSaveBlock3Ptr->challengeSettings.tx_Features_FrontierBans)
             {
                 bool32 addToList = TRUE;
                 for (j = 0; j < totalPartyBanned; j++)
@@ -2265,7 +2313,7 @@ static void RestoreHeldItems(void)
         if (gSaveBlock2Ptr->frontier.selectedPartyMons[i] != 0)
         {
             enum Item item = GetMonData(GetSavedPlayerPartyMon(gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1), MON_DATA_HELD_ITEM);
-            SetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_HELD_ITEM, &item);
+            SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
         }
     }
 }
@@ -2303,13 +2351,13 @@ static void ResetSketchedMoves(void)
                 for (k = 0; k < MAX_MON_MOVES; k++)
                 {
                     if (GetMonData(GetSavedPlayerPartyMon(gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1), MON_DATA_MOVE1 + k)
-                        == GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_MOVE1 + j))
+                        == GetMonData(&gPlayerParty[i], MON_DATA_MOVE1 + j))
                         break;
                 }
                 if (k == MAX_MON_MOVES)
-                    SetMonMoveSlot(&gParties[B_TRAINER_PLAYER][i], MOVE_SKETCH, j);
+                    SetMonMoveSlot(&gPlayerParty[i], MOVE_SKETCH, j);
             }
-            SavePlayerPartyMon(gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1, &gParties[B_TRAINER_PLAYER][i]);
+            SavePlayerPartyMon(gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1, &gPlayerParty[i]);
         }
     }
 }
@@ -2530,17 +2578,17 @@ void SaveGameFrontier(void)
     struct Pokemon *monsParty = AllocZeroed(sizeof(struct Pokemon) * PARTY_SIZE);
 
     for (i = 0; i < PARTY_SIZE; i++)
-        monsParty[i] = gParties[B_TRAINER_PLAYER][i];
+        monsParty[i] = gPlayerParty[i];
 
-    i = gPartiesCount[B_TRAINER_PLAYER];
+    i = gPlayerPartyCount;
     LoadPlayerParty();
     SetContinueGameWarpStatusToDynamicWarp();
     TrySavingData(SAVE_LINK);
     ClearContinueGameWarpStatus2();
-    gPartiesCount[B_TRAINER_PLAYER] = i;
+    gPlayerPartyCount = i;
 
     for (i = 0; i < PARTY_SIZE; i++)
-        gParties[B_TRAINER_PLAYER][i] = monsParty[i];
+        gPlayerParty[i] = monsParty[i];
 
     Free(monsParty);
 }
@@ -2629,29 +2677,29 @@ void CreateFrontierBrainPokemon(void)
                                             MON_GENDER_RANDOM,
                                             sFrontierBrainsMons[facility][symbol][i].nature,
                                             RANDOM_UNOWN_LETTER);
-        CreateMonWithIVs(&gParties[B_TRAINER_OPPONENT_A][monPartyId],
+        CreateMonWithIVs(&gEnemyParty[monPartyId],
                   sFrontierBrainsMons[facility][symbol][i].species,
                   monLevel,
                   personality,
                   OTID_STRUCT_PRESET(FRONTIER_BRAIN_OTID),
                   sFrontierBrainsMons[facility][symbol][i].fixedIV);
-        SetMonData(&gParties[B_TRAINER_OPPONENT_A][monPartyId], MON_DATA_HELD_ITEM, &sFrontierBrainsMons[facility][symbol][i].heldItem);
+        SetMonData(&gEnemyParty[monPartyId], MON_DATA_HELD_ITEM, &sFrontierBrainsMons[facility][symbol][i].heldItem);
         for (j = 0; j < NUM_STATS; j++)
-            SetMonData(&gParties[B_TRAINER_OPPONENT_A][monPartyId], MON_DATA_HP_EV + j, &sFrontierBrainsMons[facility][symbol][i].evs[j]);
+            SetMonData(&gEnemyParty[monPartyId], MON_DATA_HP_EV + j, &sFrontierBrainsMons[facility][symbol][i].evs[j]);
         friendship = MAX_FRIENDSHIP;
         for (j = 0; j < MAX_MON_MOVES; j++)
         {
-            SetMonMoveSlot(&gParties[B_TRAINER_OPPONENT_A][monPartyId], sFrontierBrainsMons[facility][symbol][i].moves[j], j);
+            SetMonMoveSlot(&gEnemyParty[monPartyId], sFrontierBrainsMons[facility][symbol][i].moves[j], j);
             if (GetMoveEffect(sFrontierBrainsMons[facility][symbol][i].moves[j]) == EFFECT_FRUSTRATION)
                 friendship = 0;
         }
-        SetMonData(&gParties[B_TRAINER_OPPONENT_A][monPartyId], MON_DATA_FRIENDSHIP, &friendship);
-        CalculateMonStats(&gParties[B_TRAINER_OPPONENT_A][monPartyId]);
+        SetMonData(&gEnemyParty[monPartyId], MON_DATA_FRIENDSHIP, &friendship);
+        CalculateMonStats(&gEnemyParty[monPartyId]);
         monPartyId++;
     }
 }
 
-enum Species GetFrontierBrainMonSpecies(u8 monId)
+u16 GetFrontierBrainMonSpecies(u8 monId)
 {
     s32 facility = VarGet(VAR_FRONTIER_FACILITY);
     s32 symbol = GetFronterBrainSymbol();
@@ -2781,7 +2829,7 @@ bool8 IsFrontierTrainerFemale(u16 trainerId)
     // Search female classes.
     for (i = 0; i < ARRAY_COUNT(gTowerFemaleFacilityClasses); i++)
     {
-        if (gTowerFemaleFacilityClasses[i].class == facilityClass)
+        if (gTowerFemaleFacilityClasses[i] == facilityClass)
             break;
     }
     if (i != ARRAY_COUNT(gTowerFemaleFacilityClasses))
@@ -2878,7 +2926,7 @@ void SetBattleFacilityTrainerGfxId(u16 trainerId, u8 tempVarId)
 {
     u32 i;
     u8 facilityClass;
-    u8 trainerObjectGfxId;
+    u16 trainerObjectGfxId;
 
     SetFacilityPtrsGetLevel();
 #if FREE_BATTLE_TOWER_E_READER == FALSE
@@ -2910,12 +2958,12 @@ void SetBattleFacilityTrainerGfxId(u16 trainerId, u8 tempVarId)
     // Search male classes.
     for (i = 0; i < ARRAY_COUNT(gTowerMaleFacilityClasses); i++)
     {
-        if (gTowerMaleFacilityClasses[i].class == facilityClass)
+        if (gTowerMaleFacilityClasses[i] == facilityClass)
             break;
     }
     if (i != ARRAY_COUNT(gTowerMaleFacilityClasses))
     {
-        trainerObjectGfxId = gTowerMaleFacilityClasses[i].gfxId;
+        trainerObjectGfxId = gTowerMaleTrainerGfxIds[i];
         switch (tempVarId)
         {
         case 0:
@@ -2934,12 +2982,12 @@ void SetBattleFacilityTrainerGfxId(u16 trainerId, u8 tempVarId)
     // Search female classes.
     for (i = 0; i < ARRAY_COUNT(gTowerFemaleFacilityClasses); i++)
     {
-        if (gTowerFemaleFacilityClasses[i].class == facilityClass)
+        if (gTowerFemaleFacilityClasses[i] == facilityClass)
             break;
     }
     if (i != ARRAY_COUNT(gTowerFemaleFacilityClasses))
     {
-        trainerObjectGfxId = gTowerFemaleFacilityClasses[i].gfxId;
+        trainerObjectGfxId = gTowerFemaleTrainerGfxIds[i];
         switch (tempVarId)
         {
         case 0:
@@ -2959,13 +3007,25 @@ void SetBattleFacilityTrainerGfxId(u16 trainerId, u8 tempVarId)
     {
     case 0:
     default:
+    #if IS_HNS
+        VarSet(VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_YOUNGSTER_HNS);
+    #else
         VarSet(VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_BOY_1);
+    #endif
         return;
     case 1:
+    #if IS_HNS
+        VarSet(VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_YOUNGSTER_HNS);
+    #else
         VarSet(VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_BOY_1);
+    #endif
         return;
     case 15:
+    #if IS_HNS
+        VarSet(VAR_OBJ_GFX_ID_E, OBJ_EVENT_GFX_YOUNGSTER_HNS);
+    #else
         VarSet(VAR_OBJ_GFX_ID_E, OBJ_EVENT_GFX_BOY_1);
+    #endif
         return;
     }
 }
@@ -3001,29 +3061,33 @@ u16 GetBattleFacilityTrainerGfxId(u16 trainerId)
     // Search male classes.
     for (i = 0; i < ARRAY_COUNT(gTowerMaleFacilityClasses); i++)
     {
-        if (gTowerMaleFacilityClasses[i].class == facilityClass)
+        if (gTowerMaleFacilityClasses[i] == facilityClass)
             break;
     }
     if (i != ARRAY_COUNT(gTowerMaleFacilityClasses))
     {
-        trainerObjectGfxId = gTowerMaleFacilityClasses[i].gfxId;
+        trainerObjectGfxId = gTowerMaleTrainerGfxIds[i];
         return trainerObjectGfxId;
     }
 
     // Search female classes.
     for (i = 0; i < ARRAY_COUNT(gTowerFemaleFacilityClasses); i++)
     {
-        if (gTowerFemaleFacilityClasses[i].class == facilityClass)
+        if (gTowerFemaleFacilityClasses[i] == facilityClass)
             break;
     }
     if (i != ARRAY_COUNT(gTowerFemaleFacilityClasses))
     {
-        trainerObjectGfxId = gTowerFemaleFacilityClasses[i].gfxId;
+        trainerObjectGfxId = gTowerFemaleTrainerGfxIds[i];
         return trainerObjectGfxId;
     }
     else
     {
+    #if IS_HNS
+        return OBJ_EVENT_GFX_YOUNGSTER_HNS;
+    #else
         return OBJ_EVENT_GFX_BOY_1;
+    #endif
     }
 }
 
@@ -3297,10 +3361,10 @@ s32 GetHighestLevelInPlayerParty(void)
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES)
-            && GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES_OR_EGG) != SPECIES_EGG)
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES)
+            && GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG) != SPECIES_EGG)
         {
-            s32 level = GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_LEVEL);
+            s32 level = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
             if (level > highestLevel)
                 highestLevel = level;
         }
@@ -3317,29 +3381,33 @@ u16 FacilityClassToGraphicsId(u8 facilityClass)
     // Search male classes.
     for (i = 0; i < ARRAY_COUNT(gTowerMaleFacilityClasses); i++)
     {
-        if (gTowerMaleFacilityClasses[i].class == facilityClass)
+        if (gTowerMaleFacilityClasses[i] == facilityClass)
             break;
     }
     if (i != ARRAY_COUNT(gTowerMaleFacilityClasses))
     {
-        trainerObjectGfxId = gTowerMaleFacilityClasses[i].gfxId;
+        trainerObjectGfxId = gTowerMaleTrainerGfxIds[i];
         return trainerObjectGfxId;
     }
 
     // Search female classes.
     for (i = 0; i < ARRAY_COUNT(gTowerFemaleFacilityClasses); i++)
     {
-        if (gTowerFemaleFacilityClasses[i].class == facilityClass)
+        if (gTowerFemaleFacilityClasses[i] == facilityClass)
             break;
     }
     if (i != ARRAY_COUNT(gTowerFemaleFacilityClasses))
     {
-        trainerObjectGfxId = gTowerFemaleFacilityClasses[i].gfxId;
+        trainerObjectGfxId = gTowerFemaleTrainerGfxIds[i];
         return trainerObjectGfxId;
     }
     else
     {
+    #if IS_HNS
+        return OBJ_EVENT_GFX_YOUNGSTER_HNS;
+    #else
         return OBJ_EVENT_GFX_BOY_1;
+    #endif
     }
 }
 
@@ -3349,17 +3417,17 @@ u16 FacilityClassToGraphicsId(u8 facilityClass)
 #define tScrollOffset data[3]
 #define tListPointerElemId 4
 
-static u16 *MakeCaughtBannedSpeciesList(u32 totalBannedSpecies)
+static u16 *MakeCaughtBannesSpeciesList(u32 totalBannedSpecies)
 {
     u32 count = 0;
     u16 *list = AllocZeroed(sizeof(u16) * totalBannedSpecies);
-    for (enum Species i = 0; i < NUM_SPECIES; i++)
+    for (u32 i = 0; i < NUM_SPECIES; i++)
     {
         if (!IsSpeciesEnabled(i))
             continue;
 
-        enum Species baseSpecies = GET_BASE_SPECIES_ID(i);
-        if (baseSpecies == i && gSpeciesInfo[baseSpecies].isFrontierBanned)
+        u32 baseSpecies = GET_BASE_SPECIES_ID(i);
+        if (baseSpecies == i && gSpeciesInfo[baseSpecies].isFrontierBanned && !gSaveBlock3Ptr->challengeSettings.tx_Features_FrontierBans)
         {
             if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(baseSpecies), FLAG_GET_CAUGHT))
             {
@@ -3399,7 +3467,7 @@ void ShowBattleFrontierCaughtBannedSpecies(void)
     DrawStdWindowFrame(windowId, FALSE);
     listTemplate.windowId = windowId;
 
-    u16 *listItems = MakeCaughtBannedSpeciesList(totalCaughtBanned);
+    u16 *listItems = MakeCaughtBannesSpeciesList(totalCaughtBanned);
     u32 inputTaskId = CreateTask(Task_BannedSpeciesWindowInput, 3);
     gTasks[inputTaskId].tWindowId = windowId;
     gSpecialVar_0x8006 = inputTaskId;

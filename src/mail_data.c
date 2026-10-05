@@ -35,7 +35,7 @@ void ClearMail(struct Mail *mail)
 
 bool8 MonHasMail(struct Pokemon *mon)
 {
-    enum Item heldItem = GetMonData(mon, MON_DATA_HELD_ITEM);
+    u16 heldItem = GetMonData(mon, MON_DATA_HELD_ITEM);
     if (ItemIsMail(heldItem) && GetMonData(mon, MON_DATA_MAIL) != MAIL_NONE)
         return TRUE;
     else
@@ -46,7 +46,7 @@ u8 GiveMailToMonByItemId(struct Pokemon *mon, enum Item itemId)
 {
     u8 heldItem[2];
     u8 id, i;
-    enum Species species;
+    u16 species;
     u32 personality;
 
     heldItem[0] = itemId;
@@ -80,18 +80,18 @@ u8 GiveMailToMonByItemId(struct Pokemon *mon, enum Item itemId)
     return MAIL_NONE;
 }
 
-u16 SpeciesToMailSpecies(enum Species species, u32 personality)
+u16 SpeciesToMailSpecies(u16 species, u32 personality)
 {
     if (species == SPECIES_UNOWN)
     {
-        enum Species species = GetUnownLetterByPersonality(personality) + UNOWN_OFFSET;
+        u32 species = GetUnownLetterByPersonality(personality) + UNOWN_OFFSET;
         return species;
     }
 
     return species;
 }
 
-enum Species MailSpeciesToSpecies(u16 mailSpecies, u16 *buffer)
+u16 MailSpeciesToSpecies(u16 mailSpecies, u16 *buffer)
 {
     u16 result;
 
@@ -110,6 +110,7 @@ enum Species MailSpeciesToSpecies(u16 mailSpecies, u16 *buffer)
 
 u8 GiveMailToMon(struct Pokemon *mon, struct Mail *mail)
 {
+    u8 heldItem[2];
     enum Item itemId = mail->itemId;
     u8 mailId = GiveMailToMonByItemId(mon, itemId);
 
@@ -117,7 +118,20 @@ u8 GiveMailToMon(struct Pokemon *mon, struct Mail *mail)
         return MAIL_NONE;
 
     gSaveBlock1Ptr->mail[mailId] = *mail;
+
+    SetMonData(mon, MON_DATA_MAIL, &mailId);
+
+    heldItem[0] = itemId;
+    heldItem[1] = itemId >> 8;
+
+    SetMonData(mon, MON_DATA_HELD_ITEM, heldItem);
+
     return mailId;
+}
+
+static bool32 UNUSED DummyMailFunc(void)
+{
+    return FALSE;
 }
 
 void TakeMailFromMon(struct Pokemon *mon)
@@ -137,6 +151,11 @@ void TakeMailFromMon(struct Pokemon *mon)
     }
 }
 
+void ClearMailItemId(u8 mailId)
+{
+    gSaveBlock1Ptr->mail[mailId].itemId = ITEM_NONE;
+}
+
 u8 SaveMailToPC(struct Mail *mail)
 {
     for (u32 i = PARTY_SIZE; i < MAIL_COUNT; i++)
@@ -153,7 +172,7 @@ u8 SaveMailToPC(struct Mail *mail)
 
 u8 TakeMailFromMonAndSave(struct Pokemon *mon)
 {
-    enum Item heldItem;
+    u32 heldItem;
     u32 mailId, newMailId;
 
     mailId = GetMonData(mon, MON_DATA_MAIL);

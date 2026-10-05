@@ -69,6 +69,12 @@ struct CableCar
 };
 
 static EWRAM_DATA struct CableCar *sCableCar = NULL;
+static EWRAM_DATA u8 sGroundX_Up = 0;
+static EWRAM_DATA u8 sGroundY_Up = 0;
+static EWRAM_DATA u8 sGroundSegmentY_Up = 0;
+static EWRAM_DATA u8 sGroundX_Down = 0;
+static EWRAM_DATA u8 sGroundY_Down = 0;
+static EWRAM_DATA u8 sGroundSegmentY_Down = 0;
 
 static void CB2_LoadCableCar(void);
 static void SetBgRegs(bool8);
@@ -227,6 +233,7 @@ void CableCar(void)
 
 static void CB2_LoadCableCar(void)
 {
+    u16 imebak;
     u8 i = 0;
     u32 sizeOut = 0;
 
@@ -331,7 +338,10 @@ static void CB2_LoadCableCar(void)
         gMain.state++;
         break;
     case 9:
-        IntrEnable(INTR_FLAG_VBLANK);
+        imebak = REG_IME;
+        REG_IME = 0;
+        REG_IE |= INTR_FLAG_VBLANK;
+        REG_IME = imebak;
         SetVBlankCallback(VBlankCB_CableCar);
         SetMainCallback2(CB2_CableCar);
         CreateTask(Task_CableCar, 0);
@@ -772,8 +782,8 @@ static void CreateCableCarSprites(void)
     u8 i;
 
     u16 playerGraphicsIds[2] = {
-        [MALE]   = OBJ_EVENT_GFX_RIVAL_BRENDAN_NORMAL,
-        [FEMALE] = OBJ_EVENT_GFX_RIVAL_MAY_NORMAL
+        [MALE]   = PLAYER_AVATAR_GFX_MALE_NORMAL,
+        [FEMALE] = PLAYER_AVATAR_GFX_FEMALE_NORMAL
     };
     u16 rval = Random();
     u16 hikerGraphicsIds[4] = {
@@ -955,67 +965,61 @@ static void AnimateGroundGoingDown(void)
 static void DrawNextGroundSegmentGoingUp(void)
 {
     u8 i = 0;
-    u8 groundX_Up = 0;
-    u8 groundY_Up = 0;
-    u8 groundSegmentY_Up = 0;
 
     sCableCar->groundXOffset = sCableCar->groundYOffset = 0;
     sCableCar->groundXBase = sCableCar->bg0HorizontalOffset;
     sCableCar->groundYBase = sCableCar->bg0VerticalOffset;
     sCableCar->groundSegmentXStart = (sCableCar->groundSegmentXStart + 30) % 32;
     sCableCar->groundTileIdx -= 2;
-    groundSegmentY_Up = (sCableCar->groundSegmentYStart + 23) % 32;
+    sGroundSegmentY_Up = (sCableCar->groundSegmentYStart + 23) % 32;
 
     // Draw next segment
     for (i = 0; i < ARRAY_COUNT(sCableCar->groundTileBuffer); i++)
     {
-        groundX_Up = sCableCar->groundSegmentXStart;
-        groundY_Up = (groundSegmentY_Up + i) % 32;
-        FillBgTilemapBufferRect(0, sCableCar->groundTileBuffer[i][sCableCar->groundTileIdx], groundX_Up, groundY_Up, 1, 1, 17);
-        groundX_Up = (groundX_Up + 1) % 32;
-        FillBgTilemapBufferRect(0, sCableCar->groundTileBuffer[i][sCableCar->groundTileIdx + 1], groundX_Up, groundY_Up, 1, 1, 17);
+        sGroundX_Up = sCableCar->groundSegmentXStart;
+        sGroundY_Up = (sGroundSegmentY_Up + i) % 32;
+        FillBgTilemapBufferRect(0, sCableCar->groundTileBuffer[i][sCableCar->groundTileIdx], sGroundX_Up, sGroundY_Up, 1, 1, 17);
+        sGroundX_Up = (sGroundX_Up + 1) % 32;
+        FillBgTilemapBufferRect(0, sCableCar->groundTileBuffer[i][sCableCar->groundTileIdx + 1], sGroundX_Up, sGroundY_Up, 1, 1, 17);
     }
 
     // Erase old segment
-    groundX_Up = (sCableCar->groundSegmentXStart + 30) % 32;
-    FillBgTilemapBufferRect(0, 0, groundX_Up, 0, 2, 32, 17);
+    sGroundX_Up = (sCableCar->groundSegmentXStart + 30) % 32;
+    FillBgTilemapBufferRect(0, 0, sGroundX_Up, 0, 2, 32, 17);
     if (sCableCar->groundTileIdx == 0)
     {
         sCableCar->groundSegmentYStart = (sCableCar->groundSegmentYStart + 29) % 32;
         sCableCar->groundTileIdx = 12;
         BufferNextGroundSegment();
-        groundX_Up = (sCableCar->groundSegmentYStart + 1) % 32;
-        FillBgTilemapBufferRect(0, 0, 0, groundX_Up, 32, 9, 17);
+        sGroundX_Up = (sCableCar->groundSegmentYStart + 1) % 32;
+        FillBgTilemapBufferRect(0, 0, 0, sGroundX_Up, 32, 9, 17);
     }
 }
 
 static void DrawNextGroundSegmentGoingDown(void)
 {
     u8 i = 0;
-    u8 groundX_Down = 0;
-    u8 groundY_Down = 0;
-    u8 groundSegmentY_Down = 0;
 
     sCableCar->groundXOffset = sCableCar->groundYOffset = 0;
     sCableCar->groundXBase = sCableCar->bg0HorizontalOffset;
     sCableCar->groundYBase = sCableCar->bg0VerticalOffset;
     sCableCar->groundSegmentXStart = (sCableCar->groundSegmentXStart + 2) % 32;
     sCableCar->groundTileIdx += 2;
-    groundSegmentY_Down = sCableCar->groundSegmentYStart;
+    sGroundSegmentY_Down = sCableCar->groundSegmentYStart;
 
     // Draw next segment
     for (i = 0; i < ARRAY_COUNT(sCableCar->groundTileBuffer); i++)
     {
-        groundX_Down = sCableCar->groundSegmentXStart;
-        groundY_Down = (groundSegmentY_Down + i) % 32;
-        FillBgTilemapBufferRect(0, sCableCar->groundTileBuffer[i][sCableCar->groundTileIdx], groundX_Down, groundY_Down, 1, 1, 17);
-        groundX_Down = (groundX_Down + 1) % 32;
-        FillBgTilemapBufferRect(0, sCableCar->groundTileBuffer[i][sCableCar->groundTileIdx + 1], groundX_Down, groundY_Down, 1, 1, 17);
+        sGroundX_Down = sCableCar->groundSegmentXStart;
+        sGroundY_Down = (sGroundSegmentY_Down + i) % 32;
+        FillBgTilemapBufferRect(0, sCableCar->groundTileBuffer[i][sCableCar->groundTileIdx], sGroundX_Down, sGroundY_Down, 1, 1, 17);
+        sGroundX_Down = (sGroundX_Down + 1) % 32;
+        FillBgTilemapBufferRect(0, sCableCar->groundTileBuffer[i][sCableCar->groundTileIdx + 1], sGroundX_Down, sGroundY_Down, 1, 1, 17);
     }
 
     // Erase old segment
-    groundY_Down = (sCableCar->groundSegmentYStart + 23) % 32;
-    FillBgTilemapBufferRect(0, 0, sCableCar->groundSegmentXStart, groundY_Down, 2, 9, 17);
+    sGroundY_Down = (sCableCar->groundSegmentYStart + 23) % 32;
+    FillBgTilemapBufferRect(0, 0, sCableCar->groundSegmentXStart, sGroundY_Down, 2, 9, 17);
     if (sCableCar->groundTileIdx == 10)
     {
         sCableCar->groundSegmentYStart = (sCableCar->groundSegmentYStart + 3) % 32;

@@ -3,6 +3,7 @@
 #include "battle_pyramid_bag.h"
 #include "event_data.h"
 #include "frontier_util.h"
+#include "pokemon.h"
 #include "battle.h"
 #include "battle_setup.h"
 #include "battle_tower.h"
@@ -38,7 +39,6 @@
 #include "constants/layouts.h"
 #include "constants/metatile_labels.h"
 #include "constants/moves.h"
-#include "constants/species.h"
 #include "constants/trainers.h"
 
 #define NUM_LAYOUT_OFFSETS 8
@@ -47,10 +47,10 @@ extern const struct MapLayout *const gMapLayouts[];
 
 struct PyramidWildMon
 {
-    enum Species species;
+    u16 species;
     u8 lvl;
     u8 abilityNum;
-    enum Move moves[MAX_MON_MOVES];
+    u16 moves[MAX_MON_MOVES];
 };
 
 struct PyramidFloorTemplate
@@ -948,7 +948,9 @@ static void SavePyramidChallenge(void)
 
 static void SetBattlePyramidPrize(void)
 {
-    if (gSaveBlock2Ptr->frontier.pyramidWinStreaks[gSaveBlock2Ptr->frontier.lvlMode] > 41)
+    enum FrontierLevelMode lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
+
+    if (gSaveBlock2Ptr->frontier.pyramidWinStreaks[lvlMode] > 41)
         gSaveBlock2Ptr->frontier.pyramidPrize = sLongStreakRewardItems[Random() % ARRAY_COUNT(sLongStreakRewardItems)];
     else
         gSaveBlock2Ptr->frontier.pyramidPrize = sShortStreakRewardItems[Random() % ARRAY_COUNT(sShortStreakRewardItems)];
@@ -1025,19 +1027,20 @@ static void HidePyramidItem(void)
     struct ObjectEventTemplate *events = gSaveBlock1Ptr->objectEventTemplates;
     int i = 0;
 
-    do
+    for (;;)
     {
         if (events[i].localId == gSpecialVar_LastTalked)
         {
             // Rather than using event flags to hide the item object event,
             // it moves them far off the map bounds.
-            events[i].x = INT16_MAX;
-            events[i].y = INT16_MAX;
+            events[i].x = SHRT_MAX;
+            events[i].y = SHRT_MAX;
             break;
         }
         i++;
+        if (events[i].localId == LOCALID_NONE)
+            break;
     }
-    while (events[i].localId != LOCALID_NONE);
 }
 
 static void SetPyramidFacilityTrainers(void)
@@ -1077,7 +1080,11 @@ static void ShowPostBattleHintText(void)
         case HINT_REMAINING_ITEMS:
             for (i = 0; i < GetNumBattlePyramidObjectEvents(); i++)
             {
+#if IS_HNS
+                if (events[i].graphicsId == OBJ_EVENT_GFX_ITEM_BALL_HNS && events[i].x != SHRT_MAX && events[i].y != SHRT_MAX)
+#else
                 if (events[i].graphicsId == OBJ_EVENT_GFX_ITEM_BALL && events[i].x != SHRT_MAX && events[i].y != SHRT_MAX)
+#endif
                     textIndex++;
             }
             i = 1;
@@ -1132,6 +1139,15 @@ static void GetCurrentBattlePyramidLocation(void)
 
 static void UpdatePyramidLightRadius(void)
 {
+    s32 j;
+
+    if (gSaveBlock2Ptr->frontier.lvlMode == FRONTIER_LVL_50)
+    {
+        FlagSet(FLAG_LIMIT_TO_50);
+        for (j = 0; j < PARTY_SIZE; j++)
+            CalculateMonStats(&gPlayerParty[j]);
+    }
+
     switch (gSpecialVar_0x8006)
     {
     case PYRAMID_LIGHT_SET_RADIUS:
@@ -1180,12 +1196,16 @@ static void ClearPyramidPartyHeldItems(void)
     int i, j;
     enum Item item = ITEM_NONE;
 
+    FlagClear(FLAG_LIMIT_TO_50);
+    for (i = 0; i < PARTY_SIZE; i++)
+        CalculateMonStats(&gPlayerParty[i]);
+
     for (i = 0; i < PARTY_SIZE; i++)
     {
         for (j = 0; j < MAX_FRONTIER_PARTY_SIZE; j++)
         {
             if (gSaveBlock2Ptr->frontier.selectedPartyMons[j] != 0 && gSaveBlock2Ptr->frontier.selectedPartyMons[j] - 1 == i)
-                SetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_HELD_ITEM, &item);
+                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
         }
     }
 }
@@ -1219,19 +1239,19 @@ static void RestorePyramidPlayerParty(void)
         int partyIndex = gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1;
         for (j = 0; j < FRONTIER_PARTY_SIZE; j++)
         {
-            if (GetMonData(GetSavedPlayerPartyMon(partyIndex), MON_DATA_SPECIES) == GetMonData(&gParties[B_TRAINER_PLAYER][j], MON_DATA_SPECIES))
+            if (GetMonData(GetSavedPlayerPartyMon(partyIndex), MON_DATA_SPECIES) == GetMonData(&gPlayerParty[j], MON_DATA_SPECIES))
             {
                 for (k = 0; k < MAX_MON_MOVES; k++)
                 {
                     for (l = 0; l < MAX_MON_MOVES; l++)
                     {
-                        if (GetMonData(GetSavedPlayerPartyMon(partyIndex), MON_DATA_MOVE1 + l) == GetMonData(&gParties[B_TRAINER_PLAYER][j], MON_DATA_MOVE1 + k))
+                        if (GetMonData(GetSavedPlayerPartyMon(partyIndex), MON_DATA_MOVE1 + l) == GetMonData(&gPlayerParty[j], MON_DATA_MOVE1 + k))
                             break;
                     }
                     if (l == MAX_MON_MOVES)
-                        SetMonMoveSlot(&gParties[B_TRAINER_PLAYER][j], MOVE_SKETCH, k);
+                        SetMonMoveSlot(&gPlayerParty[j], MOVE_SKETCH, k);
                 }
-                SavePlayerPartyMon(partyIndex, &gParties[B_TRAINER_PLAYER][j]);
+                SavePlayerPartyMon(partyIndex, &gPlayerParty[j]);
                 gSelectedOrderFromParty[j] = partyIndex + 1;
                 break;
             }
@@ -1247,16 +1267,16 @@ static u8 GetPostBattleDirectionHintTextIndex(int *hintType, u8 minDistanceForEx
     int x, y;
     u8 textIndex = 0;
     u16 *map = gBackupMapLayout.map;
-    map += gBackupMapLayout.width * MAP_OFFSET + MAP_OFFSET;
+    map += gBackupMapLayout.width * 7 + MAP_OFFSET;
 
-    for (y = 0; y < 32; y++)
+    for (y = 0; y < 32; map += 47, y++)
     {
         for (x = 0; x < 32; x++)
         {
             if ((map[x] & MAPGRID_METATILE_ID_MASK) == METATILE_BattlePyramid_Exit)
             {
-                x -= gObjectEvents[gSelectedObjectEvent].initialCoords.x - MAP_OFFSET;
-                y -= gObjectEvents[gSelectedObjectEvent].initialCoords.y - MAP_OFFSET;
+                x += MAP_OFFSET - gObjectEvents[gSelectedObjectEvent].initialCoords.x;
+                y += MAP_OFFSET - gObjectEvents[gSelectedObjectEvent].initialCoords.y;
                 if (x >= minDistanceForExitHint
                  || x <= -minDistanceForExitHint
                  || y >= minDistanceForExitHint
@@ -1300,10 +1320,7 @@ static u8 GetPostBattleDirectionHintTextIndex(int *hintType, u8 minDistanceForEx
                     }
                     else
                     {
-                        if (x + y >= 0)
-                            textIndex = 2;
-                        else
-                            textIndex = 0;
+                        textIndex = (~(x + y) >= 0) ? 0 : 2;
                     }
                     *hintType = HINT_EXIT_DIRECTION;
                 }
@@ -1314,7 +1331,6 @@ static u8 GetPostBattleDirectionHintTextIndex(int *hintType, u8 minDistanceForEx
                 return textIndex;
             }
         }
-        map += MAP_OFFSET_W + 32; // HINT: x == 32.
     }
 
     return textIndex;
@@ -1359,7 +1375,7 @@ static void MarkPyramidTrainerAsBattled(u16 trainerId)
 #if BATTLE_PYRAMID_RANDOM_ENCOUNTERS == TRUE
 // check if given species evolved from a specific evolutionary stone
 // if nItems is passed as 0, it will check for any EVO_ITEM case
-static bool32 CheckBattlePyramidEvoRequirement(enum Species species, const u16 *evoItems, u8 nItems)
+static bool32 CheckBattlePyramidEvoRequirement(u16 species, const u16 *evoItems, u8 nItems)
 {
     u32 i, j, k;
     for (i = 0; i < NUM_SPECIES; i++)
@@ -1395,8 +1411,8 @@ static bool32 CheckBattlePyramidEvoRequirement(enum Species species, const u16 *
     return FALSE;
 }
 
-extern u32 GetTotalBaseStat(enum Species species);
-void GenerateBattlePyramidWildMon(enum Species forceSpecies)
+extern u32 GetTotalBaseStat(u32 species);
+void GenerateBattlePyramidWildMon(void)
 {
     u8 name[POKEMON_NAME_LENGTH + 1];
     int i, j;
@@ -1404,7 +1420,7 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     u32 lvl = gSaveBlock2Ptr->frontier.lvlMode;
     u16 round = (gSaveBlock2Ptr->frontier.pyramidWinStreaks[lvl] / 7) % TOTAL_PYRAMID_ROUNDS;
     const struct BattlePyramidRequirement *reqs = &sBattlePyramidRequirementsByRound[round];
-    enum Species species = forceSpecies;
+    u16 species;
     u32 bstLim;
     u16 *moves = NULL;
     u16 *abilities = NULL;
@@ -1419,13 +1435,15 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     if (round >= TOTAL_PYRAMID_ROUNDS)
         round = TOTAL_PYRAMID_ROUNDS - 1;
 
-    id = GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES) - 1;   // index in table (0-11) -> higher index is lower probability
+    id = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES) - 1;   // index in table (0-11) -> higher index is lower probability
     bstLim = 450 + (25*round) + (5*id);                             // higher BST limit for 'rarer' wild mon rolls
 
     while (1)
     {
-        if (!forceSpecies)
-            species = Random() % NUM_SPECIES;
+        species = Random() % NUM_SPECIES;
+
+        if (!IsSpeciesEnabled(species))
+            continue;
 
         // check if base species
         if (GET_BASE_SPECIES_ID(species) != species)
@@ -1485,9 +1503,9 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     }
 
     // Set species, name
-    SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES, &species);
+    SetMonData(&gEnemyParty[0], MON_DATA_SPECIES, &species);
     StringCopy(name, GetSpeciesName(species));
-    SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_NICKNAME, &name);
+    SetMonData(&gEnemyParty[0], MON_DATA_NICKNAME, &name);
 
     // set level
     if (lvl != FRONTIER_LVL_50)
@@ -1499,12 +1517,12 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     {
         lvl = 50 - (5 + (Random() % (TOTAL_PYRAMID_ROUNDS - round)/4));
     }
-    SetMonData(&gParties[B_TRAINER_OPPONENT_A][0],
+    SetMonData(&gEnemyParty[0],
                MON_DATA_EXP,
                &gExperienceTables[gSpeciesInfo[species].growthRate][lvl]);
 
     // Give initial moves and replace one with desired move
-    GiveBoxMonInitialMoveset(&gParties[B_TRAINER_OPPONENT_A][0].box);
+    GiveBoxMonInitialMoveset(&gEnemyParty[0].box);
     if (moves != NULL)
     {
         // get a random move to give
@@ -1512,10 +1530,10 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
         while (1)
         {
             id = moves[Random() % moveCount];
-            if (!MonKnowsMove(&gParties[B_TRAINER_OPPONENT_A][0], id))
+            if (!MonKnowsMove(&gEnemyParty[0], id))
             {
                 // replace random move
-                SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_MOVE1 + Random() % MAX_MON_MOVES, &id);
+                SetMonData(&gEnemyParty[0], MON_DATA_MOVE1 + Random() % MAX_MON_MOVES, &id);
                 break;
             }
             i++;
@@ -1528,13 +1546,13 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     // Initialize a random ability num
     if (GetSpeciesAbility(species, 1))
     {
-        i = GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_PERSONALITY) % 2;
-        SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_ABILITY_NUM, &i);
+        i = GetMonData(&gEnemyParty[0], MON_DATA_PERSONALITY) % 2;
+        SetMonData(&gEnemyParty[0], MON_DATA_ABILITY_NUM, &i);
     }
     else
     {
         i = 0;
-        SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_ABILITY_NUM, &i);
+        SetMonData(&gEnemyParty[0], MON_DATA_ABILITY_NUM, &i);
     }
 
     // Try to replace with desired ability
@@ -1549,7 +1567,7 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
                 if (id == GetSpeciesAbility(species, j))
                 {
                     // Set this ability num
-                    SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_ABILITY_NUM, &id);
+                    SetMonData(&gEnemyParty[0], MON_DATA_ABILITY_NUM, &id);
                     break;
                 }
             }
@@ -1563,13 +1581,13 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     {
         id = (Random() % 17) + 15;
         for (i = 0; i < NUM_STATS; i++)
-            SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_HP_IV + i, &id);
+            SetMonData(&gEnemyParty[0], MON_DATA_HP_IV + i, &id);
     }
 
-    CalculateMonStats(&gParties[B_TRAINER_OPPONENT_A][0]);
+    CalculateMonStats(&gEnemyParty[0]);
 }
 #else
-void GenerateBattlePyramidWildMon(enum Species forceSpecies)
+void GenerateBattlePyramidWildMon(void)
 {
     u8 name[POKEMON_NAME_LENGTH + 1];
     int i;
@@ -1586,10 +1604,10 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     else
         wildMons = sLevel50WildMonPointers[round];
 
-    id = GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES) - 1;
-    SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES, &wildMons[id].species);
+    id = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES) - 1;
+    SetMonData(&gEnemyParty[0], MON_DATA_SPECIES, &wildMons[id].species);
     StringCopy(name, GetSpeciesName(wildMons[id].species));
-    SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_NICKNAME, &name);
+    SetMonData(&gEnemyParty[0], MON_DATA_NICKNAME, &name);
     if (lvl != FRONTIER_LVL_50)
     {
         lvl = SetFacilityPtrsGetLevel();
@@ -1600,7 +1618,7 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     {
         lvl = wildMons[id].lvl - 5 + ((Random() % 11));
     }
-    SetMonData(&gParties[B_TRAINER_OPPONENT_A][0],
+    SetMonData(&gEnemyParty[0],
                MON_DATA_EXP,
                &gExperienceTables[gSpeciesInfo[wildMons[id].species].growthRate][lvl]);
 
@@ -1608,25 +1626,25 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     {
     case 0:
     case 1:
-        SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_ABILITY_NUM, &wildMons[id].abilityNum);
+        SetMonData(&gEnemyParty[0], MON_DATA_ABILITY_NUM, &wildMons[id].abilityNum);
         break;
     case ABILITY_RANDOM:
     default:
         if (GetSpeciesAbility(wildMons[id].species, 1))
         {
-            i = GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_PERSONALITY) % 2;
-            SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_ABILITY_NUM, &i);
+            i = GetMonData(&gEnemyParty[0], MON_DATA_PERSONALITY) % 2;
+            SetMonData(&gEnemyParty[0], MON_DATA_ABILITY_NUM, &i);
         }
         else
         {
             i = 0;
-            SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_ABILITY_NUM, &i);
+            SetMonData(&gEnemyParty[0], MON_DATA_ABILITY_NUM, &i);
         }
         break;
     }
 
     for (i = 0; i < MAX_MON_MOVES; i++)
-        SetMonMoveSlot(&gParties[B_TRAINER_OPPONENT_A][0], wildMons[id].moves[i], i);
+        SetMonMoveSlot(&gEnemyParty[0], wildMons[id].moves[i], i);
 
     // UB: Reading outside the array as lvl was used for mon level instead of frontier lvl mode.
     #ifndef UBFIX
@@ -1637,9 +1655,9 @@ void GenerateBattlePyramidWildMon(enum Species forceSpecies)
     {
         id = (Random() % 17) + 15;
         for (i = 0; i < NUM_STATS; i++)
-            SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_HP_IV + i, &id);
+            SetMonData(&gEnemyParty[0], MON_DATA_HP_IV + i, &id);
     }
-    CalculateMonStats(&gParties[B_TRAINER_OPPONENT_A][0]);
+    CalculateMonStats(&gEnemyParty[0]);
 }
 #endif
 
@@ -1651,18 +1669,18 @@ u8 GetPyramidRunMultiplier(void)
 
 u8 CurrentBattlePyramidLocation(void)
 {
-    if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)
+    if ((gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR_HNS))
         return PYRAMID_LOCATION_FLOOR;
-    else if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP)
+    else if ((gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP_HNS))
         return PYRAMID_LOCATION_TOP;
     else
         return PYRAMID_LOCATION_NONE;
 }
 
-bool8 InBattlePyramid(void)
+bool8 InBattlePyramid_(void)
 {
-    return gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR
-        || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP;
+    return (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR_HNS)
+        || (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP_HNS);
 }
 
 void PausePyramidChallenge(void)
@@ -1687,6 +1705,16 @@ void CopyPyramidTrainerSpeechBefore(u16 trainerId)
     FrontierSpeechToString(gFacilityTrainers[trainerId].speechBefore);
 }
 
+void CopyPyramidTrainerWinSpeech(u16 trainerId)
+{
+    FrontierSpeechToString(gFacilityTrainers[trainerId].speechWin);
+}
+
+void CopyPyramidTrainerLoseSpeech(u16 trainerId)
+{
+    FrontierSpeechToString(gFacilityTrainers[trainerId].speechLose);
+}
+
 u8 GetTrainerEncounterMusicIdInBattlePyramid(u16 trainerId)
 {
     int i;
@@ -1701,7 +1729,11 @@ u8 GetTrainerEncounterMusicIdInBattlePyramid(u16 trainerId)
 
 static void UNUSED BattlePyramidRetireChallenge(void)
 {
+#if IS_HNS
+    ScriptContext_SetupScript(BattlePyramid_Retire_hns);
+#else
     ScriptContext_SetupScript(BattlePyramid_Retire);
+#endif
 }
 
 static u16 GetUniqueTrainerId(u8 objectEventId)
@@ -1751,15 +1783,21 @@ void GenerateBattlePyramidFloorLayout(u16 *backupMapData, bool8 setPlayerPositio
     for (i = 0; i < NUM_PYRAMID_FLOOR_SQUARES; i++)
     {
         u16 *map;
+        int yOffset, xOffset;
+    #if IS_HNS
+        const struct MapLayout *mapLayout = gMapLayouts[floorLayoutOffsets[i] + LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR_HNS];
+    #else
         const struct MapLayout *mapLayout = gMapLayouts[floorLayoutOffsets[i] + LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR];
+    #endif
         const u16 *layoutMap = mapLayout->map;
 
         gBackupMapLayout.map = backupMapData;
         gBackupMapLayout.width = mapLayout->width * PYRAMID_FLOOR_SQUARES_WIDE + MAP_OFFSET_W;
         gBackupMapLayout.height = mapLayout->height * PYRAMID_FLOOR_SQUARES_HIGH + MAP_OFFSET_H;
-        map = gBackupMapLayout.map;
-        map += gBackupMapLayout.width * (MAP_OFFSET + (i / PYRAMID_FLOOR_SQUARES_WIDE * mapLayout->height))
-            +  MAP_OFFSET + (i % PYRAMID_FLOOR_SQUARES_WIDE * mapLayout->width);
+        map = backupMapData;
+        yOffset = ((i / PYRAMID_FLOOR_SQUARES_WIDE * mapLayout->height) + MAP_OFFSET) * gBackupMapLayout.width;
+        xOffset = (i % PYRAMID_FLOOR_SQUARES_WIDE * mapLayout->width) + MAP_OFFSET;
+        map += yOffset + xOffset;
         for (y = 0; y < mapLayout->height; y++)
         {
             for (x = 0; x < mapLayout->width; x++)
@@ -1844,10 +1882,17 @@ void LoadBattlePyramidFloorObjectEventScripts(void)
 
     for (i = 0; i < OBJECT_EVENT_TEMPLATES_COUNT; i++)
     {
+#if IS_HNS
+        if (events[i].graphicsId != OBJ_EVENT_GFX_ITEM_BALL_HNS)
+            events[i].script = BattlePyramid_TrainerBattle_hns;
+        else
+            events[i].script = BattlePyramid_FindItemBall_hns;
+#else
         if (events[i].graphicsId != OBJ_EVENT_GFX_ITEM_BALL)
             events[i].script = BattlePyramid_TrainerBattle;
         else
             events[i].script = BattlePyramid_FindItemBall;
+#endif
     }
 }
 
@@ -2076,17 +2121,29 @@ static bool8 TrySetPyramidObjectEventPositionAtCoords(u8 objType, u8 x, u8 y, u8
     const struct MapHeader *mapHeader;
     struct ObjectEventTemplate *floorEvents = gSaveBlock1Ptr->objectEventTemplates;
 
+#if IS_HNS
+    mapHeader = Overworld_GetMapHeaderByGroupAndId(MAP_GROUP(MAP_BATTLE_PYRAMID_SQUARE01_HNS), floorLayoutOffsets[squareId] + MAP_NUM(MAP_BATTLE_PYRAMID_SQUARE01_HNS));
+#else
     mapHeader = Overworld_GetMapHeaderByGroupAndId(MAP_GROUP(MAP_BATTLE_PYRAMID_SQUARE01), floorLayoutOffsets[squareId] + MAP_NUM(MAP_BATTLE_PYRAMID_SQUARE01));
+#endif
     for (i = 0; i < mapHeader->events->objectEventCount; i++)
     {
         if (mapHeader->events->objectEvents[i].x != x || mapHeader->events->objectEvents[i].y != y)
             continue;
 
+#if IS_HNS
+        if (objType != OBJ_TRAINERS || mapHeader->events->objectEvents[i].graphicsId == OBJ_EVENT_GFX_ITEM_BALL_HNS)
+        {
+            if (objType != OBJ_ITEMS || mapHeader->events->objectEvents[i].graphicsId != OBJ_EVENT_GFX_ITEM_BALL_HNS)
+                continue;
+        }
+#else
         if (objType != OBJ_TRAINERS || mapHeader->events->objectEvents[i].graphicsId == OBJ_EVENT_GFX_ITEM_BALL)
         {
             if (objType != OBJ_ITEMS || mapHeader->events->objectEvents[i].graphicsId != OBJ_EVENT_GFX_ITEM_BALL)
                 continue;
         }
+#endif
 
         // Ensure an object wasn't previously placed in the exact same position.
         for (j = 0; j < objectEventId; j++)
@@ -2101,7 +2158,11 @@ static bool8 TrySetPyramidObjectEventPositionAtCoords(u8 objType, u8 x, u8 y, u8
             floorEvents[objectEventId].x += (squareId % 4) * 8;
             floorEvents[objectEventId].y += (squareId / 4) * 8;
             floorEvents[objectEventId].localId = objectEventId + 1;
+#if IS_HNS
+            if (floorEvents[objectEventId].graphicsId != OBJ_EVENT_GFX_ITEM_BALL_HNS)
+#else
             if (floorEvents[objectEventId].graphicsId != OBJ_EVENT_GFX_ITEM_BALL)
+#endif
             {
                 i = GetUniqueTrainerId(objectEventId);
                 floorEvents[objectEventId].graphicsId = GetBattleFacilityTrainerGfxId(i);
@@ -2199,8 +2260,4 @@ u16 GetBattlePyramidPickupItemId(void)
         return sPickupItemsLvlOpen[round][i];
     else
         return sPickupItemsLvl50[round][i];
-}
-
-const u8 *GetBattlePyramidTrainerScript() {
-    return BattlePyramid_TrainerBattle;
 }

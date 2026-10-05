@@ -4,7 +4,6 @@
 #include "event_data.h"
 #include "wonder_news.h"
 #include "constants/items.h"
-#include "item.h"
 
 // Every 4th reward for sending Wonder News to a link partner is a "big" reward.
 #define MAX_SENT_REWARD 4
@@ -13,7 +12,7 @@
 // must take 500 steps before any more rewards can be received.
 #define MAX_REWARD 5
 
-static enum Item GetRewardItem(struct WonderNewsMetadata *);
+static u32 GetRewardItem(struct WonderNewsMetadata *);
 static u32 GetRewardType(struct WonderNewsMetadata *);
 static void IncrementRewardCounter(struct WonderNewsMetadata *);
 static void IncrementSentRewardCounter(struct WonderNewsMetadata *);
@@ -31,11 +30,11 @@ void WonderNews_SetReward(u32 newsType)
     case WONDER_NEWS_RECV_FRIEND:
     case WONDER_NEWS_RECV_WIRELESS:
         // Random berry between ITEM_RAZZ_BERRY and ITEM_NOMEL_BERRY
-        data->berry = RandomUniform(RNG_RANDOM_BERRY, BERRY_ID_RAZZ, BERRY_ID_NOMEL);
+        data->berry = (Random() % 15) + ITEM_TO_BERRY(ITEM_RAZZ_BERRY);
         break;
     case WONDER_NEWS_SENT:
         // Random berry between ITEM_CHERI_BERRY and ITEM_IAPAPA_BERRY
-        data->berry = RandomUniform(RNG_RANDOM_BERRY, BERRY_ID_CHERI, BERRY_ID_IAPAPA);
+        data->berry = (Random() % 15) + ITEM_TO_BERRY(ITEM_CHERI_BERRY);
         break;
     }
 }
@@ -49,6 +48,22 @@ void WonderNews_Reset(void)
     data->rewardCounter = 0;
     data->berry = 0;
     VarSet(VAR_WONDER_NEWS_STEP_COUNTER, 0);
+}
+
+// Only used in FRLG
+void WonderNews_IncrementStepCounter(void)
+{
+    u16 *stepCounter = GetVarPointer(VAR_WONDER_NEWS_STEP_COUNTER);
+    struct WonderNewsMetadata *data = GetSavedWonderNewsMetadata();
+
+    // If the player has reached the reward limit, start counting steps.
+    // When they reach 500 steps reset the reward counter to allow them to
+    // receive rewards again.
+    if (data->rewardCounter >= MAX_REWARD && ++(*stepCounter) >= 500)
+    {
+        data->rewardCounter = 0;
+        *stepCounter = 0;
+    }
 }
 
 // Only used in FRLG
@@ -87,11 +102,11 @@ u16 WonderNews_GetRewardInfo(void)
     return rewardType;
 }
 
-static enum Item GetRewardItem(struct WonderNewsMetadata *data)
+static u32 GetRewardItem(struct WonderNewsMetadata *data)
 {
     enum Item itemId;
     data->newsType = WONDER_NEWS_NONE;
-    itemId = BerryTypeToItemId(data->berry);
+    itemId = data->berry + FIRST_BERRY_INDEX - 1;
     data->berry = 0;
     IncrementRewardCounter(data);
     return itemId;

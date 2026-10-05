@@ -17,12 +17,11 @@ struct FieldInput
     bool8 input_field_1_3:1;
     bool8 input_field_1_4:1;
     bool8 input_field_1_5:1;
-    bool8 input_field_1_6:1;
-    bool8 input_field_1_7:1;
+    bool8 tappedSelectButton:1;
+    bool8 heldSelectButton:1;
     u8 dpadDirection;
 };
 
-void GetPlayerPosition(struct MapPosition *);
 void FieldClearPlayerInput(struct FieldInput *pStruct);
 void FieldGetPlayerInput(struct FieldInput *pStruct, u16 keys, u16 heldKeys);
 int ProcessPlayerFieldInput(struct FieldInput *pStruct);
@@ -37,7 +36,6 @@ void ClearPoisonStepCounter(void);
 void CancelSignPostMessageBox(struct FieldInput *input);
 void HandleBoulderFallThroughHole(struct ObjectEvent *object);
 void HandleBoulderActivateVictoryRoadSwitch(u16 x, u16 y);
-bool8 TryStartStepBasedScript(struct MapPosition *, u16, enum Direction);
 
 #define NOT_SIGNPOST 0
 #define WALK_AWAY_SIGNPOST_FRAMES 6

@@ -1,9 +1,9 @@
 {
   "id": "MAP_MAGMA_HIDEOUT_4F",
   "name": "MagmaHideout_4F",
+  "game_version": "emerald",
   "layout": "LAYOUT_MAGMA_HIDEOUT_4F",
   "music": "MUS_AQUA_MAGMA_HIDEOUT",
-  "region": "REGION_HOENN",
   "region_map_section": "MAPSEC_MAGMA_HIDEOUT",
   "requires_flash": false,
   "weather": "WEATHER_NONE",

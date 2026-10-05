@@ -16,6 +16,7 @@
 #include "scanline_effect.h"
 #include "constants/songs.h"
 #include "constants/rgb.h"
+#include "event_data.h"
 
 #define GFXTAG_BLUE_LIGHT 1
 #define GFXTAG_OPTIONS    3
@@ -99,14 +100,26 @@ static void InitMenuOptionGlow(void);
 static void Task_CurrentMenuOptionGlow(u8);
 static void SetMenuOptionGlow(void);
 
-static const u16 sPokenavBgDotsPal[] = INCGFX_U16("graphics/pokenav/bg_dots.png", ".gbapal");
-static const u32 sPokenavBgDotsTiles[] = INCGFX_U32("graphics/pokenav/bg_dots.png", ".4bpp.smol");
-static const u32 sPokenavBgDotsTilemap[] = INCGFX_U32("graphics/pokenav/bg_dots.bin", ".smolTM");
-static const u16 sPokenavDeviceBgPal[] = INCGFX_U16("graphics/pokenav/device_outline.png", ".gbapal");
-static const u32 sPokenavDeviceBgTiles[] = INCGFX_U32("graphics/pokenav/device_outline.png", ".4bpp.smol", "-num_tiles 53 -Wnum_tiles");
-static const u32 sPokenavDeviceBgTilemap[] = INCGFX_U32("graphics/pokenav/device_outline_map.bin", ".smolTM");
-static const u16 sMatchCallBlueLightPal[] = INCGFX_U16("graphics/pokenav/blue_light.png", ".gbapal");
-static const u32 sMatchCallBlueLightTiles[] = INCGFX_U32("graphics/pokenav/blue_light.png", ".4bpp.smol");
+#if IS_HNS
+static const u16 sPokenavBgDotsPal[] = INCBIN_U16("graphics/pokenav/hns/bg_dots.gbapal");
+static const u32 sPokenavBgDotsTiles[] = INCBIN_U32("graphics/pokenav/hns/bg_dots.4bpp.smol");
+static const u32 sPokenavBgDotsTilemap[] = INCBIN_U32("graphics/pokenav/hns/bg_dots.bin.smolTM");
+#else
+static const u16 sPokenavBgDotsPal[] = INCBIN_U16("graphics/pokenav/bg_dots.gbapal");
+static const u32 sPokenavBgDotsTiles[] = INCBIN_U32("graphics/pokenav/bg_dots.4bpp.smol");
+static const u32 sPokenavBgDotsTilemap[] = INCBIN_U32("graphics/pokenav/bg_dots.bin.smolTM");
+#endif
+#if IS_HNS
+static const u16 sPokenavDeviceBgPal[] = INCBIN_U16("graphics/pokenav/hns/device_outline.gbapal");
+static const u32 sPokenavDeviceBgTiles[] = INCBIN_U32("graphics/pokenav/hns/device_outline.4bpp.smol");
+static const u32 sPokenavDeviceBgTilemap[] = INCBIN_U32("graphics/pokenav/hns/device_outline_map.bin.smolTM");
+#else
+static const u16 sPokenavDeviceBgPal[] = INCBIN_U16("graphics/pokenav/device_outline.gbapal");
+static const u32 sPokenavDeviceBgTiles[] = INCBIN_U32("graphics/pokenav/device_outline.4bpp.smol");
+static const u32 sPokenavDeviceBgTilemap[] = INCBIN_U32("graphics/pokenav/device_outline_map.bin.smolTM");
+#endif
+static const u16 sMatchCallBlueLightPal[] = INCBIN_U16("graphics/pokenav/blue_light.gbapal");
+static const u32 sMatchCallBlueLightTiles[] = INCBIN_U32("graphics/pokenav/blue_light.4bpp.smol");
 
 static const u8 gText_NoRibbonWinners[] = _("There are no RIBBON winners.");
 
@@ -155,7 +168,11 @@ static const struct CompressedSpriteSheet sPokenavOptionsSpriteSheets[] =
 {
     {
         .data = gPokenavOptions_Gfx,
+#if IS_HNS
+        .size = 0x3800,
+#else
         .size = 0x3400,
+#endif
         .tag = GFXTAG_OPTIONS
     },
     {
@@ -190,6 +207,9 @@ static const u16 sOptionsLabelGfx_Cute[]      = {0x120, PALTAG_OPTIONS_PINK - PA
 static const u16 sOptionsLabelGfx_Smart[]     = {0x140, PALTAG_OPTIONS_DEFAULT - PALTAG_OPTIONS_START};
 static const u16 sOptionsLabelGfx_Tough[]     = {0x160, PALTAG_OPTIONS_DEFAULT - PALTAG_OPTIONS_START};
 static const u16 sOptionsLabelGfx_Cancel[]    = {0x180, PALTAG_OPTIONS_BEIGE - PALTAG_OPTIONS_START};
+#if IS_HNS
+static const u16 sOptionsLabelGfx_Radio[]     = {0x1A0, PALTAG_OPTIONS_DEFAULT - PALTAG_OPTIONS_START};
+#endif
 
 struct
 {
@@ -231,6 +251,52 @@ struct
             sOptionsLabelGfx_SwitchOff
         }
     },
+#if IS_HNS
+    [POKENAV_MENU_TYPE_UNLOCK_MC_RADIO] =
+    {
+        .yStart = 42,
+        .deltaY = 20,
+        .gfx = {
+            sOptionsLabelGfx_RegionMap,
+            sOptionsLabelGfx_Condition,
+            sOptionsLabelGfx_MatchCall,
+            sOptionsLabelGfx_Radio,
+            sOptionsLabelGfx_SwitchOff
+        }
+    },
+    [POKENAV_MENU_TYPE_UNLOCK_MC_RIBBONS_RADIO] =
+    {
+        .yStart = 40,
+        .deltaY = 16,
+        .gfx = {
+            sOptionsLabelGfx_RegionMap,
+            sOptionsLabelGfx_Condition,
+            sOptionsLabelGfx_MatchCall,
+            sOptionsLabelGfx_Radio,
+            sOptionsLabelGfx_Ribbons,
+            sOptionsLabelGfx_SwitchOff
+        }
+    },
+    [POKENAV_MENU_TYPE_DEFAULT_NO_COND] =
+    {
+        .yStart = 56,
+        .deltaY = 20,
+        .gfx = {
+            sOptionsLabelGfx_RegionMap,
+            sOptionsLabelGfx_SwitchOff
+        }
+    },
+    [POKENAV_MENU_TYPE_UNLOCK_MC_NO_COND] =
+    {
+        .yStart = 42,
+        .deltaY = 20,
+        .gfx = {
+            sOptionsLabelGfx_RegionMap,
+            sOptionsLabelGfx_MatchCall,
+            sOptionsLabelGfx_SwitchOff
+        }
+    },
+#endif
     [POKENAV_MENU_TYPE_CONDITION] =
     {
         .yStart = 56,
@@ -267,16 +333,27 @@ static const struct WindowTemplate sOptionDescWindowTemplate =
     .baseBlock = 8
 };
 
+#if IS_HNS
+static const u8 *const sHnSMapPageDescriptionJohto = COMPOUND_STRING("Check the map of the JOHTO region");
+static const u8 *const sHnSMapPageDescriptionJohtoKanto = COMPOUND_STRING("Check the combined region map");
+#endif
+
 static const u8 *const sPageDescriptions[] =
 {
     [POKENAV_MENUITEM_MAP]                     = COMPOUND_STRING("Check the map of the HOENN region"),
     [POKENAV_MENUITEM_CONDITION]               = COMPOUND_STRING("Check POKéMON in detail."),
     [POKENAV_MENUITEM_MATCH_CALL]              = COMPOUND_STRING("Call a registered TRAINER."),
     [POKENAV_MENUITEM_RIBBONS]                 = COMPOUND_STRING("Check obtained RIBBONS."),
+#if IS_HNS
+    [POKENAV_MENUITEM_RADIO]                   = COMPOUND_STRING("Listen to the radio."),
+    [POKENAV_MENUITEM_SWITCH_OFF]              = COMPOUND_STRING("Put away the POKéGEAR."),
+    [POKENAV_MENUITEM_CONDITION_CANCEL]        = COMPOUND_STRING("Return to the POKéGEAR menu."),
+#else
     [POKENAV_MENUITEM_SWITCH_OFF]              = COMPOUND_STRING("Put away the POKéNAV."),
+    [POKENAV_MENUITEM_CONDITION_CANCEL]        = COMPOUND_STRING("Return to the POKéNAV menu."),
+#endif
     [POKENAV_MENUITEM_CONDITION_PARTY]         = COMPOUND_STRING("Check party POKéMON in detail."),
     [POKENAV_MENUITEM_CONDITION_SEARCH]        = COMPOUND_STRING("Check all POKéMON in detail."),
-    [POKENAV_MENUITEM_CONDITION_CANCEL]        = COMPOUND_STRING("Return to the POKéNAV menu."),
     [POKENAV_MENUITEM_CONDITION_SEARCH_COOL]   = COMPOUND_STRING("Find cool POKéMON."),
     [POKENAV_MENUITEM_CONDITION_SEARCH_BEAUTY] = COMPOUND_STRING("Find beautiful POKéMON."),
     [POKENAV_MENUITEM_CONDITION_SEARCH_CUTE]   = COMPOUND_STRING("Find cute POKéMON."),
@@ -1185,10 +1262,14 @@ static void CreateMatchCallBlueLightSprite(void)
     struct Pokenav_MenuGfx *gfx = GetSubstructPtr(POKENAV_SUBSTRUCT_MENU_GFX);
     u8 spriteId = CreateSprite(&sMatchCallBlueLightSpriteTemplate, 0x10, 0x60, 4);
     gfx->blueLightSprite = &gSprites[spriteId];
+#if IS_HNS
+    gfx->blueLightSprite->invisible = TRUE;
+#else
     if (AreAnyTrainerRematchesNearby())
         gfx->blueLightSprite->callback = SpriteCB_BlinkingBlueLight;
     else
         gfx->blueLightSprite->invisible = TRUE;
+#endif
 }
 
 static void DestroyRematchBlueLightSprite(void)
@@ -1221,7 +1302,13 @@ static void PrintCurrentOptionDescription(void)
 {
     struct Pokenav_MenuGfx *gfx = GetSubstructPtr(POKENAV_SUBSTRUCT_MENU_GFX);
     int menuItem = GetCurrentMenuItemId();
-    const u8 *desc = sPageDescriptions[menuItem];
+    const u8 *desc;
+#if IS_HNS
+    if (menuItem == POKENAV_MENUITEM_MAP)
+        desc = FlagGet(FLAG_VISITED_KANTO) ? sHnSMapPageDescriptionJohtoKanto : sHnSMapPageDescriptionJohto;
+    else
+#endif
+        desc = sPageDescriptions[menuItem];
     u32 width = GetStringWidth(FONT_NORMAL, desc, -1);
     FillWindowPixelBuffer(gfx->optionDescWindowId, PIXEL_FILL(6));
     AddTextPrinterParameterized3(gfx->optionDescWindowId, FONT_NORMAL, (192 - width) / 2, 1, sOptionDescTextColors, 0, desc);

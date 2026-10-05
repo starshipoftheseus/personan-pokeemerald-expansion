@@ -134,12 +134,12 @@ static const u16 sSpriteImageSizes[3][4] =
     },
 };
 
-u8 CreateMonIcon(enum Species species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, u32 personality)
+u8 CreateMonIcon(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, u32 personality)
 {
     return CreateMonIconIsEgg(species, callback, x, y, subpriority, personality, FALSE);
 }
 
-u8 CreateMonIconIsEgg(enum Species species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, u32 personality, bool32 isEgg)
+u8 CreateMonIconIsEgg(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, u32 personality, bool32 isEgg)
 {
     u8 spriteId;
     struct MonIconSpriteTemplate iconTemplate =
@@ -179,11 +179,11 @@ u8 CreateMonIconIsEgg(enum Species species, void (*callback)(struct Sprite *), s
 }
 
 
-u8 CreateMonIconNoPersonality(enum Species species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority)
+u8 CreateMonIconNoPersonality(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority)
 {
     return CreateMonIconNoPersonalityIsEgg(species, callback, x, y, subpriority, FALSE);
 }
-u8 CreateMonIconNoPersonalityIsEgg(enum Species species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, bool32 isEgg)
+u8 CreateMonIconNoPersonalityIsEgg(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, bool32 isEgg)
 {
     u8 spriteId;
     struct MonIconSpriteTemplate iconTemplate =
@@ -204,37 +204,7 @@ u8 CreateMonIconNoPersonalityIsEgg(enum Species species, void (*callback)(struct
     return spriteId;
 }
 
-u8 CreateTaggedMonIcon(u32 tileTag, u32 paletteTag, enum Species species)
-{
-    struct SpritePalette palette;
-    palette.data = gMonIconPaletteTable[gSpeciesInfo[SanitizeSpeciesId(species)].iconPalIndex].data;
-    palette.tag = paletteTag;
-    LoadSpritePalette(&palette);
-
-    struct SpriteSheet spriteSheet;
-    spriteSheet.data = GetMonIconTilesIsEgg(species, 0, FALSE);
-    spriteSheet.size = 2 * sSpriteImageSizes[sMonIconOamData.shape][sMonIconOamData.size];
-    spriteSheet.tag = tileTag;
-    LoadSpriteSheet(&spriteSheet);
-
-    struct SpriteTemplate spriteTemplate =
-    {
-        .tileTag = tileTag,
-        .paletteTag = paletteTag,
-        .oam = &sMonIconOamData,
-        .anims = sMonIconAnims,
-        .images = NULL,
-        .affineAnims = sMonIconAffineAnims
-    };
-
-    u8 spriteId = CreateSprite(&spriteTemplate, 0, 0, 0);
-    gSprites[spriteId].animPaused = TRUE;
-    gSprites[spriteId].animBeginning = FALSE;
-    UpdateMonIconFrame(&gSprites[spriteId]);
-    return spriteId;
-}
-
-enum Species GetIconSpecies(enum Species species, u32 personality)
+u16 GetIconSpecies(u16 species, u32 personality)
 {
     species = SanitizeSpeciesId(species);
     if (species == SPECIES_UNOWN)
@@ -250,7 +220,7 @@ u16 GetUnownLetterByPersonality(u32 personality)
         return GET_UNOWN_LETTER(personality);
 }
 
-enum Species GetIconSpeciesNoPersonality(enum Species species)
+u16 GetIconSpeciesNoPersonality(u16 species)
 {
     species = SanitizeSpeciesId(species);
 
@@ -259,12 +229,12 @@ enum Species GetIconSpeciesNoPersonality(enum Species species)
     return GetIconSpecies(species, 0);
 }
 
-const u8 *GetMonIconPtr(enum Species species, u32 personality)
+const u8 *GetMonIconPtr(u16 species, u32 personality)
 {
     return GetMonIconPtrIsEgg(species, personality, FALSE);
 }
 
-const u8 *GetMonIconPtrIsEgg(enum Species species, u32 personality, bool32 isEgg)
+const u8 *GetMonIconPtrIsEgg(u16 species, u32 personality, bool32 isEgg)
 {
     return GetMonIconTilesIsEgg(GetIconSpecies(species, personality), personality, isEgg);
 }
@@ -281,14 +251,23 @@ void LoadMonIconPalettes(void)
         LoadSpritePalette(&gMonIconPaletteTable[i]);
 }
 
-void LoadMonIconPalette(enum Species species)
+// unused
+void SafeLoadMonIconPalette(u16 species)
+{
+    u8 palIndex;
+    palIndex = gSpeciesInfo[SanitizeSpeciesId(species)].iconPalIndex;
+    if (IndexOfSpritePaletteTag(gMonIconPaletteTable[palIndex].tag) == 0xFF)
+        LoadSpritePalette(&gMonIconPaletteTable[palIndex]);
+}
+
+void LoadMonIconPalette(u16 species)
 {
     u8 palIndex = gSpeciesInfo[SanitizeSpeciesId(species)].iconPalIndex;
     if (IndexOfSpritePaletteTag(gMonIconPaletteTable[palIndex].tag) == 0xFF)
         LoadSpritePalette(&gMonIconPaletteTable[palIndex]);
 }
 
-void LoadMonIconPalettePersonality(enum Species species, u32 personality)
+void LoadMonIconPalettePersonality(u16 species, u32 personality)
 {
     u8 palIndex;
     species = SanitizeSpeciesId(species);
@@ -310,14 +289,14 @@ void FreeMonIconPalettes(void)
 }
 
 // unused
-void SafeFreeMonIconPalette(enum Species species)
+void SafeFreeMonIconPalette(u16 species)
 {
     u8 palIndex;
     palIndex = gSpeciesInfo[SanitizeSpeciesId(species)].iconPalIndex;
     FreeSpritePaletteByTag(gMonIconPaletteTable[palIndex].tag);
 }
 
-void FreeMonIconPalette(enum Species species)
+void FreeMonIconPalette(u16 species)
 {
     u8 palIndex;
     palIndex = gSpeciesInfo[SanitizeSpeciesId(species)].iconPalIndex;
@@ -329,12 +308,12 @@ void SpriteCB_MonIcon(struct Sprite *sprite)
     UpdateMonIconFrame(sprite);
 }
 
-const u8 *GetMonIconTiles(enum Species species, u32 personality)
+const u8 *GetMonIconTiles(u16 species, u32 personality)
 {
     return GetMonIconTilesIsEgg(species, personality, FALSE);
 }
 
-const u8 *GetMonIconTilesIsEgg(enum Species species, u32 personality, bool32 isEgg)
+const u8 *GetMonIconTilesIsEgg(u16 species, u32 personality, bool32 isEgg)
 {
     const u8 *iconSprite;
 
@@ -364,15 +343,6 @@ const u8 *GetMonIconTilesIsEgg(enum Species species, u32 personality, bool32 isE
     return iconSprite;
 }
 
-const u8 *GetMonIconTilesByIconType(enum Species species, enum SpeciesIconType iconType)
-{
-    if (iconType == EGG_ICON)
-        return gEggDatas[gSpeciesInfo[species].eggId].eggIcon;
-    if (iconType == FEMALE_ICON)
-        return gSpeciesInfo[species].iconSpriteFemale;
-    return gSpeciesInfo[species].iconSprite;
-}
-
 void TryLoadAllMonIconPalettesAtOffset(u16 offset)
 {
     s32 i;
@@ -386,17 +356,17 @@ void TryLoadAllMonIconPalettesAtOffset(u16 offset)
     }
 }
 
-u8 GetValidMonIconPalIndex(enum Species species)
+u8 GetValidMonIconPalIndex(u16 species)
 {
     return gSpeciesInfo[SanitizeSpeciesId(species)].iconPalIndex;
 }
 
-u8 GetMonIconPaletteIndexFromSpecies(enum Species species)
+u8 GetMonIconPaletteIndexFromSpecies(u16 species)
 {
     return gSpeciesInfo[SanitizeSpeciesId(species)].iconPalIndex;
 }
 
-const u16 *GetValidMonIconPalettePtr(enum Species species)
+const u16 *GetValidMonIconPalettePtr(u16 species)
 {
     return gMonIconPaletteTable[gSpeciesInfo[SanitizeSpeciesId(species)].iconPalIndex].data;
 }
@@ -417,20 +387,13 @@ u8 UpdateMonIconFrame(struct Sprite *sprite)
             sprite->animCmdIndex = 0;
             break;
         default:
-            if (sprite->usingSheet)
-            {
-                sprite->oam.tileNum = sprite->sheetTileStart + (sSpriteImageSizes[sprite->oam.shape][sprite->oam.size] * frame / TILE_SIZE_4BPP);
-            }
-            else
-            {
-                RequestSpriteCopy(
-                    // pointer arithmetic is needed to get the correct pointer to perform the sprite copy on.
-                    // because sprite->images is a struct def, it has to be casted to (u8 *) before any
-                    // arithmetic can be performed.
-                    (u8 *)sprite->images + (sSpriteImageSizes[sprite->oam.shape][sprite->oam.size] * frame),
-                    (u8 *)(OBJ_VRAM0 + sprite->oam.tileNum * TILE_SIZE_4BPP),
-                    sSpriteImageSizes[sprite->oam.shape][sprite->oam.size]);
-            }
+            RequestSpriteCopy(
+                // pointer arithmetic is needed to get the correct pointer to perform the sprite copy on.
+                // because sprite->images is a struct def, it has to be casted to (u8 *) before any
+                // arithmetic can be performed.
+                (u8 *)sprite->images + (sSpriteImageSizes[sprite->oam.shape][sprite->oam.size] * frame),
+                (u8 *)(OBJ_VRAM0 + sprite->oam.tileNum * TILE_SIZE_4BPP),
+                sSpriteImageSizes[sprite->oam.shape][sprite->oam.size]);
             sprite->animDelayCounter = sprite->anims[sprite->animNum][sprite->animCmdIndex].frame.duration & 0xFF;
             sprite->animCmdIndex++;
             result = sprite->animCmdIndex;

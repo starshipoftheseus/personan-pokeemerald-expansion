@@ -53,7 +53,7 @@ void RtcRestoreInterrupts(void)
 
 u32 ConvertBcdToBinary(u8 bcd)
 {
-    if (OW_USE_FAKE_RTC)
+    if (UseFakeRtc())
         return bcd;
 
     if (bcd > 0x9F)
@@ -109,7 +109,7 @@ u16 RtcGetDayCount(struct SiiRtcInfo *rtc)
 
 void RtcInit(void)
 {
-    if (OW_USE_FAKE_RTC)
+    if (UseFakeRtc())
         return;
 
     sErrorStatus = 0;
@@ -136,12 +136,12 @@ void RtcInit(void)
 
 u16 RtcGetErrorStatus(void)
 {
-    return (OW_USE_FAKE_RTC) ? 0 : sErrorStatus;
+    return UseFakeRtc() ? 0 : sErrorStatus;
 }
 
 void RtcGetInfo(struct SiiRtcInfo *rtc)
 {
-    if (OW_USE_FAKE_RTC)
+    if (UseFakeRtc())
         FakeRtc_GetRawInfo(rtc);
     else if (sErrorStatus & RTC_ERR_FLAG_MASK)
         *rtc = sRtcDummy;
@@ -176,7 +176,7 @@ u16 RtcCheckInfo(struct SiiRtcInfo *rtc)
     s32 month;
     s32 value;
 
-    if (OW_USE_FAKE_RTC)
+    if (UseFakeRtc())
         return 0;
 
     if (rtc->status & SIIRTCINFO_POWER)
@@ -231,7 +231,7 @@ u16 RtcCheckInfo(struct SiiRtcInfo *rtc)
 
 void RtcReset(void)
 {
-    if (OW_USE_FAKE_RTC)
+    if (UseFakeRtc())
     {
         FakeRtc_Reset();
         return;
@@ -330,7 +330,7 @@ bool8 IsBetweenHours(s32 hours, s32 begin, s32 end)
 
 enum TimeOfDay GetTimeOfDay(void)
 {
-    UpdateTimeOfDay(FALSE);
+    UpdateTimeOfDay();
     return gTimeOfDay;
 }
 
@@ -351,7 +351,7 @@ void RtcCalcLocalTimeOffset(s32 days, s32 hours, s32 minutes, s32 seconds)
     gLocalTime.hours = hours;
     gLocalTime.minutes = minutes;
     gLocalTime.seconds = seconds;
-    if (OW_USE_FAKE_RTC)
+    if (UseFakeRtc())
         FakeRtc_ManuallySetTime(gLocalTime.days, gLocalTime.hours, gLocalTime.minutes, seconds);
     RtcGetInfo(&sRtc);
     RtcCalcTimeDifference(&sRtc, &gSaveBlock2Ptr->localTimeOffset, &gLocalTime);
@@ -381,6 +381,12 @@ void CalcTimeDifference(struct Time *result, struct Time *t1, struct Time *t2)
         result->hours += HOURS_PER_DAY;
         --result->days;
     }
+}
+
+u32 RtcGetMinuteCount(void)
+{
+    RtcGetInfo(&sRtc);
+    return (HOURS_PER_DAY * MINUTES_PER_HOUR) * RtcGetDayCount(&sRtc) + MINUTES_PER_HOUR * sRtc.hour + sRtc.minute;
 }
 
 u32 RtcGetLocalDayCount(void)

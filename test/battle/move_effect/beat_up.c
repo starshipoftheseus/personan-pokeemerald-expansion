@@ -27,7 +27,7 @@ SINGLE_BATTLE_TEST("Beat Up hits the target for each non-fainted, non-statused m
         ANIMATION(ANIM_TYPE_MOVE, MOVE_BEAT_UP, player);
         ANIMATION(ANIM_TYPE_MOVE, MOVE_BEAT_UP, player);
         NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_BEAT_UP, player);
-        MESSAGE("The Pokémon was hit 4 times!");
+        MESSAGE("The Pokémon was hit 4 time(s)!");
     } THEN {
         if (gen == GEN_5) {
             EXPECT_EQ(gBattleStruct->beatUpSpecies[0], SPECIES_WOBBUFFET);
@@ -59,7 +59,7 @@ SINGLE_BATTLE_TEST("Beat Up doesn't consider Comatose as a status")
         ANIMATION(ANIM_TYPE_MOVE, MOVE_BEAT_UP, player);
         ANIMATION(ANIM_TYPE_MOVE, MOVE_BEAT_UP, player);
         NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_BEAT_UP, player);
-        MESSAGE("The Pokémon was hit 2 times!");
+        MESSAGE("The Pokémon was hit 2 time(s)!");
     }
 }
 
@@ -77,7 +77,7 @@ SINGLE_BATTLE_TEST("Beat Up doesn't list party member's name (Gen5+)")
             MESSAGE("Wobbuffet's attack!");
             MESSAGE("Wynaut's attack!");
         }
-        MESSAGE("The Pokémon was hit 2 times!");
+        MESSAGE("The Pokémon was hit 2 time(s)!");
     }
 }
 
@@ -155,7 +155,7 @@ SINGLE_BATTLE_TEST("Beat Up's damage considers stat stage changes (Gen5+)", s16 
 
 SINGLE_BATTLE_TEST("Beat Up's damage considers Huge Power and Choice Band (Gen5+)", s16 damage)
 {
-    enum Ability ability;
+    u16 ability;
     enum Item item;
 
     PARAMETRIZE { ability = ABILITY_THICK_FAT;   item = ITEM_NONE; }
@@ -200,10 +200,10 @@ SINGLE_BATTLE_TEST("Beat Up lists each party member's name")
     }
 }
 
-SINGLE_BATTLE_TEST("Beat Up's damage is typeless (up to Gen4)", s16 damage)
+SINGLE_BATTLE_TEST("Beat Up's damage is typeless", s16 damage)
 {
-    enum Species defender = SPECIES_WOBBUFFET;
-    enum Type type1, type2;
+    u16 defender = SPECIES_WOBBUFFET;
+    u16 type1, type2;
 
     PARAMETRIZE { defender = SPECIES_BLISSEY; }   // Normal
     PARAMETRIZE { defender = SPECIES_MACHAMP; }     // Fighting
@@ -225,7 +225,7 @@ SINGLE_BATTLE_TEST("Beat Up's damage is typeless (up to Gen4)", s16 damage)
     PARAMETRIZE { defender = SPECIES_SYLVEON; }     // Fairy
 
     GIVEN {
-        WITH_CONFIG(B_BEAT_UP, GEN_4);
+        WITH_CONFIG(B_BEAT_UP, GEN_3);
         type1 = GetSpeciesType(defender, 0);
         type2 = GetSpeciesType(defender, 1);
         ASSUME(type2 == type1 || type2 == TYPE_MYSTERY); // Ensure monotype targets
@@ -235,8 +235,12 @@ SINGLE_BATTLE_TEST("Beat Up's damage is typeless (up to Gen4)", s16 damage)
         TURN { MOVE(player, MOVE_BEAT_UP); }
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_BEAT_UP, player);
-        EFFECTIVENESS_SE(opponent, SE_EFFECTIVE);
         HP_BAR(opponent, captureDamage: &results[i].damage);
+        NONE_OF {
+            MESSAGE("It's super effective!");
+            MESSAGE("It's not very effective...");
+            MESSAGE("It doesn't affect");
+        }
     } THEN {
         EXPECT_GT(results[i].damage, 0);
     }
@@ -346,7 +350,7 @@ SINGLE_BATTLE_TEST("Beat Up ignores stat stage changes", s16 damage)
 
 SINGLE_BATTLE_TEST("Beat Up ignores Huge Power", s16 damage)
 {
-    enum Ability ability;
+    u16 ability;
 
     PARAMETRIZE { ability = ABILITY_THICK_FAT; }
     PARAMETRIZE { ability = ABILITY_HUGE_POWER; }

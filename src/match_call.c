@@ -1,3 +1,4 @@
+
 #include "global.h"
 #include "malloc.h"
 #include "battle.h"
@@ -6,6 +7,7 @@
 #include "birch_pc.h"
 #include "data.h"
 #include "event_data.h"
+#include "fake_rtc.h"
 #include "event_object_movement.h"
 #include "field_player_avatar.h"
 #include "main.h"
@@ -111,6 +113,108 @@ struct MatchCallTrainerTextInfo
     u16 differentRouteMatchCallTextId;
 };
 
+#if IS_HNS
+#define HNS_MAX_GENERAL_TEXTS 3
+#define HNS_MAX_GIFT_ITEMS    4
+
+struct HnsMatchCallTrainerInfo
+{
+    u16 trainerId;
+    const u8 *generalTexts[HNS_MAX_GENERAL_TEXTS];
+    u8 numGeneralTexts;
+    const u8 *battleRequestText;
+    u16 itemFlag;
+    u16 itemVar;
+    const u16 *giftItems;
+    u8 numGiftItems;
+    const u8 *foundItemText;
+};
+
+static const u16 sWadeGiftItems[] = { ITEM_ORAN_BERRY, ITEM_PECHA_BERRY, ITEM_CHERI_BERRY, ITEM_RAWST_BERRY };
+static const u16 sAlanGiftItems[] = { ITEM_FIRE_STONE, ITEM_THUNDER_STONE, ITEM_WATER_STONE, ITEM_LEAF_STONE };
+static const u16 sDanaGiftItems[] = { ITEM_THUNDER_STONE, ITEM_FIRE_STONE, ITEM_WATER_STONE };
+static const u16 sTullyGiftItems[] = { ITEM_WATER_STONE, ITEM_SHARP_BEAK };
+static const u16 sWiltonGiftItems[] = { ITEM_WATER_STONE, ITEM_HEAVY_BALL, ITEM_LURE_BALL };
+static const u16 sDerekGiftItems[] = { ITEM_NUGGET };
+static const u16 sBeverlyGiftItems[] = { ITEM_NUGGET };
+static const u16 sJoseGiftItems[] = { ITEM_SHARP_BEAK, ITEM_SILK_SCARF };
+static const u16 sKenjiGiftItems[] = { ITEM_PP_UP };
+
+#define HNS_MC_ENTRY2(name, trId) { \
+    .trainerId = trId, \
+    .generalTexts = { MatchCall_HNS_##name##_General1, MatchCall_HNS_##name##_General2 }, \
+    .numGeneralTexts = 2, \
+    .battleRequestText = MatchCall_HNS_##name##_Battle }
+
+#define HNS_MC_ENTRY3(name, trId) { \
+    .trainerId = trId, \
+    .generalTexts = { MatchCall_HNS_##name##_General1, MatchCall_HNS_##name##_General2, MatchCall_HNS_##name##_General3 }, \
+    .numGeneralTexts = 3, \
+    .battleRequestText = MatchCall_HNS_##name##_Battle }
+
+#define HNS_MC_ITEM2(name, trId, flag, var, items) { \
+    .trainerId = trId, \
+    .generalTexts = { MatchCall_HNS_##name##_General1, MatchCall_HNS_##name##_General2 }, \
+    .numGeneralTexts = 2, \
+    .battleRequestText = MatchCall_HNS_##name##_Battle, \
+    .itemFlag = flag, .itemVar = var, \
+    .giftItems = items, .numGiftItems = ARRAY_COUNT(items), \
+    .foundItemText = MatchCall_HNS_##name##_FoundItem }
+
+#define HNS_MC_ITEM3(name, trId, flag, var, items) { \
+    .trainerId = trId, \
+    .generalTexts = { MatchCall_HNS_##name##_General1, MatchCall_HNS_##name##_General2, MatchCall_HNS_##name##_General3 }, \
+    .numGeneralTexts = 3, \
+    .battleRequestText = MatchCall_HNS_##name##_Battle, \
+    .itemFlag = flag, .itemVar = var, \
+    .giftItems = items, .numGiftItems = ARRAY_COUNT(items), \
+    .foundItemText = MatchCall_HNS_##name##_FoundItem }
+
+static const struct HnsMatchCallTrainerInfo sHnsMatchCallTrainers[] =
+{
+    HNS_MC_ENTRY3(Joey,     TRAINER_JOEY_HNS),
+    HNS_MC_ITEM3(Wade,      TRAINER_WADE_HNS,     FLAG_WADE_HAS_ITEM_HNS,    VAR_WADE_ITEM_HNS,    sWadeGiftItems),
+    HNS_MC_ENTRY3(Ralph,    TRAINER_RALPH_HNS),
+    HNS_MC_ENTRY3(Liz,      TRAINER_LIZ_HNS),
+    HNS_MC_ENTRY3(Anthony,  TRAINER_ANTHONY_HNS),
+    HNS_MC_ENTRY3(Todd,     TRAINER_TODD_HNS),
+    HNS_MC_ENTRY3(Gina,     TRAINER_GINA_HNS),
+    HNS_MC_ENTRY3(Irwin,    TRAINER_IRWIN_HNS),
+    HNS_MC_ENTRY3(Arnie,    TRAINER_ARNIE_HNS),
+    HNS_MC_ITEM3(Alan,      TRAINER_ALAN_HNS,     FLAG_ALAN_HAS_ITEM_HNS,    VAR_ALAN_ITEM_HNS,    sAlanGiftItems),
+    HNS_MC_ITEM3(Dana,      TRAINER_DANA_HNS,     FLAG_DANA_HAS_ITEM_HNS,    VAR_DANA_ITEM_HNS,    sDanaGiftItems),
+    HNS_MC_ENTRY3(Chad,     TRAINER_CHAD_HNS),
+    HNS_MC_ITEM3(Derek,     TRAINER_DEREK_HNS,    FLAG_DEREK_HAS_ITEM_HNS,   VAR_DEREK_ITEM_HNS,   sDerekGiftItems),
+    HNS_MC_ITEM3(Tully,     TRAINER_TULLY_HNS,    FLAG_TULLY_HAS_ITEM_HNS,   VAR_TULLY_ITEM_HNS,   sTullyGiftItems),
+    HNS_MC_ENTRY3(Brent,    TRAINER_BRENT_HNS),
+    HNS_MC_ENTRY3(Tiffany,  TRAINER_TIFFANY_HNS),
+    HNS_MC_ENTRY3(Vance,    TRAINER_VANCE_HNS),
+    HNS_MC_ITEM3(Wilton,    TRAINER_WILTON_HNS,   FLAG_WILTON_HAS_ITEM_HNS,  VAR_WILTON_ITEM_HNS,  sWiltonGiftItems),
+    HNS_MC_ITEM3(Kenji,     TRAINER_KENJI_HNS,    FLAG_KENJI_HAS_ITEM_HNS,   VAR_KENJI_ITEM_HNS,   sKenjiGiftItems),
+    HNS_MC_ENTRY3(Parry,    TRAINER_PARRY_HNS),
+    HNS_MC_ENTRY3(Erin,     TRAINER_ERIN_HNS),
+    HNS_MC_ENTRY3(Jack,     TRAINER_JACK_HNS),
+    HNS_MC_ITEM3(Beverly,   TRAINER_BEVERLY_HNS,  FLAG_BEVERLY_HAS_ITEM_HNS, VAR_BEVERLY_ITEM_HNS, sBeverlyGiftItems),
+    HNS_MC_ENTRY2(Huey,     TRAINER_HUEY_HNS),
+    HNS_MC_ENTRY3(Gaven,    TRAINER_GAVEN_HNS),
+    HNS_MC_ENTRY3(Beth,     TRAINER_BETH_HNS),
+    HNS_MC_ITEM3(Jose,      TRAINER_JOSE_HNS,     FLAG_JOSE_HAS_ITEM_HNS,    VAR_JOSE_ITEM_HNS,    sJoseGiftItems),
+    HNS_MC_ENTRY3(Reena,    TRAINER_REENA_HNS),
+    HNS_MC_ENTRY2(Alex,     TRAINER_ALEX_HNS),
+    HNS_MC_ENTRY2(Riley,    TRAINER_RILEY_HNS),
+    HNS_MC_ENTRY2(Trevor,   TRAINER_TREVOR_HNS),
+    HNS_MC_ENTRY2(Kyle,     TRAINER_KYLE_HNS),
+    HNS_MC_ENTRY2(Carter,   TRAINER_CARTER_HNS),
+    HNS_MC_ENTRY2(Hillary,  TRAINER_HILLARY_HNS),
+    HNS_MC_ENTRY2(Rob,      TRAINER_ROB_HNS),
+    HNS_MC_ENTRY2(Nicole,   TRAINER_NICOLE_HNS),
+    HNS_MC_ENTRY2(Billy,    TRAINER_BILLY_HNS),
+    HNS_MC_ENTRY2(Kenny,    TRAINER_KENNY_HNS),
+    HNS_MC_ENTRY2(Joel,     TRAINER_JOEL_HNS),
+    HNS_MC_ENTRY2(Charles,  TRAINER_CHARLES_HNS),
+};
+#endif
+
 struct MatchCallText
 {
     const u8 *text;
@@ -148,7 +252,9 @@ static const struct MatchCallText *GetSameRouteMatchCallText(int, u8 *);
 static const struct MatchCallText *GetDifferentRouteMatchCallText(int, u8 *);
 static const struct MatchCallText *GetBattleMatchCallText(int, u8 *);
 static const struct MatchCallText *GetGeneralMatchCallText(int, u8 *);
+#if !IS_HNS
 static bool32 ShouldTrainerRequestBattle(int);
+#endif
 static void BuildMatchCallString(int, const struct MatchCallText *, u8 *);
 static u16 GetFrontierStreakInfo(u16, u32 *);
 static void PopulateMatchCallStringVars(int, const s8 *);
@@ -1025,6 +1131,10 @@ static const struct MatchCallText *const sMatchCallGeneralTopics[] =
 };
 
 extern const u8 gBirchDexRatingText_AreYouCurious[];
+extern const u8 gElmDexRatingText_AreYouCurious[];
+extern const u8 gElmDexRatingText_AreYouCuriousNational[];
+extern const u8 gElmDexRatingText_GoFindMrPokemon[];
+extern const u8 gElmDexRatingText_Robbery[];
 extern const u8 gBirchDexRatingText_SoYouveSeenAndCaught[];
 extern const u8 gBirchDexRatingText_OnANationwideBasis[];
 
@@ -1034,6 +1144,94 @@ void InitMatchCallCounters(void)
     sMatchCallState.minutes = GetCurrentTotalMinutes(&gLocalTime) + 10;
     sMatchCallState.stepCounter = 0;
 }
+
+#if IS_HNS
+#define ROUTE_STEP_COUNTER_MAX 255
+
+static EWRAM_DATA u16 sRouteStepLastMap = 0;
+
+bool32 HnsUpdateRouteStepCounter(void)
+{
+    u16 curMap = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
+    u16 steps;
+
+    if (!FlagGet(FLAG_HAS_MATCH_CALL))
+        return FALSE;
+    if (gSaveBlock3Ptr->challengeSettings.disableMatchCall)
+        return FALSE;
+    if (!HasEnoughBadgesForRematch())
+        return FALSE;
+
+    if (curMap != sRouteStepLastMap)
+    {
+        sRouteStepLastMap = curMap;
+        VarSet(VAR_ROUTE_STEP_COUNTER_HNS, 0);
+    }
+
+    steps = VarGet(VAR_ROUTE_STEP_COUNTER_HNS) + 1;
+
+    if (steps >= ROUTE_STEP_COUNTER_MAX)
+    {
+        u16 mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        u16 mapNum = gSaveBlock1Ptr->location.mapNum;
+        u16 candidates[REMATCH_SPECIAL_TRAINER_START];
+        u32 numCandidates = 0;
+        s32 i;
+
+        VarSet(VAR_ROUTE_STEP_COUNTER_HNS, 0);
+
+        for (i = 0; i < REMATCH_SPECIAL_TRAINER_START; i++)
+        {
+            if (gRematchTable[i].mapGroup != mapGroup || gRematchTable[i].mapNum != mapNum)
+                continue;
+            if (!TrainerIsMatchCallRegistered(i))
+                continue;
+            if (!HasTrainerBeenFought(gRematchTable[i].trainerIds[0]))
+                continue;
+
+            candidates[numCandidates++] = i;
+        }
+
+        if (numCandidates > 0)
+        {
+            u32 chosen = candidates[Random() % numCandidates];
+            u16 trainerId = gRematchTable[chosen].trainerIds[0];
+            u32 j;
+
+            for (j = 0; j < ARRAY_COUNT(sHnsMatchCallTrainers); j++)
+            {
+                if (sHnsMatchCallTrainers[j].trainerId == trainerId)
+                {
+                    if (sHnsMatchCallTrainers[j].itemFlag != 0 && (Random() % 5) == 0)
+                    {
+                        u8 itemIdx = Random() % sHnsMatchCallTrainers[j].numGiftItems;
+                        VarSet(sHnsMatchCallTrainers[j].itemVar, sHnsMatchCallTrainers[j].giftItems[itemIdx]);
+                        FlagSet(sHnsMatchCallTrainers[j].itemFlag);
+                    }
+                    else
+                    {
+                        UpdateRematchIfDefeated(chosen);
+                    }
+                    break;
+                }
+            }
+            if (j == ARRAY_COUNT(sHnsMatchCallTrainers))
+                UpdateRematchIfDefeated(chosen);
+
+            sMatchCallState.trainerId = trainerId;
+            sMatchCallState.triggeredFromScript = FALSE;
+            StartMatchCall();
+            return TRUE;
+        }
+    }
+    else
+    {
+        VarSet(VAR_ROUTE_STEP_COUNTER_HNS, steps);
+    }
+
+    return FALSE;
+}
+#endif
 
 static u32 GetCurrentTotalMinutes(struct Time *time)
 {
@@ -1045,7 +1243,12 @@ static bool32 UpdateMatchCallMinutesCounter(void)
     int curMinutes;
     RtcCalcLocalTime();
     curMinutes = GetCurrentTotalMinutes(&gLocalTime);
+#if IS_HNS
+    if (sMatchCallState.minutes > curMinutes
+     || curMinutes - sMatchCallState.minutes > (UseFakeRtc() ? 179 : 9))
+#else
     if (sMatchCallState.minutes > curMinutes || curMinutes - sMatchCallState.minutes > 9)
+#endif
     {
         sMatchCallState.minutes = curMinutes;
         return TRUE;
@@ -1057,7 +1260,7 @@ static bool32 UpdateMatchCallMinutesCounter(void)
 static bool32 CheckMatchCallChance(void)
 {
     int callChance = 1;
-    if (!GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_SANITY_IS_EGG) && GetMonAbility(&gParties[B_TRAINER_PLAYER][0]) == ABILITY_LIGHTNING_ROD)
+    if (!GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG) && GetMonAbility(&gPlayerParty[0]) == ABILITY_LIGHTNING_ROD)
         callChance = 2;
 
     if (Random() % 10 < callChance * 3)
@@ -1065,6 +1268,19 @@ static bool32 CheckMatchCallChance(void)
     else
         return FALSE;
 }
+
+#if IS_HNS
+// Calls are held off entirely while inside, rather than being rolled and
+// discarded, so stepping back outside doesn't cost the player a full timer.
+static bool32 HnsMapAllowsMatchCall(void)
+{
+    // Outdoors, plus caves as in HGSS. Several HnS interiors are tagged
+    // MAP_TYPE_NONE rather than MAP_TYPE_INDOOR, so allow by whitelist
+    // instead of denying by type.
+    return Overworld_MapTypeAllowsTeleportAndFly(gMapHeader.mapType)
+        || gMapHeader.mapType == MAP_TYPE_UNDERGROUND;
+}
+#endif
 
 static bool32 MapAllowsMatchCall(void)
 {
@@ -1086,7 +1302,11 @@ static bool32 MapAllowsMatchCall(void)
 
 static bool32 UpdateMatchCallStepCounter(void)
 {
+#if IS_HNS
+    if (++sMatchCallState.stepCounter >= 30)
+#else
     if (++sMatchCallState.stepCounter >= 10)
+#endif
     {
         sMatchCallState.stepCounter = 0;
         return TRUE;
@@ -1099,7 +1319,7 @@ static bool32 UpdateMatchCallStepCounter(void)
 
 static bool32 SelectMatchCallTrainer(void)
 {
-    u32 matchCallId;
+    s32 matchCallId;
     u32 numRegistered = GetNumRegisteredTrainers();
     if (numRegistered == 0)
         return FALSE;
@@ -1109,7 +1329,13 @@ static bool32 SelectMatchCallTrainer(void)
     if (sMatchCallState.trainerId == REMATCH_TABLE_ENTRIES)
         return FALSE;
 
+#if IS_HNS
+    matchCallId = GetRematchIdxByTrainerIdx(sMatchCallState.trainerId);
+    if (matchCallId < 0)
+        return FALSE;
+#else
     matchCallId = GetTrainerMatchCallId(sMatchCallState.trainerId);
+#endif
     if (GetRematchTrainerLocation(matchCallId) == gMapHeader.regionMapSectionId && !TrainerIsEligibleForRematch(matchCallId))
         return FALSE;
 
@@ -1157,12 +1383,25 @@ static u32 GetActiveMatchCallTrainerId(u32 activeMatchCallId)
 */
 bool32 TryStartMatchCall(void)
 {
+    if (gSaveBlock3Ptr->challengeSettings.disableMatchCall)
+        return FALSE;
+
+#if IS_HNS
+    if (FlagGet(FLAG_HAS_MATCH_CALL)
+        && HasEnoughBadgesForRematch()
+        && HnsMapAllowsMatchCall()
+        && UpdateMatchCallStepCounter()
+        && UpdateMatchCallMinutesCounter()
+        && CheckMatchCallChance()
+        && SelectMatchCallTrainer())
+#else
     if (FlagGet(FLAG_HAS_MATCH_CALL)
         && UpdateMatchCallStepCounter()
         && UpdateMatchCallMinutesCounter()
         && CheckMatchCallChance()
         && MapAllowsMatchCall()
         && SelectMatchCallTrainer())
+#endif
     {
         StartMatchCall();
         return TRUE;
@@ -1196,10 +1435,20 @@ static void StartMatchCall(void)
     CreateTask(ExecuteMatchCall, 1);
 }
 
-static const u16 sMatchCallWindow_Pal[] = INCGFX_U16("graphics/pokenav/match_call/window.png", ".gbapal");
-static const u8 sMatchCallWindow_Gfx[] = INCGFX_U8("graphics/pokenav/match_call/window.png", ".4bpp");
-static const u16 sPokenavIcon_Pal[] = INCGFX_U16("graphics/pokenav/match_call/nav_icon.png", ".gbapal");
-static const u32 sPokenavIcon_Gfx[] = INCGFX_U32("graphics/pokenav/match_call/nav_icon.png", ".4bpp.smol");
+#if IS_HNS
+static const u16 sMatchCallWindow_Pal[] = INCBIN_U16("graphics/pokenav/hns/match_call/window.gbapal");
+static const u8 sMatchCallWindow_Gfx[] = INCBIN_U8("graphics/pokenav/hns/match_call/window.4bpp");
+#else
+static const u16 sMatchCallWindow_Pal[] = INCBIN_U16("graphics/pokenav/match_call/window.gbapal");
+static const u8 sMatchCallWindow_Gfx[] = INCBIN_U8("graphics/pokenav/match_call/window.4bpp");
+#endif
+#if IS_HNS
+static const u16 sPokenavIcon_Pal[] = INCBIN_U16("graphics/pokenav/hns/match_call/nav_icon.gbapal");
+static const u32 sPokenavIcon_Gfx[] = INCBIN_U32("graphics/pokenav/hns/match_call/nav_icon.4bpp.smol");
+#else
+static const u16 sPokenavIcon_Pal[] = INCBIN_U16("graphics/pokenav/match_call/nav_icon.gbapal");
+static const u32 sPokenavIcon_Gfx[] = INCBIN_U32("graphics/pokenav/match_call/nav_icon.4bpp.smol");
+#endif
 
 static const u8 sText_PokenavCallEllipsis[] = _("………………\p");
 
@@ -1324,11 +1573,14 @@ static bool32 MatchCall_PrintIntro(u8 taskId)
 
         // Ready the message (and the speaker's name if possible)
         if (!sMatchCallState.triggeredFromScript)
+        {
             SelectMatchCallMessage(sMatchCallState.trainerId, gStringVar4);
+#if IS_HNS
+            gSpeakerName = GetTrainerNameFromId(sMatchCallState.trainerId);
+#endif
+        }
 
-        if (IsSpeakerBuffered(gStringVar4))
-            TrySpawnAndShowNamebox(gSpeakerName, NAME_BOX_BASE_TILE_NUM);
-
+        TrySpawnAndShowNamebox(gSpeakerName, NAME_BOX_BASE_TILE_NUM);
         InitMatchCallTextPrinter(tWindowId, gStringVar4);
         return TRUE;
     }
@@ -1541,6 +1793,52 @@ static u32 GetNthRematchTrainerFought(int n)
 
 bool32 SelectMatchCallMessage(int trainerId, u8 *str)
 {
+#if IS_HNS
+    u32 i;
+    const u8 *text = NULL;
+    bool32 newRematchRequest = FALSE;
+    s32 rematchIdx = GetRematchIdxByTrainerIdx(trainerId);
+
+    for (i = 0; i < ARRAY_COUNT(sHnsMatchCallTrainers); i++)
+    {
+        if (sHnsMatchCallTrainers[i].trainerId == trainerId)
+        {
+            if (rematchIdx >= 0 && gSaveBlock1Ptr->trainerRematches[rematchIdx] != 0)
+            {
+                text = sHnsMatchCallTrainers[i].battleRequestText;
+                newRematchRequest = TRUE;
+            }
+            else if (sHnsMatchCallTrainers[i].itemFlag != 0 && FlagGet(sHnsMatchCallTrainers[i].itemFlag))
+            {
+                text = sHnsMatchCallTrainers[i].foundItemText;
+            }
+            else
+            {
+                u8 idx = Random() % sHnsMatchCallTrainers[i].numGeneralTexts;
+                text = sHnsMatchCallTrainers[i].generalTexts[idx];
+            }
+            break;
+        }
+    }
+
+    if (text != NULL)
+    {
+        u16 lastBeatenId = GetLastBeatenRematchTrainerId(trainerId);
+        const struct TrainerMon *party = GetTrainerPartyFromId(lastBeatenId);
+        u8 monId = Random() % GetTrainerPartySizeFromId(lastBeatenId);
+        if (party != NULL)
+            StringCopy(gStringVar3, GetSpeciesName(party[monId].species));
+        else
+            StringCopy(gStringVar3, GetSpeciesName(SPECIES_NONE));
+        StringExpandPlaceholders(str, text);
+    }
+    else
+    {
+        str[0] = EOS;
+    }
+
+    return newRematchRequest;
+#else
     u32 matchCallId;
     const struct MatchCallText *matchCallText;
     bool32 newRematchRequest = FALSE;
@@ -1577,6 +1875,7 @@ bool32 SelectMatchCallMessage(int trainerId, u8 *str)
 
     BuildMatchCallString(matchCallId, matchCallText, str);
     return newRematchRequest;
+#endif
 }
 
 static int GetTrainerMatchCallId(int trainerId)
@@ -1676,13 +1975,15 @@ static void BuildMatchCallString(int matchCallId, const struct MatchCallText *ma
     StringExpandPlaceholders(str, matchCallText->text);
 }
 
+static u8 *const sMatchCallTextStringVars[] = { gStringVar1, gStringVar2, gStringVar3 };
+
 static void PopulateMatchCallStringVars(int matchCallId, const s8 *stringVarFuncIds)
 {
     int i;
     for (i = 0; i < NUM_STRVARS_IN_MSG; i++)
     {
         if (stringVarFuncIds[i] >= 0)
-            PopulateMatchCallStringVar(matchCallId, stringVarFuncIds[i], GetStringVar(i));
+            PopulateMatchCallStringVar(matchCallId, stringVarFuncIds[i], sMatchCallTextStringVars[i]);
     }
 }
 
@@ -1732,9 +2033,53 @@ static void PopulateMapName(int matchCallId, u8 *destStr)
     GetMapName(destStr, GetRematchTrainerLocation(matchCallId), 0);
 }
 
+static u8 GetLandEncounterSlot(void)
+{
+    int rand = Random() % 100;
+    if (rand < 20)
+        return 0;
+    else if (rand >= 20 && rand < 40)
+        return 1;
+    else if (rand >= 40 && rand < 50)
+        return 2;
+    else if (rand >= 50 && rand < 60)
+        return 3;
+    else if (rand >= 60 && rand < 70)
+        return 4;
+    else if (rand >= 70 && rand < 80)
+        return 5;
+    else if (rand >= 80 && rand < 85)
+        return 6;
+    else if (rand >= 85 && rand < 90)
+        return 7;
+    else if (rand >= 90 && rand < 94)
+        return 8;
+    else if (rand >= 94 && rand < 98)
+        return 9;
+    else if (rand >= 98 && rand < 99)
+        return 10;
+    else
+        return 11;
+}
+
+static u8 GetWaterEncounterSlot(void)
+{
+    int rand = Random() % 100;
+    if (rand < 60)
+        return 0;
+    else if (rand >= 60 && rand < 90)
+        return 1;
+    else if (rand >= 90 && rand < 95)
+        return 2;
+    else if (rand >= 95 && rand < 99)
+        return 3;
+    else
+        return 4;
+}
+
 static void PopulateSpeciesFromTrainerLocation(int matchCallId, u8 *destStr)
 {
-    enum Species species[2];
+    u16 species[2];
     int numSpecies;
     u8 slot;
     int i = 0;
@@ -1757,7 +2102,7 @@ static void PopulateSpeciesFromTrainerLocation(int matchCallId, u8 *destStr)
             numSpecies = 0;
             if (gWildMonHeaders[i].encounterTypes[timeOfDay].landMonsInfo)
             {
-                slot = GetLandEncounterSlotForMatchCall();
+                slot = GetLandEncounterSlot();
                 species[numSpecies] = gWildMonHeaders[i].encounterTypes[timeOfDay].landMonsInfo->wildPokemon[slot].species;
                 numSpecies++;
             }
@@ -1765,7 +2110,7 @@ static void PopulateSpeciesFromTrainerLocation(int matchCallId, u8 *destStr)
             timeOfDay = GetTimeOfDayForEncounters(i, WILD_AREA_WATER);
             if (gWildMonHeaders[i].encounterTypes[timeOfDay].waterMonsInfo)
             {
-                slot = GetWaterEncounterSlotForMatchCall();
+                slot = GetWaterEncounterSlot();
                 species[numSpecies] = gWildMonHeaders[i].encounterTypes[timeOfDay].waterMonsInfo->wildPokemon[slot].species;
                 numSpecies++;
             }
@@ -1832,7 +2177,7 @@ static int GetNumOwnedBadges(void)
 {
     u32 i;
 
-    for (i = 0; i < NUM_BADGES; i++)
+    for (i = 0; i < ARRAY_COUNT(gBadgeFlags); i++)
     {
         if (!FlagGet(gBadgeFlags[i]))
             break;
@@ -1841,6 +2186,7 @@ static int GetNumOwnedBadges(void)
     return i;
 }
 
+#if !IS_HNS
 // Whether or not a trainer calling the player from a different route should request a battle
 static bool32 ShouldTrainerRequestBattle(int matchCallId)
 {
@@ -1869,6 +2215,7 @@ static bool32 ShouldTrainerRequestBattle(int matchCallId)
 
     return FALSE;
 }
+#endif
 
 static u16 GetFrontierStreakInfo(u16 facilityId, u32 *topicTextId)
 {
@@ -1954,7 +2301,20 @@ static u16 GetFrontierStreakInfo(u16 facilityId, u32 *topicTextId)
 void BufferPokedexRatingForMatchCall(u8 *destStr)
 {
     int numSeen, numCaught;
-    u8 *str;
+    u8 *str, *str2;
+
+#if IS_HNS
+    if (VarGet(VAR_NEWBARKTOWN_LABSTATE) == 3)
+    {
+        StringExpandPlaceholders(destStr, gElmDexRatingText_GoFindMrPokemon);
+        return;
+    }
+    if (VarGet(VAR_NEWBARKTOWN_LABSTATE) == 4)
+    {
+        StringExpandPlaceholders(destStr, gElmDexRatingText_Robbery);
+        return;
+    }
+#endif
 
     u8 *buffer = Alloc(sizeof(gStringVar4));
     if (!buffer)
@@ -1963,16 +2323,35 @@ void BufferPokedexRatingForMatchCall(u8 *destStr)
         return;
     }
 
-    numSeen = GetRegionalPokedexCount(FLAG_GET_SEEN);
-    numCaught = GetRegionalPokedexCount(FLAG_GET_CAUGHT);
-    ConvertIntToDecimalStringN(gStringVar1, numSeen, STR_CONV_MODE_LEFT_ALIGN, 3);
-    ConvertIntToDecimalStringN(gStringVar2, numCaught, STR_CONV_MODE_LEFT_ALIGN, 3);
-    str = StringCopy(buffer, gBirchDexRatingText_AreYouCurious);
-    *(str++) = CHAR_PROMPT_CLEAR;
-    str = StringCopy(str, gBirchDexRatingText_SoYouveSeenAndCaught);
-    *(str++) = CHAR_PROMPT_CLEAR;
-    StringCopy(str, GetPokedexRatingText(numCaught));
-    str = StringExpandPlaceholders(destStr, buffer);
+#if IS_HNS
+    bool8 hasAckJohtoDex = FlagGet(FLAG_SYS_ACK_COMPLETE_JOHTO_DEX);
+    if (!hasAckJohtoDex || !IsNationalPokedexEnabled())
+    {
+#endif
+
+        numSeen = GetRegionalPokedexCount(FLAG_GET_SEEN);
+        numCaught = GetRegionalPokedexCount(FLAG_GET_CAUGHT);
+        ConvertIntToDecimalStringN(gStringVar1, numSeen, STR_CONV_MODE_LEFT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar2, numCaught, STR_CONV_MODE_LEFT_ALIGN, 3);
+#if IS_HNS
+        str = StringCopy(buffer, gElmDexRatingText_AreYouCurious);
+        *(str++) = CHAR_PROMPT_CLEAR;
+#else
+        str = StringCopy(buffer, gBirchDexRatingText_AreYouCurious);
+        *(str++) = CHAR_PROMPT_CLEAR;
+#endif
+        str = StringCopy(str, gBirchDexRatingText_SoYouveSeenAndCaught);
+        *(str++) = CHAR_PROMPT_CLEAR;
+        StringCopy(str, GetPokedexRatingText(numCaught));
+        str = StringExpandPlaceholders(destStr, buffer);
+
+#if IS_HNS
+        if (gSpecialVar_Result == TRUE)
+            FlagSet(FLAG_SYS_ACK_COMPLETE_JOHTO_DEX);
+    }
+    else
+        str = StringExpandPlaceholders(destStr, gElmDexRatingText_AreYouCuriousNational);
+#endif
 
     if (IsNationalPokedexEnabled())
     {
@@ -1981,7 +2360,22 @@ void BufferPokedexRatingForMatchCall(u8 *destStr)
         numCaught = GetNationalPokedexCount(FLAG_GET_CAUGHT);
         ConvertIntToDecimalStringN(gStringVar1, numSeen, STR_CONV_MODE_LEFT_ALIGN, 4);
         ConvertIntToDecimalStringN(gStringVar2, numCaught, STR_CONV_MODE_LEFT_ALIGN, 4);
-        StringExpandPlaceholders(str, gBirchDexRatingText_OnANationwideBasis);
+#if IS_HNS
+        if (hasAckJohtoDex || HasAllMons())
+        {
+            if (!hasAckJohtoDex)
+                str2 = StringCopy(buffer, gBirchDexRatingText_OnANationwideBasis);
+            else
+                str2 = StringCopy(buffer, gBirchDexRatingText_SoYouveSeenAndCaught);
+            *(str2++) = CHAR_PROMPT_CLEAR;
+            StringCopy(str2, GetNationalPokedexRatingText(numCaught));
+        }
+        else
+            str2 = StringCopy(buffer, gBirchDexRatingText_OnANationwideBasis);
+        StringExpandPlaceholders(str, buffer);
+#else
+    StringExpandPlaceholders(str, gBirchDexRatingText_OnANationwideBasis);
+#endif
     }
 
     Free(buffer);
@@ -1997,6 +2391,15 @@ void LoadMatchCallWindowGfx(u32 windowId, u32 destOffset, u32 paletteId)
 void DrawMatchCallTextBoxBorder(u32 windowId, u32 tileOffset, u32 paletteId)
 {
     DrawMatchCallTextBoxBorder_Internal(windowId, tileOffset, paletteId);
+}
+
+u32 GetTrainerRematchStepCounter(void)
+{
+#if FREE_MATCH_CALL == FALSE
+    return gSaveBlock1Ptr->trainerRematchStepCounter;
+#else
+    return 0;
+#endif
 }
 
 void SetTrainerRematchStepCounter(u32 value)

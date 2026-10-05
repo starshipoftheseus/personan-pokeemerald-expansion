@@ -24,7 +24,7 @@
 #define FLAG_TEMP_B      (TEMP_FLAGS_START + 0xB)  // Unused Flag
 #define FLAG_TEMP_C      (TEMP_FLAGS_START + 0xC)  // Unused Flag
 #define FLAG_TEMP_D      (TEMP_FLAGS_START + 0xD)  // Unused Flag
-#define FLAG_TEMP_E      (TEMP_FLAGS_START + 0xE)  // When set, follower Pokémon won't be spawned
+#define FLAG_TEMP_E      (TEMP_FLAGS_START + 0xE)  // When set, follower pokemon won't be spawned
 #define FLAG_TEMP_F      (TEMP_FLAGS_START + 0xF)  // Unused Flag
 #define FLAG_TEMP_10     (TEMP_FLAGS_START + 0x10) // Unused Flag
 #define FLAG_TEMP_11     (TEMP_FLAGS_START + 0x11)
@@ -44,15 +44,19 @@
 #define FLAG_TEMP_1F     (TEMP_FLAGS_START + 0x1F)
 #define TEMP_FLAGS_END   FLAG_TEMP_1F
 #define NUM_TEMP_FLAGS   (TEMP_FLAGS_END - TEMP_FLAGS_START + 1)
+#define FLAG_SYS_GBS_ENABLED    0x20 // GBS Flag
+#define FLAG_ITEM_PLAYER_ROOM_GB_PLAYER 0x21 //GBS Flag 2
 
 #if IS_FRLG
 
 #include "constants/flags_frlg.h"
 
+#elif IS_HNS
+
+#include "constants/flags_hns.h"
+
 #else
 
-#define FLAG_UNUSED_0x020    0x20 // Unused Flag
-#define FLAG_UNUSED_0x021    0x21 // Unused Flag
 #define FLAG_UNUSED_0x022    0x22 // Unused Flag
 #define FLAG_UNUSED_0x023    0x23 // Unused Flag
 #define FLAG_UNUSED_0x024    0x24 // Unused Flag
@@ -133,7 +137,7 @@
 #define FLAG_OCEANIC_MUSEUM_MET_REPORTER     0x69
 #define FLAG_RECEIVED_HM_STRENGTH            0x6A
 #define FLAG_RECEIVED_HM_ROCK_SMASH          0x6B
-#define FLAG_WHITEOUT_TO_LAVARIDGE           0x6C // Set after defeating Flannery, so the player can't white out from poison before receiving Go Goggles
+#define FLAG_WHITEOUT_TO_LAVARIDGE           0x6C // Set after defeating Flannery, so the player cant white out from poison before receiving Go Goggles
 #define FLAG_RECEIVED_HM_FLASH               0x6D
 #define FLAG_RECEIVED_HM_FLY                 0x6E
 #define FLAG_GROUDON_AWAKENED_MAGMA_HIDEOUT  0x6F
@@ -1638,8 +1642,7 @@
 #define FLAG_UNUSED_0x95F                           (DAILY_FLAGS_START + 0x3F) // Unused Flag
 #define DAILY_FLAGS_END                             (FLAG_UNUSED_0x95F + (7 - FLAG_UNUSED_0x95F % 8))
 #define NUM_DAILY_FLAGS                             (DAILY_FLAGS_END - DAILY_FLAGS_START + 1)
-
-#define FLAGS_COUNT (DAILY_FLAGS_END + 1)
+#define BUILD_FLAGS_END                             DAILY_FLAGS_END
 
 // Special Flags (Stored in EWRAM (sSpecialFlags), not in the SaveBlock)
 #define SPECIAL_FLAGS_START                     0x4000
@@ -2434,7 +2437,74 @@
 #define FLAG_WORLD_MAP_SEVEN_ISLAND_SEVAULT_CANYON_TANOBY_KEY       0
 #define FLAG_WORLD_MAP_BIRTH_ISLAND_EXTERIOR                        0
 
+// HnS visited flags
+
+#define FLAG_VISITED_NEWBARK_TOWN                   0
+#define FLAG_VISITED_CHERRYGROVE_CITY               0
+#define FLAG_VISITED_VIOLET_CITY                    0
+#define FLAG_VISITED_AZALEA_TOWN                    0
+#define FLAG_VISITED_GOLDENROD_CITY                 0
+#define FLAG_VISITED_ECRUTEAK_CITY                  0
+#define FLAG_VISITED_OLIVINE_CITY                   0
+#define FLAG_VISITED_CIANWOOD_CITY                  0
+#define FLAG_VISITED_MAHOGANY_TOWN                  0
+#define FLAG_VISITED_LAKE_OF_RAGE                   0
+#define FLAG_VISITED_BLACKTHORN_CITY                0
+#define FLAG_VISITED_INDIGO_PLATEAU                 0
+#define FLAG_VISITED_MT_SILVER                      0
+#define FLAG_VISITED_RECEPTION_GATE                 0
+#define FLAG_VISITED_SAFARI_ZONE_GATE               0
+#define FLAG_VISITED_KANTO                          0
+#define FLAG_VISITED_PALLET_TOWN                    0
+#define FLAG_VISITED_VIRIDIAN_CITY                  0
+#define FLAG_VISITED_PEWTER_CITY                    0
+#define FLAG_VISITED_CERULEAN_CITY                  0
+#define FLAG_VISITED_VERMILION_CITY                 0
+#define FLAG_VISITED_LAVENDER_TOWN                  0
+#define FLAG_VISITED_CELADON_CITY                   0
+#define FLAG_VISITED_SAFFRON_CITY                   0
+#define FLAG_VISITED_FUCHSIA_CITY                   0
+#define FLAG_VISITED_CINNABAR_ISLAND                0
+
 #endif
+
+// Several engine systems predate multi-region badge counts and only handle 8 badges
+// (badge-count-indexed tables like sBadgeLevel/sWhiteOutBadgeMoney, gBadgeFlags, etc).
+// HnS has 16 badges, so NUM_BADGES cannot be used to size or index any of those - use
+// this clamped count instead, or they read past the end of their tables.
+#define NUM_BADGES_CAPPED                       (NUM_BADGES > 8 ? 8 : NUM_BADGES)
+
+// Engine-wide flags for options/challenge settings (shared across all builds).
+// Fixed 32-flag block; not cleared by ClearDailyFlags or ClearTempFieldEventData.
+//
+// This address is PINNED and must never change. It used to be (BUILD_FLAGS_END + 1),
+// which meant every daily flag added to any build slid this whole block up by one and
+// silently renumbered it. Flag IDs are absolute bit indices baked into save files, so
+// that renumbering re-pointed live save data at the wrong flags (e.g. a save's
+// "Exp. Share on" bit became FLAG_LIMIT_TO_50, capping the party at level 50).
+//
+// Every build's flags must stay below this address. Current headroom below 0x960:
+// HnS ends at 0x91A (69 free), FRLG at 0x8FF (96 free), Emerald at 0x95F (0 free).
+// If a build ever needs to grow past it, raise the pin AND bump SAVE_VERSION with a
+// migration - do not let it float again.
+#define ENGINE_FLAGS_START                      0x960
+#define NUM_ENGINE_FLAGS                        32
+#define FLAG_EVEN_FASTER_JOY                    (ENGINE_FLAGS_START + 0)
+#define FLAG_MINTS_DISABLED                     (ENGINE_FLAGS_START + 1)
+#define FLAG_RECEIVED_FIRST_BALLS               (ENGINE_FLAGS_START + 2)
+#define FLAG_START_NUZLOCKE                     (ENGINE_FLAGS_START + 3)
+#define FLAG_END_NUZLOCKE                       (ENGINE_FLAGS_START + 4)
+#define FLAG_DISABLE_ENCOUNTERS                 (ENGINE_FLAGS_START + 5)
+#define FLAG_DISABLE_TRAINERS                   (ENGINE_FLAGS_START + 6)
+#define FLAG_LIMIT_TO_50                        (ENGINE_FLAGS_START + 7)
+#define FLAG_EXP_SHARE_ENABLED                  (ENGINE_FLAGS_START + 8)
+#define FLAG_SMART_WILD_AI                      (ENGINE_FLAGS_START + 9)
+#define FLAG_NO_WILD_RUNNING                      (ENGINE_FLAGS_START + 10)
+#define FLAG_NO_WILD_CATCHING                      (ENGINE_FLAGS_START + 11)
+#define FLAG_DISABLE_EXP_GAIN                      (ENGINE_FLAGS_START + 12)
+#define ENGINE_FLAGS_END                        (ENGINE_FLAGS_START + NUM_ENGINE_FLAGS - 1)
+
+#define FLAGS_COUNT (ENGINE_FLAGS_END + 1)
 
 #if TESTING
 #define TESTING_FLAGS_START                     0x5000
@@ -2448,10 +2518,5 @@
 #define TESTING_FLAG_UNUSED_7                   (TESTING_FLAGS_START + 0x7)
 #endif // TESTING
 
-
-#if !defined(FIRERED) && !defined(LEAFGREEN)
-// Combined Hoenn + Kanto build: Kanto-only constants in their own range.
-#include "constants/flags_kanto.h"
-#endif
 
 #endif // GUARD_CONSTANTS_FLAGS_H

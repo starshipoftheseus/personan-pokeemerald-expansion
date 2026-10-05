@@ -167,7 +167,7 @@ SINGLE_BATTLE_TEST("Dynamax: Dynamax expires after three turns and correctly con
 // Visual test to make sure Zoroark appears as Wobbuffet/Zigzagoon until illusion breaks
 SINGLE_BATTLE_TEST("Dynamax: Illusion doesn't break upon Dynamaxing when illusioned")
 {
-    enum Species species;
+    u32 species;
     PARAMETRIZE { species = SPECIES_WOBBUFFET; }
     PARAMETRIZE { species = SPECIES_ZIGZAGOON; }
     GIVEN {
@@ -239,8 +239,8 @@ SINGLE_BATTLE_TEST("Dynamax: Dynamaxed Pokemon are affected by Grudge")
     } SCENE {
         MESSAGE("The opposing Wobbuffet used Grudge!");
         MESSAGE("Wobbuffet used Max Strike!");
-        MESSAGE("Wobbuffet lost all of Scratch's PP due to the grudge!");
         MESSAGE("The opposing Wobbuffet fainted!");
+        MESSAGE("Wobbuffet's Scratch lost all its PP due to the grudge!");
     }
 }
 
@@ -444,7 +444,7 @@ SINGLE_BATTLE_TEST("Dynamax: Dynamaxed Pokemon that changes forms does not gain 
 SINGLE_BATTLE_TEST("Dynamax: Dynamaxed Pokemon that changes forms does not gain HP unless the new form gains Max HP")
 {
     u32 hp = 1, maxHP = 200;
-    enum Species species;
+    u32 species;
     PARAMETRIZE { species = SPECIES_ZYGARDE_10_POWER_CONSTRUCT; }
     PARAMETRIZE { species = SPECIES_ZYGARDE_50_POWER_CONSTRUCT; }
     GIVEN {
@@ -644,7 +644,7 @@ SINGLE_BATTLE_TEST("Dynamax: Sitrus Berries heal based on a Pokemon's non-Dynama
     } WHEN {
         TURN { MOVE(opponent, MOVE_FLING); MOVE(player, MOVE_SCRATCH, gimmick: dynamax); }
     } SCENE {
-        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_HELD_ITEM_BERRY, player);
+        MESSAGE("Wobbuffet restored its health using its Sitrus Berry!");
         HP_BAR(player, captureDamage: &results[i].damage);
     } FINALLY {
         EXPECT_EQ(results[0].damage, results[1].damage);
@@ -675,7 +675,7 @@ SINGLE_BATTLE_TEST("Dynamax: Max Strike lowers single opponent's speed")
 {
     GIVEN {
         // Fails?: ASSUME(GetMaxMove(B_POSITION_PLAYER_LEFT, MOVE_SCRATCH) == MOVE_MAX_STRIKE);
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_STRIKE, speed: -1);
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_STRIKE, MOVE_EFFECT_LOWER_SPEED_SIDE));
         OPPONENT(SPECIES_WOBBUFFET) { Speed(100); }
         PLAYER(SPECIES_WOBBUFFET) { Speed(80); }
     } WHEN {
@@ -699,7 +699,7 @@ SINGLE_BATTLE_TEST("Dynamax: Max Strike lowers single opponent's speed")
 DOUBLE_BATTLE_TEST("Dynamax: Max Strike lowers both opponents' speed")
 {
     GIVEN {
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_STRIKE, speed: -1);
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_STRIKE, MOVE_EFFECT_LOWER_SPEED_SIDE));
         PLAYER(SPECIES_WOBBUFFET) { Speed(80); }
         PLAYER(SPECIES_WOBBUFFET) { Speed(79); }
         OPPONENT(SPECIES_WOBBUFFET) { Speed(100); }
@@ -736,7 +736,7 @@ DOUBLE_BATTLE_TEST("Dynamax: Max Knuckle raises both allies' attack")
 {
     s16 damage[4];
     GIVEN {
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_KNUCKLE, self: TRUE, attack: 1);
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_KNUCKLE, MOVE_EFFECT_RAISE_TEAM_ATTACK));
         ASSUME(GetMoveCategory(MOVE_CLOSE_COMBAT) == DAMAGE_CATEGORY_PHYSICAL);
         ASSUME(GetMoveCategory(MOVE_SCRATCH) == DAMAGE_CATEGORY_PHYSICAL);
         PLAYER(SPECIES_WOBBUFFET);
@@ -930,7 +930,7 @@ SINGLE_BATTLE_TEST("Dynamax: G-Max Stonesurge sets up Stealth Rocks")
     } SCENE {
         // turn 1
         MESSAGE("Drednaw used G-Max Stonesurge!");
-        MESSAGE("Pointed stones float in the air on the opposing side!");
+        MESSAGE("Pointed stones float in the air around the opposing team!");
         // turn 2
         MESSAGE("Pointed stones dug into the opposing Wobbuffet!");
     }
@@ -1309,7 +1309,7 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Replenish recycles allies' berries 50\% of th
 {
     PASSES_RANDOMLY(1, 2, RNG_G_MAX_REPLENISH);
     GIVEN {
-        ASSUME(MoveHasAdditionalEffectSelf(MOVE_G_MAX_REPLENISH, MOVE_EFFECT_RECYCLE_BERRIES));
+        ASSUME(MoveHasAdditionalEffect(MOVE_G_MAX_REPLENISH, MOVE_EFFECT_RECYCLE_BERRIES));
         ASSUME(GetItemHoldEffect(ITEM_APICOT_BERRY) == HOLD_EFFECT_SP_DEFENSE_UP);
         PLAYER(SPECIES_SNORLAX) { Item(ITEM_APICOT_BERRY); GigantamaxFactor(TRUE); }
         PLAYER(SPECIES_MUNCHLAX) { Item(ITEM_APICOT_BERRY); Ability(ABILITY_THICK_FAT); }
@@ -1324,10 +1324,10 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Replenish recycles allies' berries 50\% of th
     } SCENE {
         // turn 1
 
-        MESSAGE("The Apicot Berry boosted Snorlax's Sp. Def!");
-        MESSAGE("The Apicot Berry boosted Munchlax's Sp. Def!");
-        MESSAGE("The Apicot Berry boosted the opposing Wobbuffet's Sp. Def!");
-        MESSAGE("The Apicot Berry boosted the opposing Wobbuffet's Sp. Def!");
+        MESSAGE("Using Apicot Berry, the Sp. Def of Snorlax rose!");
+        MESSAGE("Using Apicot Berry, the Sp. Def of Munchlax rose!");
+        MESSAGE("Using Apicot Berry, the Sp. Def of the opposing Wobbuffet rose!");
+        MESSAGE("Using Apicot Berry, the Sp. Def of the opposing Wobbuffet rose!");
         // turn 2
         MESSAGE("Snorlax used G-Max Replenish!");
         ANIMATION(ANIM_TYPE_MOVE, MOVE_G_MAX_REPLENISH, playerLeft);
@@ -1364,7 +1364,7 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Finale heals allies by 1/6 of their health")
 {
     s16 damage1, damage2;
     GIVEN {
-        ASSUME(MoveHasAdditionalEffectSelf(MOVE_G_MAX_FINALE, MOVE_EFFECT_HEAL_TEAM));
+        ASSUME(MoveHasAdditionalEffect(MOVE_G_MAX_FINALE, MOVE_EFFECT_HEAL_TEAM));
         PLAYER(SPECIES_ALCREMIE) { HP(1); GigantamaxFactor(TRUE); }
         PLAYER(SPECIES_MILCERY) { HP(1); }
         OPPONENT(SPECIES_WOBBUFFET);
@@ -1386,7 +1386,7 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Sweetness cures allies' status conditions")
 {
     u32 j;
     GIVEN {
-        ASSUME(MoveHasAdditionalEffectSelf(MOVE_G_MAX_SWEETNESS, MOVE_EFFECT_AROMATHERAPY));
+        ASSUME(MoveHasAdditionalEffect(MOVE_G_MAX_SWEETNESS, MOVE_EFFECT_AROMATHERAPY));
         PLAYER(SPECIES_APPLETUN) { Status1(STATUS1_POISON); GigantamaxFactor(TRUE); }
         PLAYER(SPECIES_APPLIN)  { Status1(STATUS1_POISON); }
         PLAYER(SPECIES_APPLIN)  { Status1(STATUS1_POISON); }
@@ -1403,7 +1403,7 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Sweetness cures allies' status conditions")
         STATUS_ICON(playerRight, none: TRUE);
     } THEN {
         for (j = 0; j < PARTY_SIZE; j++)
-            EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_STATUS), STATUS1_NONE);
+            EXPECT_EQ(GetMonData(&gPlayerParty[0], MON_DATA_STATUS), STATUS1_NONE);
     }
 }
 
@@ -1440,7 +1440,7 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Chi Strike boosts allies' crit chance by 1 st
     u32 j;
     GIVEN {
         WITH_CONFIG(B_CRIT_CHANCE, GEN_6);
-        ASSUME(MoveHasAdditionalEffectSelf(MOVE_G_MAX_CHI_STRIKE, MOVE_EFFECT_CRIT_PLUS_SIDE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_G_MAX_CHI_STRIKE, MOVE_EFFECT_CRIT_PLUS_SIDE));
         PLAYER(SPECIES_MACHAMP) { GigantamaxFactor(TRUE); }
         PLAYER(SPECIES_MACHOP);
         OPPONENT(SPECIES_WOBBUFFET);
@@ -1584,7 +1584,7 @@ SINGLE_BATTLE_TEST("Dynamax: Max Attacks prints a message when hitting into Max 
 SINGLE_BATTLE_TEST("Dynamax: Max Moves don't bypass absorbing abilities")
 {
     enum Move move;
-    enum Species species;
+    u32 species;
     enum Ability ability;
     PARAMETRIZE { move = MOVE_SPARK;     ability = ABILITY_VOLT_ABSORB;     species = SPECIES_LANTURN; }
     PARAMETRIZE { move = MOVE_WATER_GUN; ability = ABILITY_WATER_ABSORB;    species = SPECIES_LANTURN; }
@@ -1655,7 +1655,7 @@ DOUBLE_BATTLE_TEST("Dynamax stat lowering moves don't make stat-changing abiliti
     enum Move move = MOVE_NONE;
     u32 stat = 0;
     enum Ability ability = ABILITY_NONE;
-    enum Ability abilityList[] = {ABILITY_COMPETITIVE, ABILITY_DEFIANT, ABILITY_CONTRARY, ABILITY_SIMPLE};
+    u32 abilityList[] = {ABILITY_COMPETITIVE, ABILITY_DEFIANT, ABILITY_CONTRARY, ABILITY_SIMPLE};
     for (u32 j = 0; j < 4; j++)
     {
         PARAMETRIZE { move = MOVE_SCRATCH; stat = STAT_SPEED; ability = abilityList[j]; }
@@ -1665,17 +1665,11 @@ DOUBLE_BATTLE_TEST("Dynamax stat lowering moves don't make stat-changing abiliti
         PARAMETRIZE { move = MOVE_CRUNCH; stat = STAT_SPDEF; ability = abilityList[j]; }
     }
     GIVEN {
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_WYRMWIND, attack: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_WYRMWIND));
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_PHANTASM, defense: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_PHANTASM));
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_FLUTTERBY, spAtk: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_FLUTTERBY));
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_DARKNESS, spDef: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_DARKNESS));
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_STRIKE, speed: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_STRIKE));
-
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_STRIKE, MOVE_EFFECT_LOWER_SPEED_SIDE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_FLUTTERBY, MOVE_EFFECT_LOWER_SP_ATK_SIDE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_PHANTASM, MOVE_EFFECT_LOWER_DEFENSE_SIDE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_WYRMWIND, MOVE_EFFECT_LOWER_ATTACK_SIDE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_DARKNESS, MOVE_EFFECT_LOWER_SP_DEF_SIDE));
         PLAYER(SPECIES_WOBBUFFET) { }
         PLAYER(SPECIES_WOBBUFFET) { }
         OPPONENT(SPECIES_WOBBUFFET) { Ability(ability); }
@@ -1695,7 +1689,7 @@ DOUBLE_BATTLE_TEST("Dynamax stat raising moves don't make stat-changing abilitie
     enum Move move = MOVE_NONE;
     u32 stat = 0;
     enum Ability ability = ABILITY_NONE;
-    enum Ability abilityList[] = {ABILITY_CONTRARY, ABILITY_SIMPLE};
+    u32 abilityList[] = {ABILITY_CONTRARY, ABILITY_SIMPLE};
     for (u32 j = 0; j < 2; j++)
     {
         PARAMETRIZE { move = MOVE_PECK; stat = STAT_SPEED; ability = abilityList[j]; }
@@ -1705,16 +1699,11 @@ DOUBLE_BATTLE_TEST("Dynamax stat raising moves don't make stat-changing abilitie
         PARAMETRIZE { move = MOVE_MUD_SLAP; stat = STAT_SPDEF; ability = abilityList[j]; }
     }
     GIVEN {
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_WYRMWIND, attack: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_WYRMWIND));
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_PHANTASM, defense: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_PHANTASM));
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_FLUTTERBY, spAtk: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_FLUTTERBY));
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_DARKNESS, spDef: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_DARKNESS));
-        ASSUME_MOVE_EFFECT_STAT_CHANGE(MOVE_MAX_STRIKE, speed: -1);
-        ASSUME(MoveHasAdditionalOnSideEffect(MOVE_MAX_STRIKE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_STRIKE, MOVE_EFFECT_LOWER_SPEED_SIDE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_FLUTTERBY, MOVE_EFFECT_LOWER_SP_ATK_SIDE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_PHANTASM, MOVE_EFFECT_LOWER_DEFENSE_SIDE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_WYRMWIND, MOVE_EFFECT_LOWER_ATTACK_SIDE));
+        ASSUME(MoveHasAdditionalEffect(MOVE_MAX_DARKNESS, MOVE_EFFECT_LOWER_SP_DEF_SIDE));
         PLAYER(SPECIES_WOBBUFFET) { Ability(ability); }
         PLAYER(SPECIES_WOBBUFFET) { Ability(ABILITY_SHADOW_TAG); }
         OPPONENT(SPECIES_WOBBUFFET);
@@ -1733,7 +1722,7 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Finale heals allies by 1/6 of their health, e
 {
     s16 damage1, damage2;
     GIVEN {
-        ASSUME(MoveHasAdditionalEffectSelf(MOVE_G_MAX_FINALE, MOVE_EFFECT_HEAL_TEAM));
+        ASSUME(MoveHasAdditionalEffect(MOVE_G_MAX_FINALE, MOVE_EFFECT_HEAL_TEAM));
         PLAYER(SPECIES_ALCREMIE) { HP(1); GigantamaxFactor(TRUE); }
         PLAYER(SPECIES_MILCERY) { HP(1); }
         OPPONENT(SPECIES_WOBBUFFET)  { HP(1); }
@@ -1755,7 +1744,7 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Replenish recycles allies' berries 50\% of th
 {
     PASSES_RANDOMLY(1, 2, RNG_G_MAX_REPLENISH);
     GIVEN {
-        ASSUME(MoveHasAdditionalEffectSelf(MOVE_G_MAX_REPLENISH, MOVE_EFFECT_RECYCLE_BERRIES));
+        ASSUME(MoveHasAdditionalEffect(MOVE_G_MAX_REPLENISH, MOVE_EFFECT_RECYCLE_BERRIES));
         ASSUME(GetItemHoldEffect(ITEM_APICOT_BERRY) == HOLD_EFFECT_SP_DEFENSE_UP);
         PLAYER(SPECIES_SNORLAX) { Item(ITEM_APICOT_BERRY); GigantamaxFactor(TRUE); }
         PLAYER(SPECIES_MUNCHLAX) { Item(ITEM_APICOT_BERRY); Ability(ABILITY_THICK_FAT); }
@@ -1771,8 +1760,8 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Replenish recycles allies' berries 50\% of th
         TURN { MOVE(playerLeft, MOVE_SCRATCH, target: opponentLeft, gimmick: GIMMICK_DYNAMAX); SEND_OUT(opponentLeft, 2);}
     } SCENE {
         // turn 1
-        MESSAGE("The Apicot Berry boosted Snorlax's Sp. Def!");
-        MESSAGE("The Apicot Berry boosted Munchlax's Sp. Def!");
+        MESSAGE("Using Apicot Berry, the Sp. Def of Snorlax rose!");
+        MESSAGE("Using Apicot Berry, the Sp. Def of Munchlax rose!");
         // turn 2
         MESSAGE("Snorlax used G-Max Replenish!");
         ANIMATION(ANIM_TYPE_MOVE, MOVE_G_MAX_REPLENISH, playerLeft);
@@ -1787,7 +1776,7 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Volt Crash paralyzes other opponent even if i
         ASSUME(MoveHasAdditionalEffect(MOVE_G_MAX_VOLT_CRASH, MOVE_EFFECT_PARALYZE_SIDE));
         PLAYER(SPECIES_PIKACHU) { GigantamaxFactor(TRUE); }
         PLAYER(SPECIES_PICHU);
-        OPPONENT(SPECIES_WOBBUFFET) { HP(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { HP(1); } 
         OPPONENT(SPECIES_WYNAUT);
         OPPONENT(SPECIES_WYNAUT);
     } WHEN {
@@ -1802,73 +1791,6 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Volt Crash paralyzes other opponent even if i
         ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_PRZ, opponentRight);
         MESSAGE("The opposing Wynaut is paralyzed, so it may be unable to move!");
         STATUS_ICON(opponentRight, paralysis: TRUE);
-    }
-}
-
-SINGLE_BATTLE_TEST("Dynamax: Max Move power is based on the base move", s16 damage)
-{
-    u32 move;
-
-    PARAMETRIZE { move = MOVE_SCRATCH; }
-    PARAMETRIZE { move = MOVE_MEGA_KICK; }
-
-    GIVEN {
-        ASSUME(GetMovePower(MOVE_SCRATCH) == 40);
-        ASSUME(GetMovePower(MOVE_MEGA_KICK) == 120);
-        PLAYER(SPECIES_WOBBUFFET);
-        OPPONENT(SPECIES_WOBBUFFET);
-    } WHEN {
-        TURN { MOVE(player, move, gimmick: GIMMICK_DYNAMAX); }
-    } SCENE {
-        HP_BAR(opponent, captureDamage: &results[i].damage);
-    } FINALLY {
-        EXPECT_GT(results[1].damage, results[0].damage);
-    }
-}
-
-SINGLE_BATTLE_TEST("Dynamax: Gravity does not prevent Max Guard derived from a Gravity-banned status move")
-{
-    enum Move move;
-
-    PARAMETRIZE { move = MOVE_SPLASH; }
-    PARAMETRIZE { move = MOVE_MAGNET_RISE; }
-    PARAMETRIZE { move = MOVE_TELEKINESIS; }
-
-    GIVEN {
-        ASSUME(GetMoveEffect(MOVE_GRAVITY) == EFFECT_GRAVITY);
-        ASSUME(IsMoveGravityBanned(move));
-        PLAYER(SPECIES_WOBBUFFET) { Speed(1); Moves(move, MOVE_SCRATCH); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); Moves(MOVE_GRAVITY, MOVE_CELEBRATE); }
-    } WHEN {
-        TURN { MOVE(opponent, MOVE_GRAVITY); MOVE(player, MOVE_SCRATCH); }
-        TURN { MOVE(player, move, gimmick: GIMMICK_DYNAMAX); MOVE(opponent, MOVE_CELEBRATE); }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_GRAVITY, opponent);
-        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_DYNAMAX_GROWTH, player);
-        MESSAGE("Wobbuffet used Max Guard!");
-    }
-}
-
-SINGLE_BATTLE_TEST("Dynamax: Gravity does not prevent a Max Move derived from a Gravity-banned damaging move")
-{
-    enum Move move;
-
-    PARAMETRIZE { move = MOVE_FLY; }
-    PARAMETRIZE { move = MOVE_BOUNCE; }
-    PARAMETRIZE { move = MOVE_HIGH_JUMP_KICK; }
-
-    GIVEN {
-        ASSUME(GetMoveEffect(MOVE_GRAVITY) == EFFECT_GRAVITY);
-        ASSUME(IsMoveGravityBanned(move));
-        PLAYER(SPECIES_WOBBUFFET) { Speed(1); Moves(move, MOVE_SCRATCH); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(2); Moves(MOVE_GRAVITY, MOVE_CELEBRATE); }
-    } WHEN {
-        TURN { MOVE(opponent, MOVE_GRAVITY); MOVE(player, MOVE_SCRATCH); }
-        TURN { MOVE(player, move, gimmick: GIMMICK_DYNAMAX); MOVE(opponent, MOVE_CELEBRATE); }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_GRAVITY, opponent);
-        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_DYNAMAX_GROWTH, player);
-        HP_BAR(opponent);
     }
 }
 

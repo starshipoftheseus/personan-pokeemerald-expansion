@@ -3,8 +3,7 @@
 
 SINGLE_BATTLE_TEST("Infiltrator bypasses the opponent's Light Screen/Reflect/Aurora Veil", s16 damage)
 {
-    enum Move screenMove, attackingMove;
-    enum Ability ability;
+    u32 screenMove, attackingMove, ability;
 
     PARAMETRIZE { screenMove = MOVE_LIGHT_SCREEN; attackingMove = MOVE_WATER_GUN; ability = ABILITY_INFILTRATOR; }
     PARAMETRIZE { screenMove = MOVE_LIGHT_SCREEN; attackingMove = MOVE_WATER_GUN; ability = ABILITY_CLEAR_BODY;  }
@@ -36,8 +35,7 @@ SINGLE_BATTLE_TEST("Infiltrator bypasses the opponent's Light Screen/Reflect/Aur
 
 DOUBLE_BATTLE_TEST("Infiltrator doesn't bypass an ally's Light Screen/Reflect/Aurora Veil", s16 damage)
 {
-    enum Move screenMove, attackingMove;
-    enum Ability ability;
+    u32 screenMove, attackingMove, ability;
 
     PARAMETRIZE { screenMove = MOVE_LIGHT_SCREEN; attackingMove = MOVE_WATER_GUN; ability = ABILITY_INFILTRATOR; }
     PARAMETRIZE { screenMove = MOVE_LIGHT_SCREEN; attackingMove = MOVE_WATER_GUN; ability = ABILITY_CLEAR_BODY;  }
@@ -71,14 +69,14 @@ DOUBLE_BATTLE_TEST("Infiltrator doesn't bypass an ally's Light Screen/Reflect/Au
 
 SINGLE_BATTLE_TEST("Infiltrator bypasses the opponent's Mist")
 {
-    enum Ability ability;
+    u32 ability;
 
     PARAMETRIZE { ability = ABILITY_CLEAR_BODY; }
     PARAMETRIZE { ability = ABILITY_INFILTRATOR; }
 
     GIVEN {
         ASSUME(GetMoveEffect(MOVE_MIST) == EFFECT_MIST);
-        ASSUME_STAT_CHANGE(MOVE_SCREECH, defense: -2);
+        ASSUME(GetMoveEffect(MOVE_SCREECH) == EFFECT_DEFENSE_DOWN_2);
         PLAYER(SPECIES_DRAGAPULT) { Ability(ability); }
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
@@ -94,10 +92,15 @@ SINGLE_BATTLE_TEST("Infiltrator bypasses the opponent's Mist")
 
 DOUBLE_BATTLE_TEST("Infiltrator doesn't bypass an ally's Mist")
 {
+    u32 ability;
+
+    PARAMETRIZE { ability = ABILITY_CLEAR_BODY; }
+    PARAMETRIZE { ability = ABILITY_INFILTRATOR; }
+
     GIVEN {
         ASSUME(GetMoveEffect(MOVE_MIST) == EFFECT_MIST);
-        ASSUME_STAT_CHANGE(MOVE_SCREECH, defense: -2);
-        PLAYER(SPECIES_DRAGAPULT) { Ability(ABILITY_INFILTRATOR); }
+        ASSUME(GetMoveEffect(MOVE_SCREECH) == EFFECT_DEFENSE_DOWN_2);
+        PLAYER(SPECIES_DRAGAPULT) { Ability(ability); }
         PLAYER(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_WYNAUT);
@@ -111,7 +114,7 @@ DOUBLE_BATTLE_TEST("Infiltrator doesn't bypass an ally's Mist")
 
 SINGLE_BATTLE_TEST("Infiltrator bypasses the opponent's Safeguard")
 {
-    enum Ability ability;
+    u32 ability;
 
     PARAMETRIZE { ability = ABILITY_CLEAR_BODY; }
     PARAMETRIZE { ability = ABILITY_INFILTRATOR; }
@@ -132,12 +135,17 @@ SINGLE_BATTLE_TEST("Infiltrator bypasses the opponent's Safeguard")
     }
 }
 
-DOUBLE_BATTLE_TEST("Infiltrator doesn't bypass an ally's Safeguard - Thunder Wave")
+DOUBLE_BATTLE_TEST("Infiltrator doesn't bypass an ally's Safeguard")
 {
+    u32 ability;
+
+    PARAMETRIZE { ability = ABILITY_CLEAR_BODY; }
+    PARAMETRIZE { ability = ABILITY_INFILTRATOR; }
+
     GIVEN {
         ASSUME(GetMoveEffect(MOVE_SAFEGUARD) == EFFECT_SAFEGUARD);
         ASSUME(GetMoveEffect(MOVE_THUNDER_WAVE) == EFFECT_NON_VOLATILE_STATUS);
-        PLAYER(SPECIES_DRAGAPULT) { Ability(ABILITY_INFILTRATOR); }
+        PLAYER(SPECIES_DRAGAPULT) { Ability(ability); }
         PLAYER(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_WYNAUT);
@@ -149,26 +157,9 @@ DOUBLE_BATTLE_TEST("Infiltrator doesn't bypass an ally's Safeguard - Thunder Wav
     }
 }
 
-DOUBLE_BATTLE_TEST("Infiltrator doesn't bypass an ally's Safeguard - Confuse")
-{
-    GIVEN {
-        ASSUME(GetMoveEffect(MOVE_SAFEGUARD) == EFFECT_SAFEGUARD);
-        ASSUME(GetMoveEffect(MOVE_CONFUSE_RAY) == EFFECT_CONFUSE);
-        PLAYER(SPECIES_DRAGAPULT) { Ability(ABILITY_INFILTRATOR); }
-        PLAYER(SPECIES_WOBBUFFET);
-        OPPONENT(SPECIES_WOBBUFFET);
-        OPPONENT(SPECIES_WYNAUT);
-    } WHEN {
-        TURN { MOVE(playerRight, MOVE_SAFEGUARD); MOVE(playerLeft, MOVE_CONFUSE_RAY, target: playerRight); }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SAFEGUARD, playerRight);
-        NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_CONFUSE_RAY, playerLeft);
-    }
-}
-
 SINGLE_BATTLE_TEST("Infiltrator bypasses the opponent's Substitute (Gen 6+)")
 {
-    enum Ability ability; u32 config;
+    u32 ability, config;
 
     PARAMETRIZE { ability = ABILITY_CLEAR_BODY; config = GEN_5; }
     PARAMETRIZE { ability = ABILITY_INFILTRATOR; config = GEN_5; }
@@ -195,7 +186,7 @@ SINGLE_BATTLE_TEST("Infiltrator bypasses the opponent's Substitute (Gen 6+)")
 
 DOUBLE_BATTLE_TEST("Infiltrator bypasses an ally's Substitute (Gen 6+)")
 {
-    enum Ability ability; u32 config;
+    u32 ability, config;
 
     PARAMETRIZE { ability = ABILITY_CLEAR_BODY; config = GEN_5; }
     PARAMETRIZE { ability = ABILITY_INFILTRATOR; config = GEN_5; }
@@ -224,7 +215,7 @@ DOUBLE_BATTLE_TEST("Infiltrator bypasses an ally's Substitute (Gen 6+)")
 
 SINGLE_BATTLE_TEST("Infiltrator doesn't ignore a battler's Substitute when using Transform or Sky Drop")
 {
-    enum Ability ability; enum Move move;
+    u32 ability, move;
 
     PARAMETRIZE { ability = ABILITY_CLEAR_BODY;  move = MOVE_TRANSFORM; }
     PARAMETRIZE { ability = ABILITY_INFILTRATOR; move = MOVE_TRANSFORM; }

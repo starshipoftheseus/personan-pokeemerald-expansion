@@ -1,9 +1,9 @@
 {
   "id": "MAP_ROUTE109_SEASHORE_HOUSE",
   "name": "Route109_SeashoreHouse",
+  "game_version": "emerald",
   "layout": "LAYOUT_ROUTE109_SEASHORE_HOUSE",
   "music": "MUS_DEWFORD",
-  "region": "REGION_HOENN",
   "region_map_section": "MAPSEC_ROUTE_109",
   "requires_flash": false,
   "weather": "WEATHER_NONE",

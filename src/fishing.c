@@ -220,7 +220,7 @@ static bool32 Fishing_ShowDots(struct Task *task)
 
     AlignFishingAnimationFrames();
     task->tFrameCounter++;
-    if (JOY_NEW(A_BUTTON))
+    if (gSaveBlock3Ptr->challengeSettings.fishing == 1 && JOY_NEW(A_BUTTON))
     {
         if (!DoesFishingMinigameAllowCancel())
             return FALSE;
@@ -286,6 +286,11 @@ static bool32 Fishing_CheckForBite(struct Task *task)
 static bool32 Fishing_GotBite(struct Task *task)
 {
     AlignFishingAnimationFrames();
+    if (gSaveBlock3Ptr->challengeSettings.fishing == 0)
+    {
+        task->tStep = FISHING_MON_ON_HOOK;
+        return FALSE;
+    }
     AddTextPrinterParameterized(0, FONT_NORMAL, sText_OhABite, 0, 17, 0, NULL);
     task->tStep = FISHING_CHANGE_MINIGAME;
     task->tFrameCounter = 0;
@@ -486,10 +491,10 @@ static bool32 Fishing_DoesFirstMonInPartyHaveSuctionCupsOrStickyHold(void)
 {
     enum Ability ability;
 
-    if (GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_SANITY_IS_EGG))
+    if (GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG))
         return FALSE;
 
-    ability = GetMonAbility(&gParties[B_TRAINER_PLAYER][0]);
+    ability = GetMonAbility(&gPlayerParty[0]);
 
     return (ability == ABILITY_SUCTION_CUPS || ability == ABILITY_STICKY_HOLD);
 }
@@ -518,6 +523,7 @@ static u32 CalculateFishingBiteOdds(u32 rod, bool32 isStickyHold)
         odds *= 2;
 
     odds = min(100, odds);
+    DebugPrintf("Fishing odds: %d", odds);
     return odds;
 }
 
@@ -645,6 +651,7 @@ u32 CalculateChainFishingShinyRolls(void)
     if (!I_FISHING_CHAIN || !gIsFishingEncounter)
         return 0;
     u32 a = 2 * min(gChainFishingDexNavStreak, FISHING_CHAIN_SHINY_STREAK_MAX);
+    DebugPrintf("Total Shiny Rolls %d", a);
     return a;
 }
 

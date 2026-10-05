@@ -41,6 +41,8 @@ u8 CreateTask(TaskFunc func, u8 priority)
         }
     }
 
+    assertf(FALSE, "tasks full (0x%x)", func);
+
     return 0;
 }
 
@@ -172,6 +174,18 @@ u8 FindTaskIdByFunc(TaskFunc func)
             return (u8)i;
 
     return TASK_NONE; // No task was found.
+}
+
+u8 GetTaskCount(void)
+{
+    u8 i;
+    u8 count = 0;
+
+    for (i = 0; i < NUM_TASKS; i++)
+        if (gTasks[i].isActive == TRUE)
+            count++;
+
+    return count;
 }
 
 void SetWordTaskArg(u8 taskId, u8 dataElem, u32 value)

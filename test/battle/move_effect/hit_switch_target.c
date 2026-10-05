@@ -83,6 +83,7 @@ SINGLE_BATTLE_TEST("Dragon Tail switches the target after Rocky Helmet and Iron 
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_DRAGON_TAIL, player);
         HP_BAR(player);
+        MESSAGE("Wobbuffet was hurt by the opposing Togedemaru's Iron Barbs!");
         HP_BAR(player);
         MESSAGE("Wobbuffet was hurt by the opposing Togedemaru's Rocky Helmet!");
         MESSAGE("The opposing Charmander was dragged out!");
@@ -114,7 +115,7 @@ SINGLE_BATTLE_TEST("Dragon Tail effect fails against target with Suction Cups")
     } SCENE {
         ANIMATION(ANIM_TYPE_MOVE, MOVE_DRAGON_TAIL, player);
         ABILITY_POPUP(opponent, ABILITY_SUCTION_CUPS);
-        MESSAGE("The opposing Octillery is anchored in place with its suction cups!");
+        MESSAGE("The opposing Octillery anchors itself with Suction Cups!");
         NOT MESSAGE("The opposing Charmander was dragged out!");
     }
 }
@@ -158,7 +159,7 @@ SINGLE_BATTLE_TEST("Dragon Tail switches target out and incoming mon has Levitat
         ANIMATION(ANIM_TYPE_MOVE, MOVE_DRAGON_TAIL, player);
         HP_BAR(opponent);
         MESSAGE("The opposing Weezing was dragged out!");
-        MESSAGE("The toxic spikes disappeared from the ground around the opposing side!");
+        MESSAGE("The poison spikes disappeared from the ground around the opposing team!");
         NOT STATUS_ICON(opponent, poison: TRUE);
         HP_BAR(opponent);
     }

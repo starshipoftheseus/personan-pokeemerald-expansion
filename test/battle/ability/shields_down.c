@@ -52,8 +52,7 @@ SINGLE_BATTLE_TEST("Minior Core transforms into Minior Meteor on battle start if
 
 SINGLE_BATTLE_TEST("Shields Down protects Minior Meteor from status conditions")
 {
-    enum Species species;
-    u32 hp;
+    u32 species, hp;
     PARAMETRIZE { species = SPECIES_MINIOR_METEOR; hp = 300; }
     PARAMETRIZE { species = SPECIES_MINIOR_CORE; hp = 100; }
 

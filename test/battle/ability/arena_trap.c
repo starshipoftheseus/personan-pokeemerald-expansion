@@ -35,8 +35,7 @@ SINGLE_BATTLE_TEST("Arena Trap doesn't prevent switch outs if the Pokémon is sw
 
 SINGLE_BATTLE_TEST("Arena Trap doesn't prevent switch outs via moves that switch out")
 {
-    enum Move move;
-    enum BattleMoveEffects effect;
+    u16 move, effect;
     PARAMETRIZE { move = MOVE_BATON_PASS; effect = EFFECT_BATON_PASS; }
     PARAMETRIZE { move = MOVE_U_TURN; effect = EFFECT_HIT_ESCAPE; }
     PARAMETRIZE { move = MOVE_VOLT_SWITCH; effect = EFFECT_HIT_ESCAPE; }

@@ -12,6 +12,7 @@
 #include "constants/map_scripts.h"
 #include "constants/script_commands.h"
 #include "field_message_box.h"
+#include "rtc.h"
 
 #include "dexnav.h"
 
@@ -40,12 +41,7 @@ EWRAM_DATA u8 gMsgBoxIsCancelable = FALSE;
 
 extern ScrCmdFunc gScriptCmdTable[];
 extern ScrCmdFunc gScriptCmdTableEnd[];
-
-void InitScriptStack(struct ScriptStack *stk)
-{
-    stk->stackDepth = 0;
-    memset(stk->stack, 0, (int)ARRAY_COUNT(stk->stack) * sizeof(u8*));
-}
+extern void *const gNullScriptPtr;
 
 void InitScriptContext(struct ScriptContext *ctx, void *cmdTable, void *cmdTableEnd)
 {
@@ -82,13 +78,20 @@ void SetupNativeScript(struct ScriptContext *ctx, bool8 (*ptr)(void))
 
 void StopScript(struct ScriptContext *ctx)
 {
-    assertf(!FuncIsActiveTask(Task_WarpAndLoadMap), "Leaving script while a warp is in progress: try adding a waitstate");
+    // if Task_WarpAndLoadMap is active, and our script context isn't "waiting", then we may be leaving the script that triggered the warp too early
+    // if Task_WarpAndLoadMap is active, but our script context *is* "waiting", we're leaving the current map's OnFrame which ignores waiting state
+    bool8 shouldAssert = FuncIsActiveTask(Task_WarpAndLoadMap);
+    if (shouldAssert) shouldAssert = sGlobalScriptContextStatus != CONTEXT_WAITING;
+    assertf(!shouldAssert, "Leaving script while a warp is in progress: try adding a waitstate");
     ctx->mode = SCRIPT_MODE_STOPPED;
     ctx->scriptPtr = NULL;
 }
 
 bool8 RunScriptCommand(struct ScriptContext *ctx)
 {
+    if (ctx->mode == SCRIPT_MODE_STOPPED)
+        return FALSE;
+
     switch (ctx->mode)
     {
     case SCRIPT_MODE_STOPPED:
@@ -110,10 +113,16 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
             u8 cmdCode;
             ScrCmdFunc *func;
 
-            if (ctx->scriptPtr == NULL)
+            if (!ctx->scriptPtr)
             {
                 ctx->mode = SCRIPT_MODE_STOPPED;
                 return FALSE;
+            }
+
+            if (ctx->scriptPtr == gNullScriptPtr)
+            {
+                while (1)
+                    asm("svc 2"); // HALT
             }
 
             cmdCode = *(ctx->scriptPtr);
@@ -134,21 +143,7 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
     return TRUE;
 }
 
-bool8 ScriptStackPush(struct ScriptStack *stk, const u8 *ptr)
-{
-    if (stk->stackDepth + 1 >= (int)ARRAY_COUNT(stk->stack))
-    {
-        return FALSE;
-    }
-    else
-    {
-        stk->stack[stk->stackDepth] = ptr;
-        stk->stackDepth++;
-        return TRUE;
-    }
-}
-
-bool8 ScriptPush(struct ScriptContext *ctx, const u8 *ptr)
+static bool8 ScriptPush(struct ScriptContext *ctx, const u8 *ptr)
 {
     if (ctx->stackDepth + 1 >= (int)ARRAY_COUNT(ctx->stack))
     {
@@ -162,16 +157,7 @@ bool8 ScriptPush(struct ScriptContext *ctx, const u8 *ptr)
     }
 }
 
-const u8 *ScriptStackPop(struct ScriptStack *stk)
-{
-    if (stk->stackDepth == 0)
-        return NULL;
-
-    stk->stackDepth--;
-    return stk->stack[stk->stackDepth];
-}
-
-const u8 *ScriptPop(struct ScriptContext *ctx)
+static const u8 *ScriptPop(struct ScriptContext *ctx)
 {
     if (ctx->stackDepth == 0)
         return NULL;
@@ -182,26 +168,16 @@ const u8 *ScriptPop(struct ScriptContext *ctx)
 
 void ScriptJump(struct ScriptContext *ctx, const u8 *ptr)
 {
-    assertf(ptr != NULL, "goto to NULL");
     ctx->scriptPtr = ptr;
 }
 
 void ScriptCall(struct ScriptContext *ctx, const u8 *ptr)
 {
-    assertf(ptr != NULL, "call to NULL")
-    {
-        // HINT: Returning without having pushed the current location is
-        // equivalent to branching to a script that just contains
-        // 'return'.
-        return;
-    }
-
     bool32 failed = ScriptPush(ctx, ctx->scriptPtr);
-    assertf(!failed, "could not push %p to %p", ptr, ctx)
+    assertf(!failed, "could not push %p", ptr)
     {
         return;
     }
-
     ctx->scriptPtr = ptr;
 }
 
@@ -333,29 +309,6 @@ void ScriptContext_Enable(void)
     LockPlayerFieldControls();
 }
 
-void ScriptContext_SetupContextFromStack(struct ScriptStack *stk, struct ScriptContext *ctx)
-{
-    const u8 *ptr;
-
-    while ((ptr = ScriptStackPop(stk)) != NULL)
-    {
-        if (ScriptPush(ctx, ptr)) {
-            errorf("Failed to push %p to %p.", ptr, ctx);
-        }
-    }
-
-    ctx->scriptPtr = ScriptPop(ctx);
-    ctx->mode = SCRIPT_MODE_BYTECODE;
-
-    if (OW_FOLLOWERS_SCRIPT_MOVEMENT)
-        FlagSet(FLAG_SAFE_FOLLOWER_MOVEMENT);
-}
-
-void ScriptContext_SetupGlobalContextFromStack(struct ScriptStack *stk)
-{
-    ScriptContext_SetupContextFromStack(stk, &sGlobalScriptContext);
-}
-
 // Sets up and runs a script in its own context immediately. The script will be
 // finished when this function returns. Used mainly by all of the map header
 // scripts (except the frame table scripts).
@@ -417,11 +370,7 @@ const u8 *MapHeaderCheckScriptTable(u8 tag)
 
         // Run map script if vars are equal
         if (VarGet(varIndex1) == VarGet(varIndex2))
-        {
-            const u8 *mapScript = T2_READ_PTR(ptr);
-            if (!Script_HasNoEffect(mapScript))
-                return mapScript;
-        }
+            return T2_READ_PTR(ptr);
 
         ptr += 4;
     }
@@ -703,9 +652,7 @@ void Script_RequestWriteVar_Internal(u32 varId)
 {
     if (varId == 0)
         return;
-
-    if ((!gMapHeader.writeSpecialVarIsEffect)
-     && (SPECIAL_VARS_START <= varId && varId <= SPECIAL_VARS_END))
+    if (SPECIAL_VARS_START <= varId && varId <= SPECIAL_VARS_END)
         return;
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE);
 }
@@ -746,3 +693,34 @@ void SetWalkingIntoSignVars(void)
     // gWalkAwayFromSignInhibitTimer = 6;
     // sMsgBoxIsCancelable = TRUE;
 }
+
+void SetTimeBasedEncounters(void)
+{   
+    if (GetTimeOfDay() != TIME_NIGHT)
+	{
+		VarSet(VAR_TIME_BASED_ENCOUNTER, 1); // Day
+	}
+    else
+    {
+		VarSet(VAR_TIME_BASED_ENCOUNTER, 2); // Night
+	}
+	/*
+    RtcCalcLocalTime();
+    if ((gLocalTime.hours >= 6 && gLocalTime.hours <= 17) && (gSaveBlock1Ptr->tx_Mode_AlternateSpawns == 1)) //6am-6pm DAY
+    {
+		VarSet(VAR_TIME_BASED_ENCOUNTER, 3); // Modern Spawns, Day
+	}
+    else if (gSaveBlock1Ptr->tx_Mode_AlternateSpawns == 1)
+    {
+		VarSet(VAR_TIME_BASED_ENCOUNTER, 4); // Modern Spawns, Night
+	}
+	else if ((gLocalTime.hours >= 6 && gLocalTime.hours <= 17) && (gSaveBlock1Ptr->tx_Mode_AlternateSpawns == 0)) //6am-6pm DAY
+	{
+		VarSet(VAR_TIME_BASED_ENCOUNTER, 1); // Day
+	}
+	else if (gSaveBlock1Ptr->tx_Mode_AlternateSpawns == 0)
+    {
+		VarSet(VAR_TIME_BASED_ENCOUNTER, 2); // Night
+	}
+    */
+}    

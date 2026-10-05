@@ -2,6 +2,7 @@
 #include "battle_pike.h"
 #include "event_data.h"
 #include "frontier_util.h"
+#include "pokemon.h"
 #include "fieldmap.h"
 #include "save.h"
 #include "battle.h"
@@ -34,9 +35,9 @@ struct PikeRoomNPC
 
 struct PikeWildMon
 {
-    enum Species species;
+    u16 species;
     u8 levelDelta;
-    enum Move moves[MAX_MON_MOVES];
+    u16 moves[MAX_MON_MOVES];
 };
 
 // IWRAM bss
@@ -83,7 +84,7 @@ static void PrepareTwoTrainers(void);
 static void TryHealMons(u8 healCount);
 static void Task_DoStatusInflictionScreenFlash(u8 taskId);
 static bool8 AtLeastTwoAliveMons(void);
-static u8 SpeciesToPikeMonId(enum Species species);
+static u8 SpeciesToPikeMonId(u16 species);
 static bool8 CanEncounterWildMon(u8 monLevel);
 static u8 GetPikeQueenFightType(u8);
 static bool8 StatusInflictionFadeOut(struct Task *task);
@@ -267,151 +268,251 @@ static const struct PikeWildMon *const *const sWildMons[2] =
 static const struct PikeRoomNPC sNPCTable[] =
 {
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_WOMAN_1_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_POKEFAN_F,
+#endif
         .speechId1 = 3,
         .speechId2 = 5,
         .speechId3 = 6
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_BUG_CATCHER_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_NINJA_BOY,
+#endif
         .speechId1 = 13,
         .speechId2 = 32,
         .speechId3 = 37
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_FAT_MAN_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_FAT_MAN,
+#endif
         .speechId1 = 8,
         .speechId2 = 11,
         .speechId3 = 12
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_BUG_CATCHER_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_BUG_CATCHER,
+#endif
         .speechId1 = 34,
         .speechId2 = 30,
         .speechId3 = 33
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_COOLTRAINER_M_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_EXPERT_M,
+#endif
         .speechId1 = 0,
         .speechId2 = 0,
         .speechId3 = 0
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_OLD_WOMAN_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_OLD_WOMAN,
+#endif
         .speechId1 = 1,
         .speechId2 = 1,
         .speechId3 = 1
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_BLACK_BELT_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_BLACK_BELT,
+#endif
         .speechId1 = 22,
         .speechId2 = 23,
         .speechId3 = 27
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_HIKER_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_HIKER,
+#endif
         .speechId1 = 8,
         .speechId2 = 22,
         .speechId3 = 31
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_GIRL_1_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_GIRL_3,
+#endif
         .speechId1 = 13,
         .speechId2 = 39,
         .speechId3 = 21
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_WOMAN_2_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_WOMAN_2,
+#endif
         .speechId1 = 2,
         .speechId2 = 4,
         .speechId3 = 17
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_BIKER_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_CYCLING_TRIATHLETE_M,
+#endif
         .speechId1 = 30,
         .speechId2 = 20,
         .speechId3 = 36
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_GENTLEMAN_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_MAN_5,
+#endif
         .speechId1 = 28,
         .speechId2 = 34,
         .speechId3 = 25
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_YOUNGSTER_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_SCHOOL_KID_M,
+#endif
         .speechId1 = 23,
         .speechId2 = 38,
         .speechId3 = 26
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_FISHERMAN_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_FISHERMAN,
+#endif
         .speechId1 = 23,
         .speechId2 = 30,
         .speechId3 = 11
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_LASS_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_LASS,
+#endif
         .speechId1 = 15,
         .speechId2 = 19,
         .speechId3 = 14
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_SUPER_NERD_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_MANIAC,
+#endif
         .speechId1 = 2,
         .speechId2 = 29,
         .speechId3 = 26
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_COOLTRAINER_M_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_RUNNING_TRIATHLETE_M,
+#endif
         .speechId1 = 37,
         .speechId2 = 12,
         .speechId3 = 32
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_MAN_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_MAN_3,
+#endif
         .speechId1 = 24,
         .speechId2 = 23,
         .speechId3 = 38
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_WOMAN_3_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_WOMAN_3,
+#endif
         .speechId1 = 5,
         .speechId2 = 22,
         .speechId3 = 4
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_LITTLE_BOY_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_LITTLE_BOY,
+#endif
         .speechId1 = 41,
         .speechId2 = 37,
         .speechId3 = 35
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_TUBER_F_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_TUBER_F,
+#endif
         .speechId1 = 39,
         .speechId2 = 14,
         .speechId3 = 13
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_GENTLEMAN_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_GENTLEMAN,
+#endif
         .speechId1 = 10,
         .speechId2 = 7,
         .speechId3 = 9
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_LITTLE_GIRL_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_LITTLE_GIRL,
+#endif
         .speechId1 = 40,
         .speechId2 = 20,
         .speechId3 = 16
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_COOLTRAINER_F_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_RUNNING_TRIATHLETE_F,
+#endif
         .speechId1 = 18,
         .speechId2 = 13,
         .speechId3 = 21
     },
     {
+#if IS_HNS
+        .graphicsId = OBJ_EVENT_GFX_MAN_HNS,
+#else
         .graphicsId = OBJ_EVENT_GFX_MAN_1,
+#endif
         .speechId1 = 22,
         .speechId2 = 31,
         .speechId3 = 27
@@ -462,6 +563,18 @@ static const u16 sNPCSpeeches[][EASY_CHAT_BATTLE_WORDS_COUNT] =
     {EC_WORD_MY, EC_WORD_POKEMON, EC_WORD_ARE, EC_WORD_STRONG, EC_WORD_TO, EC_WORD_POISON},
     {EC_WORD_LALALA, EC_WORD_LALALA, EC_WORD_EXCL, EC_WORD_I_AM, EC_WORD_AWESOME, EC_WORD_LALALA},
     {EC_MOVE2(TOXIC), EC_WORD_IS, EC_WORD_A, EC_WORD_TERRIBLE, EC_WORD_THING, EC_WORD_ISN_T_IT_QUES},
+};
+
+// Table duplicated from frontier_util, only Battle Pike entry used
+static const u8 sFrontierBrainStreakAppearances[NUM_FRONTIER_FACILITIES][4] =
+{
+    [FRONTIER_FACILITY_TOWER]   = {35,  70, 35, 1},
+    [FRONTIER_FACILITY_DOME]    = { 4,   9,  5, 0},
+    [FRONTIER_FACILITY_PALACE]  = {21,  42, 21, 1},
+    [FRONTIER_FACILITY_ARENA]   = {28,  56, 28, 1},
+    [FRONTIER_FACILITY_FACTORY] = {21,  42, 21, 1},
+    [FRONTIER_FACILITY_PIKE]    = {28, 140, 56, 1},
+    [FRONTIER_FACILITY_PYRAMID] = {21,  70, 35, 0},
 };
 
 static void (*const sBattlePikeFunctions[])(void) =
@@ -544,8 +657,13 @@ static void SetupRoomObjectEvents(void)
     u32 objGfx1;
     u16 objGfx2;
 
+#if IS_HNS
+    VarSet(VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_LINK_RECEPTIONIST_HNS);
+    VarSet(VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_DUSCLOPS);
+#else
     VarSet(VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_LINK_RECEPTIONIST);
     VarSet(VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_DUSCLOPS);
+#endif
     setObjGfx1 = TRUE;
     setObjGfx2 = FALSE;
     objGfx1 = 0;
@@ -558,28 +676,48 @@ static void SetupRoomObjectEvents(void)
         setObjGfx1 = FALSE;
         break;
     case PIKE_ROOM_HEAL_FULL:
+#if IS_HNS
+        objGfx1 = OBJ_EVENT_GFX_LINK_RECEPTIONIST_HNS;
+#else
         objGfx1 = OBJ_EVENT_GFX_LINK_RECEPTIONIST;
+#endif
         break;
     case PIKE_ROOM_NPC:
-        objGfx1 = (u8)(GetNPCRoomGraphicsId());
+        objGfx1 = GetNPCRoomGraphicsId();
         break;
     case PIKE_ROOM_STATUS:
+#if IS_HNS
+        objGfx1 = OBJ_EVENT_GFX_GENTLEMAN_HNS;
+        if (sStatusMon == PIKE_STATUSMON_DUSCLOPS)
+            objGfx2 = OBJ_EVENT_GFX_DUSCLOPS;
+        else
+            objGfx2 = OBJ_EVENT_GFX_KIRLIA;
+#else
         objGfx1 = OBJ_EVENT_GFX_GENTLEMAN;
         if (sStatusMon == PIKE_STATUSMON_DUSCLOPS)
             objGfx2 = OBJ_EVENT_GFX_DUSCLOPS;
         else
             objGfx2 = OBJ_EVENT_GFX_KIRLIA;
+#endif
         setObjGfx2 = TRUE;
         break;
     case PIKE_ROOM_HEAL_PART:
+#if IS_HNS
+        objGfx1 = OBJ_EVENT_GFX_GENTLEMAN_HNS;
+#else
         objGfx1 = OBJ_EVENT_GFX_GENTLEMAN;
+#endif
         break;
     case PIKE_ROOM_WILD_MONS:
         setObjGfx1 = FALSE;
         break;
     case PIKE_ROOM_HARD_BATTLE:
         PrepareOneTrainer(TRUE);
+#if IS_HNS
+        objGfx2 = OBJ_EVENT_GFX_LINK_RECEPTIONIST_HNS;
+#else
         objGfx2 = OBJ_EVENT_GFX_LINK_RECEPTIONIST;
+#endif
         setObjGfx1 = FALSE;
         setObjGfx2 = TRUE;
         break;
@@ -589,7 +727,11 @@ static void SetupRoomObjectEvents(void)
         break;
     case PIKE_ROOM_BRAIN:
         SetFrontierBrainObjEventGfx(FRONTIER_FACILITY_PIKE);
+#if IS_HNS
+        objGfx2 = OBJ_EVENT_GFX_LINK_RECEPTIONIST_HNS;
+#else
         objGfx2 = OBJ_EVENT_GFX_LINK_RECEPTIONIST;
+#endif
         setObjGfx1 = FALSE;
         setObjGfx2 = TRUE;
         break;
@@ -832,7 +974,7 @@ static bool8 DoesAbilityPreventStatus(struct Pokemon *mon, u32 status)
     return ret;
 }
 
-static bool8 DoesTypePreventStatus(enum Species species, u32 status)
+static bool8 DoesTypePreventStatus(u16 species, u32 status)
 {
     bool8 ret = FALSE;
 
@@ -869,7 +1011,7 @@ static bool8 TryInflictRandomStatus(void)
     u8 count;
     u8 indices[FRONTIER_PARTY_SIZE];
     u32 status;
-    enum Species species;
+    u16 species;
     bool8 statusChosen;
     struct Pokemon *mon;
 
@@ -910,7 +1052,7 @@ static bool8 TryInflictRandomStatus(void)
             j = 0;
             for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
             {
-                mon = &gParties[B_TRAINER_PLAYER][indices[i]];
+                mon = &gPlayerParty[indices[i]];
                 if (GetAilmentFromStatus(GetMonData(mon, MON_DATA_STATUS)) == AILMENT_NONE
                     && GetMonData(mon, MON_DATA_HP) != 0)
                 {
@@ -953,7 +1095,7 @@ static bool8 TryInflictRandomStatus(void)
     j = 0;
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
     {
-        mon = &gParties[B_TRAINER_PLAYER][indices[i]];
+        mon = &gPlayerParty[indices[i]];
         if (GetAilmentFromStatus(GetMonData(mon, MON_DATA_STATUS)) == AILMENT_NONE
             && GetMonData(mon, MON_DATA_HP) != 0)
         {
@@ -985,7 +1127,7 @@ static bool8 AtLeastOneHealthyMon(void)
     healthyMonsCount = 0;
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
     {
-        struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][i];
+        struct Pokemon *mon = &gPlayerParty[i];
         if (GetAilmentFromStatus(GetMonData(mon, MON_DATA_STATUS)) == AILMENT_NONE
             && GetMonData(mon, MON_DATA_HP) != 0)
         {
@@ -1003,7 +1145,7 @@ static bool8 AtLeastOneHealthyMon(void)
 
 static u8 GetNextRoomType(void)
 {
-    bool8 roomTypesDisabled[NUM_PIKE_ROOM_TYPES - 1]; // excludes Brain room, which can't be disabled
+    bool8 roomTypesDisabled[NUM_PIKE_ROOM_TYPES - 1]; // excludes Brain room, which cant be disabled
     u8 i;
     u8 nextRoomType;
     u8 roomHint;
@@ -1100,7 +1242,7 @@ bool32 TryGenerateBattlePikeWildMon(bool8 checkKeenEyeIntimidate)
     enum FrontierLevelMode lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     const struct PikeWildMon *const *const wildMons = sWildMons[lvlMode];
     u32 abilityNum;
-    s32 pikeMonId = GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES);
+    s32 pikeMonId = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES);
     pikeMonId = SpeciesToPikeMonId(pikeMonId);
 
     if (gSaveBlock2Ptr->frontier.lvlMode != FRONTIER_LVL_50)
@@ -1125,7 +1267,7 @@ bool32 TryGenerateBattlePikeWildMon(bool8 checkKeenEyeIntimidate)
     if (checkKeenEyeIntimidate == TRUE && !CanEncounterWildMon(monLevel))
         return FALSE;
 
-    SetMonData(&gParties[B_TRAINER_OPPONENT_A][0],
+    SetMonData(&gEnemyParty[0],
                MON_DATA_EXP,
                &gExperienceTables[gSpeciesInfo[wildMons[headerId][pikeMonId].species].growthRate][monLevel]);
 
@@ -1133,11 +1275,11 @@ bool32 TryGenerateBattlePikeWildMon(bool8 checkKeenEyeIntimidate)
         abilityNum = Random() % 2;
     else
         abilityNum = 0;
-    SetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_ABILITY_NUM, &abilityNum);
+    SetMonData(&gEnemyParty[0], MON_DATA_ABILITY_NUM, &abilityNum);
     for (i = 0; i < MAX_MON_MOVES; i++)
-        SetMonMoveSlot(&gParties[B_TRAINER_OPPONENT_A][0], wildMons[headerId][pikeMonId].moves[i], i);
+        SetMonMoveSlot(&gEnemyParty[0], wildMons[headerId][pikeMonId].moves[i], i);
 
-    CalculateMonStats(&gParties[B_TRAINER_OPPONENT_A][0]);
+    CalculateMonStats(&gEnemyParty[0]);
     return TRUE;
 }
 
@@ -1264,7 +1406,7 @@ static void TryHealMons(u8 healCount)
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
     {
         bool32 canBeHealed = FALSE;
-        struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][indices[i]];
+        struct Pokemon *mon = &gPlayerParty[indices[i]];
         u16 curr = GetMonData(mon, MON_DATA_HP);
         u16 max = GetMonData(mon, MON_DATA_MAX_HP);
         if (curr < max)
@@ -1293,7 +1435,7 @@ static void TryHealMons(u8 healCount)
 
         if (canBeHealed == TRUE)
         {
-            HealMon(&gParties[B_TRAINER_PLAYER][indices[i]]);
+            HealMon(&gPlayerParty[indices[i]]);
             if (--healCount == 0)
                 break;
         }
@@ -1307,9 +1449,9 @@ static void GetInBattlePike(void)
 
 bool8 InBattlePike(void)
 {
-    return gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_THREE_PATH_ROOM
-        || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_NORMAL
-        || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS
+    return (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_THREE_PATH_ROOM || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_THREE_PATH_ROOM_HNS)
+        || (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_NORMAL || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_NORMAL_HNS)
+        || (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS_HNS)
         || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_UNUSED;
 }
 
@@ -1466,7 +1608,7 @@ static bool8 AtLeastTwoAliveMons(void)
     struct Pokemon *mon;
     u8 i, countDead;
 
-    mon = &gParties[B_TRAINER_PLAYER][0];
+    mon = &gPlayerParty[0];
     countDead = 0;
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++, mon++)
     {
@@ -1484,7 +1626,7 @@ static u8 GetPikeQueenFightType(u8 nextRoom)
 {
     u8 numPikeSymbols;
 
-    const u8 *streakAppearances = gFrontierBrainInfo[FRONTIER_FACILITY_PIKE].streakAppearances;
+    u8 facility = FRONTIER_FACILITY_PIKE;
     u8 ret = FRONTIER_BRAIN_NOT_READY;
     enum FrontierLevelMode lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     u16 winStreak = gSaveBlock2Ptr->frontier.pikeWinStreaks[lvlMode];
@@ -1495,16 +1637,16 @@ static u8 GetPikeQueenFightType(u8 nextRoom)
     {
     case 0:
     case 1:
-        if (winStreak == streakAppearances[numPikeSymbols] - streakAppearances[3])
+        if (winStreak == sFrontierBrainStreakAppearances[facility][numPikeSymbols] - sFrontierBrainStreakAppearances[facility][3])
             ret = numPikeSymbols + 1; // FRONTIER_BRAIN_SILVER and FRONTIER_BRAIN_GOLD
         break;
     case 2:
     default:
-        if (winStreak == streakAppearances[0] - streakAppearances[3])
+        if (winStreak == sFrontierBrainStreakAppearances[facility][0] - sFrontierBrainStreakAppearances[facility][3])
             ret = FRONTIER_BRAIN_STREAK;
-        else if (winStreak == streakAppearances[1] - streakAppearances[3]
-                 || (winStreak > streakAppearances[1]
-                     && (winStreak - streakAppearances[1] + streakAppearances[3]) % streakAppearances[2] == 0))
+        else if (winStreak == sFrontierBrainStreakAppearances[facility][1] - sFrontierBrainStreakAppearances[facility][3]
+                 || (winStreak > sFrontierBrainStreakAppearances[facility][1]
+                     && (winStreak - sFrontierBrainStreakAppearances[facility][1] + sFrontierBrainStreakAppearances[facility][3]) % sFrontierBrainStreakAppearances[facility][2] == 0))
             ret = FRONTIER_BRAIN_STREAK_LONG;
         break;
     }
@@ -1538,7 +1680,7 @@ static void IsPartyFullHealed(void)
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
     {
         bool32 canBeHealed = FALSE;
-        struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][i];
+        struct Pokemon *mon = &gPlayerParty[i];
         u16 curr = GetMonData(mon, MON_DATA_HP);
         u16 max = GetMonData(mon, MON_DATA_MAX_HP);
         if (curr >= max && GetAilmentFromStatus(GetMonData(mon, MON_DATA_STATUS)) == AILMENT_NONE)
@@ -1571,9 +1713,19 @@ static void IsPartyFullHealed(void)
 
 static void SaveMonHeldItems(void)
 {
-    for (u32 i = 0; i < FRONTIER_PARTY_SIZE; i++)
+    u8 i;
+    s32 j;
+
+    if (gSaveBlock2Ptr->frontier.lvlMode == FRONTIER_LVL_50)
     {
-        enum Item heldItem = GetMonData(GetSavedPlayerPartyMon(gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1),
+        FlagSet(FLAG_LIMIT_TO_50);
+        for (j = 0; j < PARTY_SIZE; j++)
+            CalculateMonStats(&gPlayerParty[j]);
+    }
+
+    for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+    {
+        int heldItem = GetMonData(GetSavedPlayerPartyMon(gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1),
                                   MON_DATA_HELD_ITEM);
         gSaveBlock2Ptr->frontier.pikeHeldItemsBackup[i] = heldItem;
     }
@@ -1582,10 +1734,15 @@ static void SaveMonHeldItems(void)
 static void RestoreMonHeldItems(void)
 {
     u8 i;
+    s32 j;
+
+    FlagClear(FLAG_LIMIT_TO_50);
+    for (j = 0; j < PARTY_SIZE; j++)
+        CalculateMonStats(&gPlayerParty[j]);
 
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
     {
-        SetMonData(&gParties[B_TRAINER_PLAYER][gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1],
+        SetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1],
                    MON_DATA_HELD_ITEM,
                    &gSaveBlock2Ptr->frontier.pikeHeldItemsBackup[i]);
     }
@@ -1607,12 +1764,12 @@ static void InitPikeChallenge(void)
 
 static bool8 CanEncounterWildMon(u8 enemyMonLevel)
 {
-    if (!GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_SANITY_IS_EGG))
+    if (!GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG))
     {
-        enum Ability monAbility = GetMonAbility(&gParties[B_TRAINER_PLAYER][0]);
+        enum Ability monAbility = GetMonAbility(&gPlayerParty[0]);
         if (monAbility == ABILITY_KEEN_EYE || monAbility == ABILITY_INTIMIDATE)
         {
-            u8 playerMonLevel = GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_LEVEL);
+            u8 playerMonLevel = GetMonData(&gPlayerParty[0], MON_DATA_LEVEL);
             if (playerMonLevel > 5 && enemyMonLevel <= playerMonLevel - 5 && Random() % 2 == 0)
                 return FALSE;
         }
@@ -1621,7 +1778,7 @@ static bool8 CanEncounterWildMon(u8 enemyMonLevel)
     return TRUE;
 }
 
-static u8 SpeciesToPikeMonId(enum Species species)
+static u8 SpeciesToPikeMonId(u16 species)
 {
     u8 ret;
 

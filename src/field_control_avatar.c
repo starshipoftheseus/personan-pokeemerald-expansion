@@ -1,12 +1,12 @@
 #include "global.h"
 #include "battle_setup.h"
 #include "bike.h"
+#include "bug_contest.h"
 #include "coord_event_weather.h"
 #include "daycare.h"
 #include "debug.h"
 #include "dexnav.h"
 #include "faraway_island.h"
-#include "follower_npc.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "event_scripts.h"
@@ -25,6 +25,7 @@
 #include "link.h"
 #include "match_call.h"
 #include "metatile_behavior.h"
+#include "mom_savings.h"
 #include "overworld.h"
 #include "pokemon.h"
 #include "safari_zone.h"
@@ -36,20 +37,20 @@
 #include "trainer_hill.h"
 #include "vs_seeker.h"
 #include "wild_encounter.h"
-#include "wild_encounter_ow.h"
 #include "constants/event_bg.h"
 #include "constants/event_objects.h"
 #include "constants/field_poison.h"
-#include "constants/layouts.h"
 #include "constants/metatile_behaviors.h"
 #include "constants/songs.h"
 #include "constants/trainer_hill.h"
 
 static EWRAM_DATA u8 sWildEncounterImmunitySteps = 0;
 static EWRAM_DATA u16 sPrevMetatileBehavior = 0;
+static EWRAM_DATA u8 sPlayerSelectHoldFrames = 0;
 
 COMMON_DATA u8 gSelectedObjectEvent = 0;
 
+static void GetPlayerPosition(struct MapPosition *);
 static void GetInFrontOfPlayerPosition(struct MapPosition *);
 static u16 GetPlayerCurMetatileBehavior(int);
 static bool8 TryStartInteractionScript(struct MapPosition *, u16, enum Direction);
@@ -60,6 +61,7 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *, u8, enum Dire
 static const u8 *GetInteractedWaterScript(struct MapPosition *, u8, enum Direction);
 static bool32 TrySetupDiveDownScript(void);
 static bool32 TrySetupDiveEmergeScript(void);
+static bool8 TryStartStepBasedScript(struct MapPosition *, u16, enum Direction);
 static bool8 CheckStandardWildEncounter(u16);
 static bool8 TryArrowWarp(struct MapPosition *, u16, enum Direction);
 static bool8 IsWarpMetatileBehavior(u16);
@@ -99,6 +101,8 @@ void FieldClearPlayerInput(struct FieldInput *input)
     input->input_field_1_1 = FALSE;
     input->input_field_1_2 = FALSE;
     input->input_field_1_3 = FALSE;
+    input->tappedSelectButton = FALSE;
+    input->heldSelectButton = FALSE;
     input->dpadDirection = 0;
 }
 
@@ -116,6 +120,16 @@ void FieldGetPlayerInput(struct FieldInput *input, u16 newKeys, u16 heldKeys)
                 input->pressedStartButton = TRUE;
             if (newKeys & SELECT_BUTTON)
                 input->pressedSelectButton = TRUE;
+            if (sPlayerSelectHoldFrames == 60)
+                input->heldSelectButton = TRUE;
+            if (heldKeys & SELECT_BUTTON)
+                sPlayerSelectHoldFrames = sPlayerSelectHoldFrames < 0xFF ? sPlayerSelectHoldFrames + 1 : 0xFF;
+            else if (sPlayerSelectHoldFrames != 0)
+            {
+                if (sPlayerSelectHoldFrames < 60)
+                    input->tappedSelectButton = TRUE;
+                sPlayerSelectHoldFrames = 0;
+            }
             if (newKeys & A_BUTTON)
                 input->pressedAButton = TRUE;
             if (newKeys & B_BUTTON)
@@ -184,8 +198,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     {
         IncrementGameStat(GAME_STAT_STEPS);
         IncrementBirthIslandRockStepCount();
-        DespawnAllOverworldWildEncounters(OWE_GENERATED, WILD_CHECK_REPEL);
-        if (FindTaskIdByFunc(Task_FollowerNPCOutOfDoor) == TASK_NONE && TryStartStepBasedScript(&position, metatileBehavior, playerDirection) == TRUE)
+        if (TryStartStepBasedScript(&position, metatileBehavior, playerDirection) == TRUE)
             return TRUE;
     }
 
@@ -234,11 +247,33 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     if (input->tookStep && TryFindHiddenPokemon())
         return TRUE;
 
-    if (input->pressedSelectButton && UseRegisteredKeyItemOnField() == TRUE)
+    if (input->tappedSelectButton && UseRegisteredKeyItemOnField(FALSE) == TRUE)
         return TRUE;
 
+    if (input->heldSelectButton && UseRegisteredKeyItemOnField(TRUE) == TRUE)
+        return TRUE;
+
+#if IS_HNS
+    if (input->pressedRButton && TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
+    {
+        if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_MACH_BIKE)
+        {
+            gPlayerAvatar.flags &= ~PLAYER_AVATAR_FLAG_MACH_BIKE;
+            gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_ACRO_BIKE;
+            SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_ACRO_BIKE);
+        }
+        else
+        {
+            gPlayerAvatar.flags &= ~PLAYER_AVATAR_FLAG_ACRO_BIKE;
+            gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_MACH_BIKE;
+            SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_MACH_BIKE);
+        }
+        PlaySE(SE_BIKE_BELL);
+    }
+#else
     if (input->pressedRButton && TryStartDexNavSearch())
         return TRUE;
+#endif
 
     if (input->input_field_1_2 && DEBUG_OVERWORLD_MENU && !DEBUG_OVERWORLD_IN_MENU)
     {
@@ -258,7 +293,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     return FALSE;
 }
 
-void GetPlayerPosition(struct MapPosition *position)
+static void GetPlayerPosition(struct MapPosition *position)
 {
     PlayerGetDestCoords(&position->x, &position->y);
     position->elevation = PlayerGetElevation();
@@ -298,7 +333,8 @@ static bool8 TryStartInteractionScript(struct MapPosition *position, u16 metatil
      && script != SecretBase_EventScript_RecordMixingPC
      && script != SecretBase_EventScript_DollInteract
      && script != SecretBase_EventScript_CushionInteract
-     && script != EventScript_PC)
+     && script != EventScript_PC
+     && script != GoldenrodCity_RadioTower_5F_EventScript_Petrel)
         PlaySE(SE_SELECT);
 
     ScriptContext_SetupScript(script);
@@ -403,14 +439,10 @@ static const u8 *GetInteractedObjectEventScript(struct MapPosition *position, u8
     gSelectedObjectEvent = objectEventId;
     gSpecialVar_LastTalked = gObjectEvents[objectEventId].localId;
 
-    if (PlayerHasFollowerNPC() && objectEventId == GetFollowerNPCObjectId())
-        script = GetFollowerNPCScriptPointer();
-    else if (IsOverworldWildEncounter(&gObjectEvents[objectEventId], OWE_ANY))
-        script = GetOverworlWildEncounterScript(objectEventId);
-    else if (gObjectEvents[objectEventId].localId == OBJ_EVENT_ID_FOLLOWER)
-        script = EventScript_Follower;
-    else if (InTrainerHill() == TRUE)
+    if (InTrainerHill() == TRUE)
         script = GetTrainerHillTrainerScript();
+    else if (PlayerHasFollowerNPC() && objectEventId == GetFollowerNPCObjectId())
+        script = GetFollowerNPCScriptPointer();
     else
         script = GetObjectEventScriptPointerByObjectEventId(objectEventId);
 
@@ -488,6 +520,8 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *position, u8 me
     }
     if (MetatileBehavior_IsPC(metatileBehavior) == TRUE)
         return EventScript_PC;
+    if (IS_HNS && MetatileBehavior_IsHeadbuttTree(metatileBehavior) == TRUE)
+        return EventScript_Headbutt;
     if (MetatileBehavior_IsClosedSootopolisDoor(metatileBehavior) == TRUE)
         return EventScript_ClosedSootopolisDoor;
     if (MetatileBehavior_IsSkyPillarClosedDoor(metatileBehavior) == TRUE)
@@ -598,7 +632,7 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *position, u8 me
         SetMsgSignPostAndVarFacing(direction);
         return Common_EventScript_ShowPokemonCenterSign;
     }
-    if (IsFieldMoveUnlocked(FIELD_MOVE_ROCK_CLIMB) && MetatileBehavior_IsRockClimbable(metatileBehavior) == TRUE && !IsRockClimbActive())
+    if (MetatileBehavior_IsRockClimbable(metatileBehavior) == TRUE && !IsRockClimbActive())
         return EventScript_UseRockClimb;
 
     elevation = position->elevation;
@@ -684,7 +718,7 @@ static bool32 TrySetupDiveEmergeScript(void)
     return FALSE;
 }
 
-bool8 TryStartStepBasedScript(struct MapPosition *position, u16 metatileBehavior, enum Direction direction)
+static bool8 TryStartStepBasedScript(struct MapPosition *position, u16 metatileBehavior, enum Direction direction)
 {
     if (TryStartCoordEventScript(position) == TRUE)
         return TRUE;
@@ -694,6 +728,10 @@ bool8 TryStartStepBasedScript(struct MapPosition *position, u16 metatileBehavior
         return TRUE;
     if (TryStartStepCountScript(metatileBehavior) == TRUE)
         return TRUE;
+#if IS_HNS
+    if (Mom_TryTriggerGiftCall() == TRUE)
+        return TRUE;
+#endif
     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_FORCED_MOVE) && !MetatileBehavior_IsForcedMovementTile(metatileBehavior) && UpdateRepelCounter() == TRUE)
         return TRUE;
     if (OnStep_DexNavSearch())
@@ -727,7 +765,11 @@ static bool8 TryStartMiscWalkingScripts(u16 metatileBehavior)
     }
     else if (MetatileBehavior_IsBattlePyramidWarp(metatileBehavior))
     {
+#if IS_HNS
+        ScriptContext_SetupScript(BattlePyramid_WarpToNextFloor_hns);
+#else
         ScriptContext_SetupScript(BattlePyramid_WarpToNextFloor);
+#endif
         return TRUE;
     }
     else if (MetatileBehavior_IsSecretBaseGlitterMat(metatileBehavior) == TRUE)
@@ -752,7 +794,6 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
     }
 
     IncrementRematchStepCounter();
-    IncrementDaycareSteps();
     UpdateFriendshipStepCounter();
     UpdateFarawayIslandStepCounter();
     UpdateFollowerStepCounter();
@@ -816,11 +857,17 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
 
     if (SafariZoneTakeStep() == TRUE)
         return TRUE;
+    if (BugContestCheckTimeLimit() == TRUE)
+        return TRUE;
     if (CountSSTidalStep(1) == TRUE)
     {
         ScriptContext_SetupScript(SSTidalCorridor_EventScript_ReachedStepCount);
         return TRUE;
     }
+#if IS_HNS
+    if (HnsUpdateRouteStepCounter())
+        return TRUE;
+#endif
     if (TryStartMatchCall())
         return TRUE;
     return FALSE;
@@ -840,7 +887,7 @@ static void UpdateFriendshipStepCounter(void)
     (*ptr) %= 128;
     if (*ptr == 0)
     {
-        struct Pokemon *mon = gParties[B_TRAINER_PLAYER];
+        struct Pokemon *mon = gPlayerParty;
         for (i = 0; i < PARTY_SIZE; i++)
         {
             AdjustFriendship(mon, FRIENDSHIP_EVENT_WALKING);
@@ -851,7 +898,7 @@ static void UpdateFriendshipStepCounter(void)
 
 static void UpdateFollowerStepCounter(void)
 {
-    if (gPartiesCount[B_TRAINER_PLAYER] > 0 && gFollowerSteps < (u16)-1)
+    if (gPlayerPartyCount > 0 && gFollowerSteps < (u16)-1)
         gFollowerSteps++;
 }
 
@@ -893,26 +940,9 @@ void RestartWildEncounterImmunitySteps(void)
     sWildEncounterImmunitySteps = 0;
 }
 
-static bool32 ShouldDisableRandomEncounters(void)
-{
-    if (FlagGet(WE_FLAG_NO_ENCOUNTER))
-        return TRUE;
-
-    if (!WE_VANILLA_RANDOM && WE_OW_ENCOUNTERS)
-    {
-        if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS && !WE_OWE_BATTLE_PIKE)
-            return FALSE;
-
-        if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR && !WE_OWE_BATTLE_PYRAMID)
-            return FALSE;
-    }
-
-    return !WE_VANILLA_RANDOM;
-}
-
 static bool8 CheckStandardWildEncounter(u16 metatileBehavior)
 {
-    if (ShouldDisableRandomEncounters())
+    if (FlagGet(OW_FLAG_NO_ENCOUNTER))
         return FALSE;
 
     if (sWildEncounterImmunitySteps < 4)

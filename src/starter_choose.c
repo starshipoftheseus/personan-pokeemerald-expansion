@@ -1,5 +1,6 @@
 #include "global.h"
 #include "bg.h"
+#include "challenge_menu.h"
 #include "data.h"
 #include "decompress.h"
 #include "event_data.h"
@@ -10,6 +11,7 @@
 #include "palette.h"
 #include "pokedex.h"
 #include "pokemon.h"
+#include "randomizer.h"
 #include "scanline_effect.h"
 #include "sound.h"
 #include "sprite.h"
@@ -21,6 +23,7 @@
 #include "trainer_pokemon_sprites.h"
 #include "trig.h"
 #include "window.h"
+#include "constants/pokemon.h"
 #include "constants/songs.h"
 #include "constants/rgb.h"
 
@@ -44,21 +47,21 @@ static void Task_DeclineStarter(u8 taskId);
 static void Task_MoveStarterChooseCursor(u8 taskId);
 static void Task_CreateStarterLabel(u8 taskId);
 static void CreateStarterPokemonLabel(u8 selection);
-static u8 CreatePokemonFrontSprite(enum Species species, u8 x, u8 y);
+static u8 CreatePokemonFrontSprite(u16 species, u8 x, u8 y);
 static void SpriteCB_SelectionHand(struct Sprite *sprite);
 static void SpriteCB_Pokeball(struct Sprite *sprite);
 static void SpriteCB_StarterPokemon(struct Sprite *sprite);
 
 static u16 sStarterLabelWindowId;
 
-const u16 gBirchBagGrass_Pal[] = INCGFX_U16("graphics/starter_choose/tiles.png", ".gbapal");
-static const u16 sPokeballSelection_Pal[] = INCGFX_U16("graphics/starter_choose/pokeball_selection.png", ".gbapal");
-static const u16 sStarterCircle_Pal[] = INCGFX_U16("graphics/starter_choose/starter_circle.png", ".gbapal");
-const u32 gBirchBagTilemap[] = INCGFX_U32("graphics/starter_choose/birch_bag.bin", ".smolTM");
-const u32 gBirchGrassTilemap[] = INCGFX_U32("graphics/starter_choose/birch_grass.bin", ".smolTM");
-const u32 gBirchBagGrass_Gfx[] = INCGFX_U32("graphics/starter_choose/tiles.png", ".4bpp.smol");
-const u32 gPokeballSelection_Gfx[] = INCGFX_U32("graphics/starter_choose/pokeball_selection.png", ".4bpp.smol");
-static const u32 sStarterCircle_Gfx[] = INCGFX_U32("graphics/starter_choose/starter_circle.png", ".4bpp.smol");
+const u16 gBirchBagGrass_Pal[] = INCBIN_U16("graphics/starter_choose/tiles.gbapal");
+static const u16 sPokeballSelection_Pal[] = INCBIN_U16("graphics/starter_choose/pokeball_selection.gbapal");
+static const u16 sStarterCircle_Pal[] = INCBIN_U16("graphics/starter_choose/starter_circle.gbapal");
+const u32 gBirchBagTilemap[] = INCBIN_U32("graphics/starter_choose/birch_bag.bin.smolTM");
+const u32 gBirchGrassTilemap[] = INCBIN_U32("graphics/starter_choose/birch_grass.bin.smolTM");
+const u32 gBirchBagGrass_Gfx[] = INCBIN_U32("graphics/starter_choose/tiles.4bpp.smol");
+const u32 gPokeballSelection_Gfx[] = INCBIN_U32("graphics/starter_choose/pokeball_selection.4bpp.smol");
+static const u32 sStarterCircle_Gfx[] = INCBIN_U32("graphics/starter_choose/starter_circle.4bpp.smol");
 
 static const struct WindowTemplate sWindowTemplates[] =
 {
@@ -110,9 +113,16 @@ static const u8 sStarterLabelCoords[STARTER_MON_COUNT][2] =
     {8, 4},
 };
 
+#if IS_HNS
+// Must match the VAR_STARTER_MON values set in NewBarkTown_Lab_hns/scripts.inc
+#define GRASS_STARTER SPECIES_CHIKORITA
+#define FIRE_STARTER  SPECIES_CYNDAQUIL
+#define WATER_STARTER SPECIES_TOTODILE
+#else
 #define GRASS_STARTER (IS_FRLG ? SPECIES_BULBASAUR  : SPECIES_TREECKO)
 #define FIRE_STARTER  (IS_FRLG ? SPECIES_CHARMANDER : SPECIES_TORCHIC)
 #define WATER_STARTER (IS_FRLG ? SPECIES_SQUIRTLE   : SPECIES_MUDKIP )
+#endif
 
 static const u16 sStarterMon[STARTER_MON_COUNT] =
 {
@@ -346,11 +356,102 @@ static const struct SpriteTemplate sSpriteTemplate_StarterCircle =
     .callback = SpriteCB_StarterPokemon
 };
 
+static u16 sOneTypeChallengeStarters[STARTER_MON_COUNT];
+
+#define SPECIES_BITMAP_SIZE   ((NUM_SPECIES + 8) / 8)
+#define SetSpeciesBit(map, s) ((map)[(s) / 8] |= 1 << ((s) % 8))
+#define GetSpeciesBit(map, s) ((map)[(s) / 8] & (1 << ((s) % 8)))
+
+// Fills every One Type Challenge starter slot in one pass. This used to rescan
+// the whole species table once per candidate to find base stages, which froze
+// the game for a moment the first time a ball in Elm's lab was interacted with.
+static void PickOneTypeChallengeStarters(void)
+{
+    u8 typeChallenge = gSaveBlock3Ptr->challengeSettings.tx_Challenges_OneTypeChallenge;
+    u8 hasPreEvolution[SPECIES_BITMAP_SIZE];
+    u16 candidates[64];
+    u16 count = 0;
+    u16 i, stride;
+
+    for (i = 0; i < ARRAY_COUNT(hasPreEvolution); i++)
+        hasPreEvolution[i] = 0;
+
+    // One pass to mark every species that something else evolves into.
+    for (i = 1; i < NUM_SPECIES; i++)
+    {
+        const struct Evolution *evos;
+        u32 k;
+
+        if (!IsSpeciesEnabled(i))
+            continue;
+
+        evos = GetSpeciesEvolutions(i);
+        if (evos == NULL)
+            continue;
+
+        for (k = 0; evos[k].method != EVOLUTIONS_END; k++)
+        {
+            u16 target = evos[k].targetSpecies;
+
+            if (target != SPECIES_NONE && target <= NUM_SPECIES)
+                SetSpeciesBit(hasPreEvolution, target);
+        }
+    }
+
+    for (i = 1; i < NUM_SPECIES && count < ARRAY_COUNT(candidates); i++)
+    {
+        const struct Evolution *evos;
+
+        if (!IsSpeciesEnabled(i))
+            continue;
+        // Alternate forms share a name and a sprite with their base form, so
+        // offering them would show the player the same mon in several balls.
+        if (GET_BASE_SPECIES_ID(i) != i)
+            continue;
+        if (GetSpeciesBit(hasPreEvolution, i))
+            continue;
+    #if RANDOMIZER_AVAILABLE
+        // Honour the randomizer's Gen 1-3 scope even when nothing else is
+        // being randomized, so a Gen 1-3 game doesn't hand out a Gen 6 starter.
+        if (!IsSpeciesInGenScope(i))
+            continue;
+    #endif
+
+        evos = GetSpeciesEvolutions(i);
+        if (evos == NULL || evos[0].method == EVOLUTIONS_END)
+            continue;
+        // Checked last: walking the evolution line is the expensive test.
+        if (!DoesSpeciesPassOneTypeChallenge(i))
+            continue;
+
+        candidates[count++] = i;
+    }
+
+    // Spread the picks out so the balls aren't three neighbours in the dex.
+    stride = (count >= STARTER_MON_COUNT) ? count / STARTER_MON_COUNT : 1;
+
+    for (i = 0; i < STARTER_MON_COUNT; i++)
+    {
+        if (count == 0)
+            sOneTypeChallengeStarters[i] = (typeChallenge == TYPE_DRAGON) ? SPECIES_DRATINI : sStarterMon[i];
+        else
+            sOneTypeChallengeStarters[i] = candidates[(gSaveBlock2Ptr->playerTrainerId[0] + i * stride) % count];
+    }
+}
+
 // .text
 u16 GetStarterPokemon(u16 chosenStarterId)
 {
-    if (chosenStarterId > STARTER_MON_COUNT)
+    if (chosenStarterId >= STARTER_MON_COUNT)
         chosenStarterId = 0;
+
+    if (IsOneTypeChallengeActive())
+    {
+        if (sOneTypeChallengeStarters[0] == SPECIES_NONE)
+            PickOneTypeChallengeStarters();
+        return sOneTypeChallengeStarters[chosenStarterId];
+    }
+
     return sStarterMon[chosenStarterId];
 }
 
@@ -574,7 +675,7 @@ static void CreateStarterPokemonLabel(u8 selection)
     s32 width;
     u8 labelLeft, labelRight, labelTop, labelBottom;
 
-    enum Species species = GetStarterPokemon(selection);
+    u16 species = GetStarterPokemon(selection);
     CopyMonCategoryText(species, categoryText);
     speciesName = GetSpeciesName(species);
 
@@ -625,7 +726,7 @@ static void Task_CreateStarterLabel(u8 taskId)
     gTasks[taskId].func = Task_HandleStarterChooseInput;
 }
 
-static u8 CreatePokemonFrontSprite(enum Species species, u8 x, u8 y)
+static u8 CreatePokemonFrontSprite(u16 species, u8 x, u8 y)
 {
     u8 spriteId;
 

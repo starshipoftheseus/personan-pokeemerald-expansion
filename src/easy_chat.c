@@ -212,7 +212,7 @@ static void SetRectangleCursorPos_GroupMode(s8, s8);
 static void SetRectangleCursorPos_AlphabetMode(s8, s8);
 static void SpriteCB_WordSelectCursor(struct Sprite *);
 static void SetWordSelectCursorPos(u8, u8);
-static bool32 EasyChatIsNationalPokedexEnabled(void);
+static bool8 EasyChatIsNationalPokedexEnabled(void);
 static u16 GetRandomUnlockedEasyChatPokemon(void);
 static void SetUnlockedEasyChatGroups(void);
 static void SetUnlockedWordsByAlphabet(void);
@@ -220,8 +220,8 @@ static u8 *CopyEasyChatWordPadded(u8 *, u16, u16);
 static u8 IsEasyChatWordUnlocked(u16);
 static u16 SetSelectedWordGroup_GroupMode(u16);
 static u16 SetSelectedWordGroup_AlphabetMode(u16);
-static bool32 IsEasyChatIndexAndGroupUnlocked(u16, u8);
-static bool32 IsRestrictedWordSpecies(enum Species);
+static bool8 IsEasyChatIndexAndGroupUnlocked(u16, u8);
+static int IsRestrictedWordSpecies(u16);
 static void DoQuizAnswerEasyChatScreen(void);
 static void DoQuizQuestionEasyChatScreen(void);
 static void DoQuizSetAnswerEasyChatScreen(void);
@@ -706,20 +706,20 @@ static const u16 sBerryMasterWifePhrases[][2] = {
     [PHRASE_SUPER_HUSTLE - 1]        = {EC_WORD_SUPER, EC_WORD_HUSTLE},
 };
 
-static const u16 sTriangleCursor_Pal[] = INCGFX_U16("graphics/easy_chat/triangle_cursor.png", ".gbapal");
-static const u32 sTriangleCursor_Gfx[] = INCGFX_U32("graphics/easy_chat/triangle_cursor.png", ".4bpp");
-static const u32 sScrollIndicator_Gfx[] = INCGFX_U32("graphics/easy_chat/scroll_indicator.png", ".4bpp");
-static const u32 sStartSelectButtons_Gfx[] = INCGFX_U32("graphics/easy_chat/start_select_buttons.png", ".4bpp");
+static const u16 sTriangleCursor_Pal[] = INCBIN_U16("graphics/easy_chat/triangle_cursor.gbapal");
+static const u32 sTriangleCursor_Gfx[] = INCBIN_U32("graphics/easy_chat/triangle_cursor.4bpp");
+static const u32 sScrollIndicator_Gfx[] = INCBIN_U32("graphics/easy_chat/scroll_indicator.4bpp");
+static const u32 sStartSelectButtons_Gfx[] = INCBIN_U32("graphics/easy_chat/start_select_buttons.4bpp");
 // In Ruby/Sapphire Easy Chat screens had a black background, and when the player & interviewer were present
 // on screen the interview_frame gfx was shown behind them.
 // In Emerald all Easy Chat screens have a filled background, so these gfx go unused
-static const u16 sRSInterviewFrame_Pal[] = INCGFX_U16("graphics/easy_chat/interview_frame.png", ".gbapal");
-static const u32 sRSInterviewFrame_Gfx[] = INCGFX_U32("graphics/easy_chat/interview_frame.png", ".4bpp.smol");
-static const u16 sTextInputFrameOrange_Pal[] = INCGFX_U16("graphics/easy_chat/text_input_frame_orange.pal", ".gbapal");
-static const u16 sTextInputFrameGreen_Pal[] = INCGFX_U16("graphics/easy_chat/text_input_frame_green.pal", ".gbapal");
-static const u32 sTextInputFrame_Gfx[] = INCGFX_U32("graphics/easy_chat/text_input_frame.png", ".4bpp.smol");
-static const u16 sTitleText_Pal[] = INCGFX_U16("graphics/easy_chat/title_text.pal", ".gbapal");
-static const u16 sText_Pal[] = INCGFX_U16("graphics/easy_chat/text.pal", ".gbapal");
+static const u16 sRSInterviewFrame_Pal[] = INCBIN_U16("graphics/easy_chat/interview_frame.gbapal");
+static const u32 sRSInterviewFrame_Gfx[] = INCBIN_U32("graphics/easy_chat/interview_frame.4bpp.smol");
+static const u16 sTextInputFrameOrange_Pal[] = INCBIN_U16("graphics/easy_chat/text_input_frame_orange.gbapal");
+static const u16 sTextInputFrameGreen_Pal[] = INCBIN_U16("graphics/easy_chat/text_input_frame_green.gbapal");
+static const u32 sTextInputFrame_Gfx[] = INCBIN_U32("graphics/easy_chat/text_input_frame.4bpp.smol");
+static const u16 sTitleText_Pal[] = INCBIN_U16("graphics/easy_chat/title_text.gbapal");
+static const u16 sText_Pal[] = INCBIN_U16("graphics/easy_chat/text.gbapal");
 
 static const struct EasyChatPhraseFrameDimensions sPhraseFrameDimensions[] = {
     [FRAMEID_GENERAL_2x2] = {
@@ -1229,7 +1229,7 @@ static const u16 sDefaultBattleLostWords[EASY_CHAT_BATTLE_WORDS_COUNT] = {
     EC_WORD_ELLIPSIS,
 };
 
-static const enum Species sRestrictedWordSpecies[] = {
+static const u16 sRestrictedWordSpecies[] = {
     SPECIES_DEOXYS,
 };
 
@@ -1409,6 +1409,33 @@ static void ExitEasyChatScreen(MainCallback callback)
     FreeEasyChatScreenWordData();
     FreeAllWindowBuffers();
     SetMainCallback2(callback);
+}
+
+// HnS: Odd Egg interview passwords — 4 Easy Chat words → species index 1..7
+static const u16 sInterviewPasswords[11][4] = {
+    { EC_WORD_STATIC, EC_WORD_ELECTRIC, EC_WORD_WAAAH, EC_WORD_PLAY },
+    { EC_WORD_CUTE_CHARM, EC_WORD_NORMAL, EC_WORD_EEK, EC_WORD_LOOKS },
+    { EC_WORD_CUTE_CHARM, EC_WORD_NORMAL, EC_WORD_LALALA, EC_WORD_SLEEP },
+    { EC_WORD_GUTS, EC_WORD_FIGHTING, EC_WORD_HIYAH, EC_WORD_TRAINS },
+    { EC_WORD_OBLIVIOUS, EC_WORD_ICE, EC_WORD_EHEHE, EC_WORD_SHOW },
+    { EC_WORD_STATIC, EC_WORD_ELECTRIC, EC_WORD_OI_OI_OI, EC_WORD_STORES },
+    { EC_WORD_FLAME_BODY, EC_WORD_FIRE, EC_WORD_TCH, EC_WORD_ANGERS },
+    { EC_WORD_SWIFT_SWIM, EC_WORD_WATER, EC_WORD_WAAAH, EC_WORD_SINK },
+    { EC_WORD_STURDY, EC_WORD_ROCK, EC_WORD_URGH, EC_WORD_PRETEND },
+    { EC_WORD_NATURAL_CURE, EC_WORD_NORMAL, EC_WORD_SIGH, EC_WORD_TRUST },
+    { EC_WORD_SOUNDPROOF, EC_WORD_PSYCHIC, EC_WORD_HMM, EC_WORD_WORRY },
+};
+
+static u16 EvaluateInterviewPassword(const u16 *w)
+{
+    for (int i = 0; i < ARRAY_COUNT(sInterviewPasswords); i++) {
+        bool8 ok = TRUE;
+        for (int k = 0; k < 4; k++) {
+            if (w[k] != sInterviewPasswords[i][k]) { ok = FALSE; break; }
+        }
+        if (ok) return (u16)(i + 1);
+    }
+    return 0;
 }
 
 void ShowEasyChatScreen(void)
@@ -1950,7 +1977,9 @@ static u16 HandleEasyChatInput_ConfirmWordsYesNo(void)
         return ECFUNC_CLOSE_PROMPT;
     case 0: // Yes
         SetSpecialEasyChatResult();
-        gSpecialVar_Result = GetEasyChatCompleted();
+        gSpecialVar_Result = (sEasyChatScreen->type == EASY_CHAT_TYPE_INTERVIEW)
+                        ? gSpecialVar_0x8004
+                        : GetEasyChatCompleted();
         SaveCurrentPhrase();
         return ECFUNC_EXIT;
     default:
@@ -2748,6 +2777,11 @@ static u8 GetWordSelectLastRow(void)
     return sEasyChatScreen->wordSelectLastRow;
 }
 
+static u8 UNUSED UnusedDummy(void)
+{
+    return FALSE;
+}
+
 static bool32 CanScrollUp(void)
 {
     switch (sEasyChatScreen->inputState)
@@ -2919,6 +2953,9 @@ static void SetSpecialEasyChatResult(void)
 {
     switch (sEasyChatScreen->type)
     {
+    case EASY_CHAT_TYPE_INTERVIEW:
+        gSpecialVar_0x8004 = EvaluateInterviewPassword(sEasyChatScreen->currentPhrase);
+        break;
     case EASY_CHAT_TYPE_PROFILE:
         FlagSet(FLAG_SYS_CHAT_USED);
         break;
@@ -3905,7 +3942,7 @@ static void PrintTitle(void)
     CopyWindowToVram(WIN_TITLE, COPYWIN_FULL);
 }
 
-static void PrintEasyChatText(u8 windowId, u8 fontId, const u8 *str, u8 x, u8 y, u8 speed, TextPrinterCallback callback)
+static void PrintEasyChatText(u8 windowId, u8 fontId, const u8 *str, u8 x, u8 y, u8 speed, void (*callback)(struct TextPrinterTemplate *, u16))
 {
     AddTextPrinterParameterized(windowId, fontId, str, x, y, speed, callback);
 }
@@ -4884,11 +4921,11 @@ static bool8 IsModeWindowAnimActive(void)
 
 static void CreateScrollIndicatorSprites(void)
 {
-    u8 spriteId = CreateSpriteUnchecked(&sSpriteTemplate_ScrollIndicator, 96, 80, 0);
+    u8 spriteId = CreateSprite(&sSpriteTemplate_ScrollIndicator, 96, 80, 0);
     if (spriteId != MAX_SPRITES)
         sScreenControl->scrollIndicatorUpSprite = &gSprites[spriteId];
 
-    spriteId = CreateSpriteUnchecked(&sSpriteTemplate_ScrollIndicator, 96, 156, 0);
+    spriteId = CreateSprite(&sSpriteTemplate_ScrollIndicator, 96, 156, 0);
     if (spriteId != MAX_SPRITES)
     {
         sScreenControl->scrollIndicatorDownSprite = &gSprites[spriteId];
@@ -4929,11 +4966,11 @@ static void SetScrollIndicatorXPos(bool32 inWordSelect)
 // The Start/Select buttons are used as page scroll indicators
 static void CreateStartSelectButtonSprites(void)
 {
-    u8 spriteId = CreateSpriteUnchecked(&sSpriteTemplate_StartSelectButton, 220, 84, 1);
+    u8 spriteId = CreateSprite(&sSpriteTemplate_StartSelectButton, 220, 84, 1);
     if (spriteId != MAX_SPRITES)
         sScreenControl->startButtonSprite = &gSprites[spriteId];
 
-    spriteId = CreateSpriteUnchecked(&sSpriteTemplate_StartSelectButton, 220, 156, 1);
+    spriteId = CreateSprite(&sSpriteTemplate_StartSelectButton, 220, 156, 1);
     if (spriteId != MAX_SPRITES)
     {
         sScreenControl->selectButtonSprite = &gSprites[spriteId];
@@ -5478,7 +5515,7 @@ static u16 UNUSED GetRandomUnlockedTrendySaying(void)
     return EC_EMPTY_WORD;
 }
 
-static bool32 EasyChatIsNationalPokedexEnabled(void)
+static bool8 EasyChatIsNationalPokedexEnabled(void)
 {
     return IsNationalPokedexEnabled();
 }
@@ -5487,7 +5524,7 @@ static u16 GetRandomUnlockedEasyChatPokemon(void)
 {
     u16 i;
     u16 numWords;
-    const enum Species *species;
+    const u16 *species;
     u16 index = EasyChat_GetNumWordsInGroup(EC_GROUP_POKEMON);
     if (index == 0)
         return EC_EMPTY_WORD;
@@ -5756,7 +5793,7 @@ static bool8 IsEasyChatGroupUnlocked2(u8 groupId)
     return FALSE;
 }
 
-static bool32 IsEasyChatIndexAndGroupUnlocked(u16 wordIndex, u8 groupId)
+static bool8 IsEasyChatIndexAndGroupUnlocked(u16 wordIndex, u8 groupId)
 {
     switch (groupId)
     {
@@ -5778,7 +5815,7 @@ static bool32 IsEasyChatIndexAndGroupUnlocked(u16 wordIndex, u8 groupId)
 
 // Pokémon words in EC_GROUP_POKEMON_NATIONAL are always allowed (assuming the group is unlocked)
 // unless they are in this group. If they are in this group (just Deoxys), they must also have been seen.
-static bool32 IsRestrictedWordSpecies(enum Species species)
+static int IsRestrictedWordSpecies(u16 species)
 {
     u32 i;
     for (i = 0; i < ARRAY_COUNT(sRestrictedWordSpecies); i++)

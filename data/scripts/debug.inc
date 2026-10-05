@@ -20,8 +20,6 @@ Debug_CheatStart::
 	givemon SPECIES_TREECKO, 20, ITEM_NONE
 	givemon SPECIES_TORCHIC, 20, ITEM_NONE
 	givemon SPECIES_MUDKIP, 20, ITEM_NONE
-	givemon SPECIES_WAILMER, 20, ITEM_NONE, move1 = MOVE_SURF, move2 = MOVE_WATERFALL, move3 = MOVE_DIVE, move4 = MOVE_STRENGTH
-	givemon SPECIES_TROPIUS, 20, ITEM_NONE, move1 = MOVE_FLY, move2 = MOVE_CUT, move3 = MOVE_ROCK_SMASH, move4 = MOVE_FLASH
 	setflag FLAG_SYS_POKEDEX_GET
 	special SetUnlockedPokedexFlags
 	setflag FLAG_RECEIVED_POKEDEX_FROM_BIRCH
@@ -80,8 +78,6 @@ Debug_CheatStartFrlg::
 	givemon SPECIES_BULBASAUR, 20, ITEM_NONE
 	givemon SPECIES_CHARMANDER, 20, ITEM_NONE
 	givemon SPECIES_SQUIRTLE, 20, ITEM_NONE
-	givemon SPECIES_PSYDUCK, 20, ITEM_NONE, move1 = MOVE_SURF, move2 = MOVE_WATERFALL, move3 = MOVE_STRENGTH, move4 = MOVE_ROCK_SMASH
-	givemon SPECIES_FARFETCHD, 20, ITEM_NONE, move1 = MOVE_FLY, move2 = MOVE_CUT, move3 = MOVE_FLASH, move4 = MOVE_FURY_ATTACK
 	clearflag FLAG_HIDE_OAK_IN_HIS_LAB
 	setflag FLAG_HIDE_RIVAL_IN_LAB
 	setvar VAR_MAP_SCENE_PALLET_TOWN_OAK, 1 @ prevents Oak scene when trying to enter Route 1
@@ -169,6 +165,7 @@ Debug_EventScript_CheckEVs::
 	getpartysize
 	goto_if_eq VAR_RESULT, 0, Debug_NoPokemon
 	special ChoosePartyMon
+	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, Debug_EventScript_CheckEVs_End
 	callnative Script_GetChosenMonOffensiveEVs
 	msgbox Debug_EventScript_Text_OffensiveEVs, MSGBOX_DEFAULT
@@ -189,6 +186,7 @@ Debug_EventScript_CheckIVs::
 	getpartysize
 	goto_if_eq VAR_RESULT, 0, Debug_NoPokemon
 	special ChoosePartyMon
+	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, Debug_EventScript_CheckIVs_End
 	callnative Script_GetChosenMonOffensiveIVs
 	msgbox Debug_EventScript_Text_OffensiveIVs, MSGBOX_DEFAULT
@@ -205,27 +203,47 @@ Debug_EventScript_Text_DefensiveIVs:
 	.string "HP IVs: {STR_VAR_1}, DEF IVs: {STR_VAR_2}, SPDEF IVs: {STR_VAR_3}$"
 
 Debug_EventScript_Script_1::
+	goto UnionCave_B2F_EventScript_Lapras
 	release
 	end
 
+Debug_Text_1:
+	.string "{STR_VAR_1}$"
+
+
 Debug_EventScript_Script_2::
+	finditem ITEM_POTION
+	giveitem ITEM_SUPER_POTION
 	release
 	end
 
 Debug_EventScript_Script_3::
+	goto SinjohRuins_EventScript_StevenBattle
 	release
 	end
 
 Debug_EventScript_Script_4::
+	msgbox SinjohRuins_Lab_Text_StevenCall3Plates, MSGBOX_DEFAULT
+	pokenavcall SinjohRuins_Lab_Text_StevenCall6Plates
 	release
 	end
 
 Debug_EventScript_Script_5::
+	special InitKantoRoamers
 	release
 	end
 
 Debug_EventScript_Script_6::
-	release
+	lockall
+	setvar VAR_FRONTIER_FACILITY, FRONTIER_FACILITY_TOWER
+	setvar VAR_FRONTIER_BATTLE_MODE, FRONTIER_MODE_SINGLES
+	frontier_settrainers
+	setvar VAR_TRAINER_BATTLE_OPPONENT_A, FRONTIER_TRAINER_LEADER_BROCK_HNS
+	special HealPlayerParty
+	dofacilitytrainerbattle FACILITY_BATTLE_TOWER
+	waitstate
+	special HealPlayerParty
+	releaseall
 	end
 
 Debug_EventScript_Script_7::
@@ -235,6 +253,88 @@ Debug_EventScript_Script_7::
 Debug_EventScript_Script_8::
 	release
 	end
+
+Debug_EventScript_Lance_Multi::
+	special SavePlayerParty
+	fadescreen FADE_TO_BLACK
+	special ChooseHalfPartyForBattle
+	waitstate
+	goto_if_ne VAR_RESULT, 0, Debug_EventScript_DoLanceMultiBattle
+	special LoadPlayerParty
+	release
+	end
+
+Debug_EventScript_DoLanceMultiBattle::
+	multi_2_vs_2 TRAINER_ARIANA_1_HNS, Debug_Text_ArianaDefeat, TRAINER_GRUNT_23_HNS, Debug_Text_Grunt23Defeat, PARTNER_LANCE_HNS
+	switch VAR_RESULT
+	case 1, Debug_EventScript_LanceMultiWin
+	fadescreen FADE_TO_BLACK
+	special SetCB2WhiteOut
+	waitstate
+
+Debug_EventScript_LanceMultiWin::
+	msgbox Debug_Text_LanceMultiVictory, MSGBOX_DEFAULT
+	release
+	end
+
+Debug_Text_ArianaDefeat:
+	.string "You haven't seen the last of me!$"
+
+Debug_Text_Grunt23Defeat:
+	.string "I won't accept this!$"
+
+Debug_Text_LanceMultiVictory:
+	.string "Lance multi battle complete!$"
+
+Debug_EventScript_Silver_Multi::
+	special SavePlayerParty
+	fadescreen FADE_TO_BLACK
+	special ChooseHalfPartyForBattle
+	waitstate
+	goto_if_ne VAR_RESULT, 0, Debug_EventScript_PickSilverPartner
+	special LoadPlayerParty
+	release
+	end
+
+Debug_EventScript_PickSilverPartner::
+	switch VAR_STARTER_MON
+	case 0, Debug_EventScript_DoSilverMulti_Typhlosion
+	case 1, Debug_EventScript_DoSilverMulti_Feraligatr
+	case 2, Debug_EventScript_DoSilverMulti_Meganium
+	goto Debug_EventScript_DoSilverMulti_Typhlosion
+
+Debug_EventScript_DoSilverMulti_Typhlosion::
+	multi_2_vs_2 TRAINER_LANCE_3_HNS, Debug_Text_Lance3Defeat, TRAINER_CLAIR_3_HNS, Debug_Text_Clair3Defeat, PARTNER_SILVER_TYPHLOSION_HNS
+	goto Debug_EventScript_SilverMultiResult
+
+Debug_EventScript_DoSilverMulti_Feraligatr::
+	multi_2_vs_2 TRAINER_LANCE_3_HNS, Debug_Text_Lance3Defeat, TRAINER_CLAIR_3_HNS, Debug_Text_Clair3Defeat, PARTNER_SILVER_FERALIGATR_HNS
+	goto Debug_EventScript_SilverMultiResult
+
+Debug_EventScript_DoSilverMulti_Meganium::
+	multi_2_vs_2 TRAINER_LANCE_3_HNS, Debug_Text_Lance3Defeat, TRAINER_CLAIR_3_HNS, Debug_Text_Clair3Defeat, PARTNER_SILVER_MEGANIUM_HNS
+	goto Debug_EventScript_SilverMultiResult
+
+Debug_EventScript_SilverMultiResult::
+	switch VAR_RESULT
+	case 1, Debug_EventScript_SilverMultiWin
+	fadescreen FADE_TO_BLACK
+	special SetCB2WhiteOut
+	waitstate
+
+Debug_EventScript_SilverMultiWin::
+	msgbox Debug_Text_SilverMultiVictory, MSGBOX_DEFAULT
+	release
+	end
+
+Debug_Text_SilverMultiVictory:
+	.string "Silver multi battle complete!$"
+
+Debug_Text_Lance3Defeat:
+	.string "You haven't seen the last of me!$"
+
+Debug_Text_Clair3Defeat:
+	.string "I won't accept this!$"
 
 Debug_CheckSaveBlock::
 	callnative CheckSaveBlock1Size
@@ -279,10 +379,12 @@ Debug_HatchAnEgg::
 	getpartysize
 	goto_if_eq VAR_RESULT, 0, Debug_NoPokemon
 	special ChoosePartyMon
+	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, Debug_HatchAnEgg_End
 	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
 	goto_if_ne VAR_RESULT, SPECIES_EGG, DebugScript_HatchAnEgg_CantForceHatch
 	special EggHatch
+	waitstate
 Debug_HatchAnEgg_End::
 	releaseall
 	end
@@ -363,6 +465,7 @@ Debug_EventScript_WallyTutorial::
 	special SavePlayerParty
 	special LoadWallyZigzagoon
 	special StartWallyTutorialBattle
+	waitstate
 	special LoadPlayerParty
 	release
 	end
@@ -403,6 +506,7 @@ Debug_EventScript_InflictStatus1_Close:
 
 Debug_EventScript_InflictStatus1_Single:
 	special ChoosePartyMon
+	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, Debug_EventScript_InflictStatus1_Close
 	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
 	goto_if_eq VAR_RESULT, SPECIES_EGG, Debug_EventScript_InflictStatus1_Close
@@ -428,6 +532,7 @@ Debug_EventScript_InflictStatus1_Single:
 
 Debug_EventScript_KoPokemon::
 	special ChoosePartyMon
+	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, Debug_EventScript_InflictStatus1_Close
 	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
 	goto_if_eq VAR_RESULT, SPECIES_EGG, Debug_EventScript_InflictStatus1_Close
@@ -437,6 +542,7 @@ Debug_EventScript_KoPokemon::
 
 Debug_EventScript_SetHiddenNature::
 	special ChoosePartyMon
+	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, Debug_EventScript_InflictStatus1_Close
 	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
 	goto_if_eq VAR_RESULT, SPECIES_EGG, Debug_EventScript_InflictStatus1_Close
@@ -474,6 +580,7 @@ Debug_EventScript_SetHiddenNature::
 
 Debug_EventScript_SetAbility::
 	special ChoosePartyMon
+	waitstate
 	callnative DebugNative_GetAbilityNames
 	dynmultipush gStringVar1, 0
 	dynmultipush gStringVar2, 1
@@ -488,12 +595,14 @@ Debug_EventScript_SetAbilityClose:
 
 Debug_EventScript_SetFriendship::
 	special ChoosePartyMon
+	waitstate
 	callnative DebugNative_Party_SetFriendship
 	releaseall
 	end
 
 Debug_EventScript_GivePokerus::
 	special ChoosePartyMon
+	waitstate
 	callnative DebugNative_Party_SetPokerus
 	releaseall
 	end
@@ -805,19 +914,22 @@ Debug_EventScript_FontTest::
 Debug_EventScript_TellTheTime::
 	callnative DebugMenu_CalculateTime
 	msgbox Debug_EventScript_TellTheTime_Text_0, MSGBOX_DEFAULT
-	releaseall
+	waitmessage
+	closemessage
 	end
 
 Debug_EventScript_PrintTimeOfDay::
 	callnative DebugMenu_CalculateTimeOfDay
 	msgbox DebugEventScript_PrintWeekday_Text_0, MSGBOX_DEFAULT
-	releaseall
+	waitmessage
+	closemessage
 	end
 
 Debug_EventScript_FakeRTCNotEnabled::
 	msgbox Debug_EventScript_FakeRTCNotEnabled_Text_0, MSGBOX_DEFAULT
-	releaseall
-	end
+	waitmessage
+	closemessage
+	return
 
 Debug_EventScript_FakeRTCNotEnabled_Text_0:
 	.string "You currently do not have Fake RTC\nenabled. Please enable it in include/\lconfig/overworld.h$"

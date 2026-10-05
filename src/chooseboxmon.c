@@ -4,7 +4,6 @@
 #include "event_data.h"
 #include "event_scripts.h"
 #include "field_weather.h"
-#include "malloc.h"
 #include "menu.h"
 #include "move.h"
 #include "move_relearner.h"
@@ -19,8 +18,7 @@
 #include "strings.h"
 #include "constants/party_menu.h"
 #include "constants/songs.h"
-
-#include "sound.h"
+#include "nuzlocke.h"
 
 #define VALID_MON 0
 #define INVALID_MON 1
@@ -30,62 +28,63 @@ struct PcMonSelection
     void      (*partyMonBackup)(void);
     u32       (*isMonInvalid)(struct BoxPokemon *);
     const u8* postSelectionScript;
-    u32       isStrict:1;
-    u32       padding:31;
+    u32 isStrict:1;
+    u32 padding:31; 
 };
 
 static EWRAM_DATA u8 sSelectionType = 0;
 
 // All these filter functions return 0 when a mon is a valid or a number corresponding to the type of error
-static u32 ChooseBoxMon_NoFilter(struct BoxPokemon *boxmon);
-static u32 ChooseBoxMon_IsNotEgg(struct BoxPokemon *boxmon);
-static u32 ChooseBoxMon_IsMatchingSpecies(struct BoxPokemon *boxmon);
-static u32 ChooseBoxMon_CanMonDeleteMove(struct BoxPokemon *boxmon);
-static u32 ChooseBoxMon_CanMonLearnSpecialVarMove(struct BoxPokemon *boxmon);
-static u32 ChooseBoxMon_CanRelearnMoves(struct BoxPokemon *boxmon);
-static u32 ChooseBoxMon_CanEvolve(struct BoxPokemon *boxmon);
+static u32 NoFilter(struct BoxPokemon *boxmon);
+static u32 IsNotEgg(struct BoxPokemon *boxmon);
+static u32 IsMatchingSpecies(struct BoxPokemon *boxmon);
+static u32 CanMonDeleteMove(struct BoxPokemon *boxmon);
+static u32 CanMonLearnMove(struct BoxPokemon *boxmon);
+static u32 CanMonLearnPLAMove(struct BoxPokemon *boxmon);
+static u32 CanRelearnMoves(struct BoxPokemon *boxmon);
 
 static const struct PcMonSelection sPcMonSelectionTypes[] =
 {
-    [SELECT_PC_MON_NORMAL] = {ChoosePartyMon, ChooseBoxMon_NoFilter, NULL, FALSE},
-    [SELECT_PC_MON_TRADE] = {ChoosePartyMon, ChooseBoxMon_IsMatchingSpecies, NULL, FALSE},
-    [SELECT_PC_MON_DAYCARE] = {ChooseSendDaycareMon, ChooseBoxMon_IsNotEgg, NULL, TRUE},
-    [SELECT_PC_MON_MOVE_TUTOR] = {ChooseMonForMoveTutor, ChooseBoxMon_CanMonLearnSpecialVarMove, MoveTutor_AfterChooseBoxMon, FALSE},
-    [SELECT_PC_MON_MOVE_DELETER] = {ChoosePartyMon, ChooseBoxMon_CanMonDeleteMove, NULL, FALSE},
-    [SELECT_PC_MON_MOVE_RELEARNER] = {ChooseMonForMoveRelearner, ChooseBoxMon_CanRelearnMoves, NULL, FALSE},
-    [SELECT_PC_MON_EVOLUTION] = {ChoosePartyMon, ChooseBoxMon_CanEvolve, NULL, FALSE},
+    [SELECT_PC_MON_NORMAL] = {ChoosePartyMon, NoFilter, NULL, FALSE},
+    [SELECT_PC_MON_TRADE] = {ChoosePartyMon, IsMatchingSpecies, NULL, FALSE},
+    [SELECT_PC_MON_DAYCARE] = {ChooseSendDaycareMon, IsNotEgg, NULL, TRUE},
+    [SELECT_PC_MON_MOVE_TUTOR] = {ChooseMonForMoveTutor, CanMonLearnMove, MoveTutor_AfterChooseBoxMon, FALSE},
+    [SELECT_PC_MON_MOVE_DELETER] = {ChoosePartyMon, CanMonDeleteMove, NULL, FALSE},
+    [SELECT_PC_MON_MOVE_RELEARNER] = {ChooseMonForMoveRelearner, CanRelearnMoves, NULL, FALSE},
+    [SELECT_PC_MON_PLA_TUTOR] = {ChooseMonForMoveTutor, CanMonLearnPLAMove, MoveTutor_AfterChooseBoxMon, FALSE},
 };
 
-static u32 ChooseBoxMon_NoFilter(struct BoxPokemon *boxmon)
+static u32 NoFilter(struct BoxPokemon *boxmon)
 {
     return VALID_MON;
 }
 
-static u32 ChooseBoxMon_IsNotEgg(struct BoxPokemon *boxmon)
+static u32 IsNotEgg(struct BoxPokemon *boxmon)
 {
     if (GetBoxMonData(boxmon, MON_DATA_IS_EGG))
         return INVALID_MON;
     return VALID_MON;
 }
 
-static u32 ChooseBoxMon_CanRelearnMoves(struct BoxPokemon *boxmon)
+static u32 CanRelearnMoves(struct BoxPokemon *boxmon)
 {
-    gRelearnMode = RELEARN_MODE_SCRIPT;
     if (GetBoxMonData(boxmon, MON_DATA_IS_EGG))
         return INVALID_MON;
-    if (HasMoveToRelearn(boxmon, gMoveRelearnerState))
+    if (CanBoxMonRelearnMoves(boxmon, gMoveRelearnerState))
         return VALID_MON;
     return INVALID_MON;
 }
 
-static u32 ChooseBoxMon_IsMatchingSpecies(struct BoxPokemon *boxmon)
+static u32 IsMatchingSpecies(struct BoxPokemon *boxmon)
 {
+    if (gSpecialVar_0x8009 == SPECIES_NONE)
+        return VALID_MON;
     if (GetBoxMonData(boxmon, MON_DATA_SPECIES_OR_EGG) == gSpecialVar_0x8009)
         return VALID_MON;
     return INVALID_MON;
 }
 
-static u32 ChooseBoxMon_CanMonDeleteMove(struct BoxPokemon *boxmon)
+static u32 CanMonDeleteMove(struct BoxPokemon *boxmon)
 {
     if (GetBoxMonData(boxmon, MON_DATA_IS_EGG))
         return INVALID_MON;
@@ -94,47 +93,156 @@ static u32 ChooseBoxMon_CanMonDeleteMove(struct BoxPokemon *boxmon)
     return VALID_MON;
 }
 
-static u32 ChooseBoxMon_CanMonLearnMove(struct BoxPokemon *boxmon, enum Move move)
+static u32 CanMonLearnMove(struct BoxPokemon *boxmon)
 {
     if (GetBoxMonData(boxmon, MON_DATA_IS_EGG))
         return CANNOT_LEARN_MOVE_IS_EGG;
-    if (BoxMonKnowsMove(boxmon, move))
+    if (BoxMonKnowsMove(boxmon, gSpecialVar_0x8005))
         return ALREADY_KNOWS_MOVE;
-    if (CanLearnTeachableMove(GetBoxMonData(boxmon, MON_DATA_SPECIES), move))
+    if (CanLearnTeachableMove(GetBoxMonData(boxmon, MON_DATA_SPECIES), gSpecialVar_0x8005))
         return VALID_MON;
     return CANNOT_LEARN_MOVE;
 }
 
-//super hacky way to exclude PC mons until I handle evolution for pc mon in a different PR
-static bool32 IsFromPC(u32 adress)
+static const u16 sPLATutorLearnsets[][2] =
 {
-    u32 pcMonStart = (u32)&gPokemonStoragePtr->boxes;
-    u32 pcMonEnd = pcMonStart + sizeof(struct BoxPokemon) * TOTAL_BOXES_COUNT * IN_BOX_COUNT;
-    return (pcMonStart <= adress && adress <= pcMonEnd);
-}
-static u32 ChooseBoxMon_CanEvolve(struct BoxPokemon *boxmon)
-{
-    struct Pokemon *mon = Alloc(sizeof(struct Pokemon));
-    u32 result;
+    {SPECIES_HITMONTOP,         MOVE_VICTORY_DANCE},
+    {SPECIES_BRELOOM,           MOVE_VICTORY_DANCE},
+    {SPECIES_SPINDA,            MOVE_VICTORY_DANCE},
+    {SPECIES_LUDICOLO,          MOVE_VICTORY_DANCE},
+    {SPECIES_BELLOSSOM,         MOVE_VICTORY_DANCE},
 
-    if (IsFromPC((u32)boxmon))
-        return INVALID_MON;
-    BoxMonToMon(boxmon, mon);
-    if (GetEvolutionTargetSpecies(mon, EVO_MODE_SCRIPT_TRIGGER, gSpecialVar_0x8005, NULL, NULL, CHECK_EVO))
-        result = VALID_MON;
-    else
-        result = INVALID_MON;
-    Free(mon);
-    return result;
-}
+    {SPECIES_GLALIE,            MOVE_MOUNTAIN_GALE},
+    {SPECIES_MAMOSWINE,         MOVE_MOUNTAIN_GALE},
+    {SPECIES_SANDSLASH_ALOLA,   MOVE_MOUNTAIN_GALE},
+    {SPECIES_KINGLER,           MOVE_MOUNTAIN_GALE},
+    {SPECIES_CRAWDAUNT,         MOVE_MOUNTAIN_GALE},
+    {SPECIES_LAPRAS,            MOVE_MOUNTAIN_GALE},
+    {SPECIES_FERALIGATR,        MOVE_MOUNTAIN_GALE},
 
-static u32 ChooseBoxMon_CanMonLearnSpecialVarMove(struct BoxPokemon *boxmon)
+    {SPECIES_BANETTE,           MOVE_BITTER_MALICE},
+    {SPECIES_DUSCLOPS,          MOVE_BITTER_MALICE},
+    {SPECIES_DUSKNOIR,          MOVE_BITTER_MALICE},
+    {SPECIES_CORSOLA_GALAR,      MOVE_BITTER_MALICE},
+    {SPECIES_CURSOLA,           MOVE_BITTER_MALICE},
+    {SPECIES_GENGAR,            MOVE_BITTER_MALICE},
+    {SPECIES_MOLTRES_GALAR,     MOVE_BITTER_MALICE},
+    {SPECIES_MAROWAK_ALOLA,     MOVE_BITTER_MALICE},
+
+    {SPECIES_RAPIDASH_GALAR,    MOVE_SPRINGTIDE_STORM},
+    {SPECIES_MEGANIUM,          MOVE_SPRINGTIDE_STORM},
+    {SPECIES_ALTARIA,           MOVE_SPRINGTIDE_STORM},
+    {SPECIES_TOGETIC,           MOVE_SPRINGTIDE_STORM},
+    {SPECIES_TOGEKISS,          MOVE_SPRINGTIDE_STORM},
+
+    {SPECIES_CLEFABLE,          MOVE_LUNAR_BLESSING},
+    {SPECIES_NIDOQUEEN,         MOVE_LUNAR_BLESSING},
+    {SPECIES_LUNATONE,          MOVE_LUNAR_BLESSING},
+    {SPECIES_URSARING,          MOVE_LUNAR_BLESSING},
+    {SPECIES_URSALUNA,          MOVE_LUNAR_BLESSING},
+    {SPECIES_URSALUNA_BLOODMOON, MOVE_LUNAR_BLESSING},
+    {SPECIES_UMBREON,           MOVE_LUNAR_BLESSING},
+
+    {SPECIES_ARTICUNO,          MOVE_BLEAKWIND_STORM},
+
+    {SPECIES_ZAPDOS,            MOVE_WILDBOLT_STORM},
+
+    {SPECIES_MOLTRES,           MOVE_SANDSEAR_STORM},
+
+    {SPECIES_SHUCKLE,           MOVE_SHELTER},
+    {SPECIES_BLASTOISE,         MOVE_SHELTER},
+    {SPECIES_CLOYSTER,          MOVE_SHELTER},
+    {SPECIES_TORKOAL,           MOVE_SHELTER},
+
+    {SPECIES_XATU,              MOVE_ESPER_WING},
+    {SPECIES_ARTICUNO_GALAR,    MOVE_ESPER_WING},
+    {SPECIES_TOGETIC,           MOVE_ESPER_WING},
+    {SPECIES_TOGEKISS,          MOVE_ESPER_WING},
+    {SPECIES_LATIOS,            MOVE_ESPER_WING},
+    {SPECIES_LATIAS,            MOVE_ESPER_WING},
+
+    {SPECIES_GARDEVOIR,         MOVE_TAKE_HEART},
+    {SPECIES_EEVEE,             MOVE_TAKE_HEART},
+    {SPECIES_VAPOREON,          MOVE_TAKE_HEART},
+    {SPECIES_JOLTEON,           MOVE_TAKE_HEART},
+    {SPECIES_FLAREON,           MOVE_TAKE_HEART},
+    {SPECIES_ESPEON,            MOVE_TAKE_HEART},
+    {SPECIES_UMBREON,           MOVE_TAKE_HEART},
+    {SPECIES_LEAFEON,           MOVE_TAKE_HEART},
+    {SPECIES_GLACEON,           MOVE_TAKE_HEART},
+    {SPECIES_SYLVEON,           MOVE_TAKE_HEART},
+    {SPECIES_PICHU_SPIKY_EARED, MOVE_TAKE_HEART},
+    {SPECIES_PIKACHU,           MOVE_TAKE_HEART},
+    {SPECIES_RAICHU,            MOVE_TAKE_HEART},
+    {SPECIES_RAICHU_ALOLA,      MOVE_TAKE_HEART},
+    {SPECIES_CLEFAIRY,          MOVE_TAKE_HEART},
+    {SPECIES_CLEFABLE,          MOVE_TAKE_HEART},
+    {SPECIES_TOGEKISS,          MOVE_TAKE_HEART},
+    {SPECIES_DRAGONITE,         MOVE_TAKE_HEART},
+    {SPECIES_MEGANIUM,          MOVE_TAKE_HEART},
+    {SPECIES_MEW ,              MOVE_TAKE_HEART},
+    {SPECIES_CELEBI,            MOVE_TAKE_HEART},
+
+    {SPECIES_ALAKAZAM,          MOVE_MYSTICAL_POWER},
+    {SPECIES_MEDICHAM,          MOVE_MYSTICAL_POWER},
+    {SPECIES_ESPEON,            MOVE_MYSTICAL_POWER},
+    {SPECIES_XATU,              MOVE_MYSTICAL_POWER},
+    {SPECIES_SLOWKING,          MOVE_MYSTICAL_POWER},
+    {SPECIES_SLOWKING_GALAR,    MOVE_MYSTICAL_POWER},
+
+    {SPECIES_SWAMPERT,          MOVE_WAVE_CRASH},
+    {SPECIES_DRAGONAIR,          MOVE_WAVE_CRASH},
+    {SPECIES_DRAGONITE,         MOVE_WAVE_CRASH},
+    {SPECIES_KINGLER,           MOVE_WAVE_CRASH},
+    {SPECIES_CRAWDAUNT,         MOVE_WAVE_CRASH},
+    {SPECIES_SHARPEDO,          MOVE_WAVE_CRASH},
+    {SPECIES_KABUTOPS,          MOVE_WAVE_CRASH},
+    {SPECIES_FERALIGATR,        MOVE_WAVE_CRASH},
+    {SPECIES_GYARADOS,          MOVE_WAVE_CRASH},
+    {SPECIES_WALREIN,           MOVE_WAVE_CRASH},
+    {SPECIES_QUAGSIRE,           MOVE_WAVE_CRASH},
+    {SPECIES_MANTINE,            MOVE_WAVE_CRASH},
+    {SPECIES_RELICANTH,         MOVE_WAVE_CRASH},
+
+    {SPECIES_SHUCKLE,           MOVE_POWER_SHIFT},
+    {SPECIES_ALAKAZAM,          MOVE_POWER_SHIFT},
+    {SPECIES_GARDEVOIR,         MOVE_POWER_SHIFT},
+    {SPECIES_GALLADE,            MOVE_POWER_SHIFT},
+    {SPECIES_MEDICHAM,          MOVE_POWER_SHIFT},
+    {SPECIES_SLOWBRO,           MOVE_POWER_SHIFT},
+    {SPECIES_SLOWBRO_GALAR,     MOVE_POWER_SHIFT},
+};
+
+static u32 CanMonLearnPLAMove(struct BoxPokemon *boxmon)
 {
-     return ChooseBoxMon_CanMonLearnMove(boxmon, gSpecialVar_0x8005);
+    u16 species;
+    u16 move;
+    u32 i;
+
+    if (GetBoxMonData(boxmon, MON_DATA_IS_EGG))
+        return CANNOT_LEARN_MOVE_IS_EGG;
+    if (BoxMonKnowsMove(boxmon, gSpecialVar_0x8005))
+        return ALREADY_KNOWS_MOVE;
+
+    species = GetBoxMonData(boxmon, MON_DATA_SPECIES);
+    move = gSpecialVar_0x8005;
+
+    for (i = 0; i < ARRAY_COUNT(sPLATutorLearnsets); i++)
+    {
+        if (sPLATutorLearnsets[i][0] == species && sPLATutorLearnsets[i][1] == move)
+            return VALID_MON;
+    }
+    return CANNOT_LEARN_MOVE;
 }
 
 u32 IsBoxMonExcluded(struct BoxPokemon *boxmon)
 {
+    struct Pokemon mon = {0};
+    BoxMonToMon(boxmon, &mon);
+
+    if ((IsNuzlockeActive() || IsNuzlockeEasyActive()) && GetMonData(&mon, MON_DATA_HP) == 0 && GetMonData(&mon, MON_DATA_IS_EGG) == FALSE)
+        return TRUE;
+
     return sPcMonSelectionTypes[sSelectionType].isMonInvalid(boxmon);
 }
 
@@ -174,28 +282,11 @@ void ChooseBoxMon(struct ScriptContext *ctx)
     }
 }
 
-void PickPartyMon(struct ScriptContext *ctx)
-{
-    sSelectionType = ScriptReadByte(ctx);
-    for (u32 i = 0; i < gPartiesCount[B_TRAINER_PLAYER]; i++)
-    {
-        if (!sPcMonSelectionTypes[sSelectionType].isMonInvalid(&gParties[B_TRAINER_PLAYER][i].box))
-        {
-            gSpecialVar_0x8004 = i;
-            return;
-        }
-    }
-    gSpecialVar_0x8004 = PARTY_NOTHING_CHOSEN;
-}
-
 enum LearnMoveState
 {
     LEARN_MOVE_END,
 
-    VALIDATE_BEFORE_LEARNING, //Start for OW move turors
-
-    PROMPT_BEFORE_LEARNING_1, //Start for move relearner
-    PROMPT_BEFORE_LEARNING_2,
+    MON_CAN_LEARN, //Start
 
     LEARN_MOVE,
 
@@ -227,14 +318,13 @@ static struct BoxPokemon *LearnMove_GetBoxMonFromTaskData(u8 partyIndex)
     if (partyIndex == PC_MON_CHOSEN)
         boxmon = GetBoxedMonPtr(gSpecialVar_MonBoxId, gSpecialVar_MonBoxPos);
     else
-        boxmon = &(gParties[B_TRAINER_PLAYER][partyIndex].box);
+        boxmon = &(gPlayerParty[partyIndex].box);
     return boxmon;
 }
 
 #define state         gTasks[taskId].data[0]
 #define partyIndex    gTasks[taskId].data[1]
 #define move          gTasks[taskId].data[2]
-#define recoverPP     gTasks[taskId].data[3]
 // MoveLearnUI does not contain a waitMessage function and LearnMove assumes the calling task will wait when a printer is active
 // Remember to update Task_LearnMove is you wish to change to an explicit waitMessage system
 s32 LearnMove(const struct MoveLearnUI *ui, u8 taskId)
@@ -242,25 +332,11 @@ s32 LearnMove(const struct MoveLearnUI *ui, u8 taskId)
     struct BoxPokemon *boxmon = LearnMove_GetBoxMonFromTaskData(partyIndex);
     switch (state)
     {
-    case PROMPT_BEFORE_LEARNING_1:
-        ui->askConfirmation();
-        return PROMPT_BEFORE_LEARNING_2;
-    case PROMPT_BEFORE_LEARNING_2:
-        switch (ui->waitConfirmation())
-        {
-        case 0: // Yes
-            return LEARN_MOVE;
-        case 1: // No
-        case MENU_B_PRESSED:
-            gSpecialVar_Result = FALSE;
-            return LEARN_MOVE_END;
-        }
-        return state;
-    case VALIDATE_BEFORE_LEARNING:
+    case MON_CAN_LEARN:
         GetBoxMonNickname(boxmon, gStringVar1);
         StringCopy(gStringVar2, GetMoveName(move));
         gSpecialVar_Result = FALSE;
-        switch(ChooseBoxMon_CanMonLearnMove(boxmon, move))
+        switch (IsBoxMonExcluded(boxmon))
         {
         case VALID_MON:
             return LEARN_MOVE;
@@ -342,11 +418,9 @@ s32 LearnMove(const struct MoveLearnUI *ui, u8 taskId)
     {
         u32 slot = GetMoveSlotToReplace();
         RemoveBoxMonPPBonus(boxmon, slot);
-        u32 originalPP = GetBoxMonData(boxmon, MON_DATA_PP1 + slot);
         u32 pp = GetMovePP(move);
         SetBoxMonData(boxmon, MON_DATA_MOVE1 + slot, &move);
-        if (recoverPP || (pp < originalPP))
-            SetBoxMonData(boxmon, MON_DATA_PP1 + slot, &pp);
+        SetBoxMonData(boxmon, MON_DATA_PP1 + slot, &pp);
         GetBoxMonNickname(boxmon, gStringVar1);
         StringCopy(gStringVar2, GetMoveName(move));
         gSpecialVar_Result = TRUE;
@@ -362,20 +436,14 @@ s32 LearnMove(const struct MoveLearnUI *ui, u8 taskId)
     default:
         errorf("Unknown LearnMove state %d\nEnding move learning ...", state);
     case LEARN_MOVE_END:
-        if (IsFanfareTaskInactive())
-            ui->endTask(taskId);
+        ui->endTask(taskId);
         return LEARN_MOVE_END;
     }
 }
 
 s32 GetLearnMoveStartState(void)
 {
-    return VALIDATE_BEFORE_LEARNING;
-}
-
-s32 GetLearnMoveStartAfterPromptState(void)
-{
-    return PROMPT_BEFORE_LEARNING_1;
+    return MON_CAN_LEARN;
 }
 
 //At the time of writing code for this, there was no prescribed way to make a task persist between scenes

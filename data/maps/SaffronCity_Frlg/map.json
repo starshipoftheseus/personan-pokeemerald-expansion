@@ -1,6 +1,7 @@
 {
   "id": "MAP_SAFFRON_CITY",
   "name": "SaffronCity_Frlg",
+  "game_version": "frlg",
   "layout": "LAYOUT_SAFFRON_CITY",
   "music": "MUS_RG_PEWTER",
   "region": "REGION_KANTO",
@@ -236,7 +237,7 @@
     },
     {
       "type": "object",
-      "graphics_id": "OBJ_EVENT_GFX_CRUSH_GIRL",
+      "graphics_id": "OBJ_EVENT_GFX_BATTLE_GIRL",
       "x": 47,
       "y": 24,
       "elevation": 3,
@@ -356,9 +357,7 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [
-
-  ],
+  "coord_events": [],
   "bg_events": [
     {
       "type": "sign",

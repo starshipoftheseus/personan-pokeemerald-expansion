@@ -32,9 +32,10 @@
 
 #if OW_POKEMON_OBJECT_EVENTS
 #if OW_PKMN_OBJECTS_SHARE_PALETTES == FALSE
-#define OVERWORLD_PAL(...)                                  \
-    .overworldPalette = DEFAULT(NULL, __VA_ARGS__),         \
-    .overworldShinyPalette = DEFAULT_2(NULL, __VA_ARGS__),
+#define OVERWORLD_PAL(...)                                        \
+    .overworldPalette = DEFAULT(NULL, __VA_ARGS__),               \
+    .overworldShinyPalette = DEFAULT_2(NULL, __VA_ARGS__),        \
+    .overworldShinyPaletteModern = DEFAULT_3(NULL, __VA_ARGS__),
 #if P_GENDER_DIFFERENCES
 #define OVERWORLD_PAL_FEMALE(...)                                 \
     .overworldPaletteFemale = DEFAULT(NULL, __VA_ARGS__),         \
@@ -148,6 +149,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .levelUpLearnset = sNoneLevelUpLearnset,
         .teachableLearnset = sNoneTeachableLearnset,
         .eggMoveLearnset = sNoneEggMoveLearnset,
+        .randomizerMode = MON_RANDOMIZER_INVALID,
     },
 
     #include "species_info/gen_1_families.h"
@@ -163,6 +165,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
     [SPECIES_EGG] =
     {
         .frontPic = gMonFrontPic_Egg,
+        .frontAnimFrames = sAnims_SingleFramePlaceHolder,
         .frontPicSize = MON_COORDS_SIZE(24, 24),
         .frontPicYOffset = 20,
         .backPic = gMonFrontPic_Egg,

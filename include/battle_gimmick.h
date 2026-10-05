@@ -1,8 +1,6 @@
 #ifndef GUARD_BATTLE_GIMMICK_H
 #define GUARD_BATTLE_GIMMICK_H
 
-#include "constants/trainer_slide.h"
-
 enum Gimmick
 {
     GIMMICK_NONE,
@@ -23,8 +21,6 @@ struct GimmickInfo
     const u8 *indicatorData;
     bool32 (*CanActivate)(enum BattlerId battler);
     void (*ActivateGimmick)(enum BattlerId battler);
-    enum TrainerSlideType attackerSlideType;
-    enum TrainerSlideType opponentSlideType;
 };
 
 void AssignUsableGimmicks(void);

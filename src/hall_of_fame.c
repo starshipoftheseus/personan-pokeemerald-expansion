@@ -313,9 +313,13 @@ static const struct SpriteTemplate sSpriteTemplate_HofConfetti =
     .callback = SpriteCB_HofConfetti
 };
 
-static const u16 sHallOfFame_Pal[] = INCGFX_U16("graphics/misc/japanese_hof.png", ".gbapal");
+#if IS_HNS
+static const u16 sHallOfFame_Pal[] = INCBIN_U16("graphics/misc/japanese_hof_hns.gbapal");
+#else
+static const u16 sHallOfFame_Pal[] = INCBIN_U16("graphics/misc/japanese_hof.gbapal");
+#endif
 
-static const u32 sHallOfFame_Gfx[] = INCGFX_U32("graphics/misc/japanese_hof.png", ".4bpp.smol", "-num_tiles 29 -Wnum_tiles");
+static const u32 sHallOfFame_Gfx[] = INCBIN_U32("graphics/misc/japanese_hof.4bpp.smol");
 
 static const struct HallofFameMon sDummyFameMon =
 {
@@ -385,7 +389,7 @@ static bool8 InitHallOfFameScreen(void)
         if (!gPaletteFade.active)
         {
             SetMainCallback2(CB2_HallOfFame);
-            PlayBGM(MUS_HALL_OF_FAME);
+            PlayBGM(IS_HNS ? MUS_HG_HALL_OF_FAME : MUS_HALL_OF_FAME);
             return FALSE;
         }
         break;
@@ -435,14 +439,14 @@ static void Task_Hof_InitMonData(u8 taskId)
     for (i = 0; i < PARTY_SIZE; i++)
     {
         u8 nickname[POKEMON_NAME_LENGTH + 1];
-        if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES))
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES))
         {
-            sHofMonPtr->mon[i].species = GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES_OR_EGG);
-            sHofMonPtr->mon[i].tid = GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_OT_ID);
-            sHofMonPtr->mon[i].isShiny = GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_IS_SHINY);
-            sHofMonPtr->mon[i].personality = GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_PERSONALITY);
-            sHofMonPtr->mon[i].lvl = GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_LEVEL);
-            GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_NICKNAME, nickname);
+            sHofMonPtr->mon[i].species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
+            sHofMonPtr->mon[i].tid = GetMonData(&gPlayerParty[i], MON_DATA_OT_ID);
+            sHofMonPtr->mon[i].isShiny = GetMonData(&gPlayerParty[i], MON_DATA_IS_SHINY);
+            sHofMonPtr->mon[i].personality = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
+            sHofMonPtr->mon[i].lvl = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
+            GetMonData(&gPlayerParty[i], MON_DATA_NICKNAME, nickname);
             for (j = 0; j < POKEMON_NAME_LENGTH; j++)
                 sHofMonPtr->mon[i].nickname[j] = nickname[j];
             gTasks[taskId].tMonNumber++;
@@ -624,7 +628,8 @@ static void Task_Hof_TryDisplayAnotherMon(u8 taskId)
         if (gTasks[taskId].tDisplayedMonId < PARTY_SIZE - 1 && currMon[1].species != SPECIES_NONE) // there is another Pokémon to display
         {
             gTasks[taskId].tDisplayedMonId++;
-            BeginNormalPaletteFade(sHofFadePalettes, 0, 12, 12, RGB(16, 29, 24));
+            if (!IS_HNS)
+                BeginNormalPaletteFade(sHofFadePalettes, 0, 12, 12, RGB(16, 29, 24));
             gSprites[gTasks[taskId].tMonSpriteId(currPokeID)].oam.priority = 1;
             gTasks[taskId].func = Task_Hof_DisplayMon;
         }
@@ -671,7 +676,7 @@ static void Task_Hof_DoConfetti(u8 taskId)
             if (gTasks[taskId].tMonSpriteId(i) != SPRITE_NONE)
                 gSprites[gTasks[taskId].tMonSpriteId(i)].oam.priority = 1;
         }
-        BeginNormalPaletteFade(sHofFadePalettes, 0, 12, 12, RGB(16, 29, 24));
+        BeginNormalPaletteFade(sHofFadePalettes, 0, 12, 12, IS_HNS ? RGB(21, 15, 5) : RGB(16, 29, 24));
         FillWindowPixelBuffer(0, PIXEL_FILL(0));
         CopyWindowToVram(0, COPYWIN_FULL);
         gTasks[taskId].tFrameCount = 7;
@@ -935,7 +940,7 @@ static void Task_HofPC_DrawSpritesPrintText(u8 taskId)
         }
     }
 
-    BlendPalettes(PALETTES_OBJECTS, 0xC, RGB(16, 29, 24));
+    BlendPalettes(PALETTES_OBJECTS, 0xC, IS_HNS ? RGB(21, 15, 5) : RGB(16, 29, 24));
 
     ConvertIntToDecimalStringN(gStringVar1, gTasks[taskId].tCurrPageNo, STR_CONV_MODE_RIGHT_ALIGN, 3);
     StringExpandPlaceholders(gStringVar4, gText_HOFNumber);
@@ -968,7 +973,7 @@ static void Task_HofPC_PrintMonInfo(u8 taskId)
     currMonID = gTasks[taskId].tMonSpriteId(gTasks[taskId].tCurrMonId);
     gSprites[currMonID].oam.priority = 0;
     sHofFadePalettes = (0x10000 << gSprites[currMonID].oam.paletteNum) ^ PALETTES_OBJECTS;
-    BlendPalettesUnfaded(sHofFadePalettes, 0xC, RGB(16, 29, 24));
+    BlendPalettesUnfaded(sHofFadePalettes, 0xC, IS_HNS ? RGB(21, 15, 5) : RGB(16, 29, 24));
 
     currMon = &savedTeams->mon[gTasks[taskId].tCurrMonId];
     if (currMon->species != SPECIES_EGG)
@@ -1246,9 +1251,30 @@ static void HallOfFame_PrintPlayerInfo(u8 unused1, u8 unused2)
 
 static void ClearVramOamPltt_LoadHofPal(void)
 {
-    DmaClearLarge16(3, (void *)VRAM, VRAM_SIZE, 0x1000);
-    DmaClear32(3, (void *)OAM, OAM_SIZE);
-    DmaClear16(3, (void *)PLTT, PLTT_SIZE);
+    u32 vramOffset, oamOffset, plttOffset;
+    u32 vramSize, oamSize, plttSize;
+
+    vramOffset = (VRAM);
+    vramSize = VRAM_SIZE;
+    while (TRUE)
+    {
+        DmaFill16(3, 0, vramOffset, 0x1000);
+        vramOffset += 0x1000;
+        vramSize -= 0x1000;
+        if (vramSize <= 0x1000)
+        {
+            DmaFill16(3, 0, vramOffset, vramSize);
+            break;
+        }
+    }
+
+    oamOffset = OAM;
+    oamSize = OAM_SIZE;
+    DmaFill32(3, 0, oamOffset, oamSize);
+
+    plttOffset = PLTT;
+    plttSize = PLTT_SIZE;
+    DmaFill16(3, 0, plttOffset, plttSize);
 
     ResetPaletteFade();
     LoadPalette(sHallOfFame_Pal, BG_PLTT_ID(0), sizeof(sHallOfFame_Pal));

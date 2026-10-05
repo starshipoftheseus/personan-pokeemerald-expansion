@@ -36,7 +36,9 @@ int GameClear(void)
 
     SetContinueGameWarpStatus();
 
-    if (gSaveBlock2Ptr->playerGender == MALE)
+    if (IS_HNS)
+        SetContinueGameWarpToHealLocation(HEAL_LOCATION_NEW_BARK_TOWN_HNS);
+    else if (gSaveBlock2Ptr->playerGender == MALE)
         SetContinueGameWarpToHealLocation(HEAL_LOCATION_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F);
     else
         SetContinueGameWarpToHealLocation(HEAL_LOCATION_LITTLEROOT_TOWN_MAYS_HOUSE_2F);
@@ -45,7 +47,7 @@ int GameClear(void)
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][i];
+        struct Pokemon *mon = &gPlayerParty[i];
 
         ribbonCounts[i].partyIndex = i;
         ribbonCounts[i].count = 0;
@@ -78,7 +80,7 @@ int GameClear(void)
 
         if (ribbonCounts[0].count > NUM_CUTIES_RIBBONS)
         {
-            TryPutSpotTheCutiesOnAir(&gParties[B_TRAINER_PLAYER][ribbonCounts[0].partyIndex], MON_DATA_CHAMPION_RIBBON);
+            TryPutSpotTheCutiesOnAir(&gPlayerParty[ribbonCounts[0].partyIndex], MON_DATA_CHAMPION_RIBBON);
         }
     }
 
@@ -113,16 +115,19 @@ bool8 EnterHallOfFame(void)
         SetGameStat(GAME_STAT_FIRST_HOF_PLAY_TIME, (gSaveBlock2Ptr->playTimeHours << 16) | (gSaveBlock2Ptr->playTimeMinutes << 8) | gSaveBlock2Ptr->playTimeSeconds);
     }
     SetContinueGameWarpStatus();
-    SetContinueGameWarpToHealLocation(HEAL_LOCATION_PALLET_TOWN);
+    if (IS_HNS)
+        SetContinueGameWarpToHealLocation(HEAL_LOCATION_NEW_BARK_TOWN_HNS);
+    else
+        SetContinueGameWarpToHealLocation(HEAL_LOCATION_PALLET_TOWN);
     gaveAtLeastOneRibbon = FALSE;
     for (i = 0, r7 = &ribbonState; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SANITY_HAS_SPECIES) && !GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SANITY_IS_EGG))
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SANITY_HAS_SPECIES) && !GetMonData(&gPlayerParty[i], MON_DATA_SANITY_IS_EGG))
         {
-            if (!GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_CHAMPION_RIBBON))
+            if (!GetMonData(&gPlayerParty[i], MON_DATA_CHAMPION_RIBBON))
             {
                 *r7 = TRUE;
-                SetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_CHAMPION_RIBBON, &ribbonState);
+                SetMonData(&gPlayerParty[i], MON_DATA_CHAMPION_RIBBON, &ribbonState);
                 gaveAtLeastOneRibbon = TRUE;
             }
         }

@@ -93,11 +93,11 @@ bool8 CheckRelicanthWailord(void)
 {
     // Emerald change: why did they flip it?
     // First comes Wailord
-    if (GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_WAILORD)
+    if (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_WAILORD)
     {
         CalculatePlayerPartyCount();
         // Last comes Relicanth
-        if (GetMonData(&gParties[B_TRAINER_PLAYER][gPartiesCount[B_TRAINER_PLAYER] - 1], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_RELICANTH)
+        if (GetMonData(&gPlayerParty[gPlayerPartyCount - 1], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_RELICANTH)
             return TRUE;
     }
     return FALSE;
@@ -257,6 +257,11 @@ static void DoBrailleRegisteelEffect(void)
     UnfreezeObjectEvents();
 }
 
+// theory: another commented out DoBrailleWait and Task_BrailleWait.
+static void UNUSED DoBrailleWait(void)
+{
+}
+
 // this used to be FldEff_UseFlyAncientTomb . why did GF merge the 2 functions?
 bool8 FldEff_UsePuzzleEffect(void)
 {
@@ -337,4 +342,69 @@ bool8 ShouldDoBrailleRegicePuzzle(void)
     }
 
     return FALSE;
+}
+
+bool8 CheckHooh(void)
+{
+    if (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_HO_OH)
+        return TRUE;
+    return FALSE;
+}
+
+bool8 CheckAerodactyl(void)
+{
+    if (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_AERODACTYL)
+        return TRUE;
+    return FALSE;
+}
+
+bool8 CheckKabuto(void)
+{
+    if (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_KABUTO)
+        return TRUE;
+    return FALSE;
+}
+
+bool8 CheckOmanyte(void)
+{
+    if (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_OMANYTE)
+        return TRUE;
+    return FALSE;
+}
+
+bool8 CheckTogepi(void)
+{
+    // Elm doesn't check Togepi until the egg has been received.
+    // After that, even if it's not hatched, if you somehow got a Togepi or its evolutions, Elm's script will trigger
+    if (FlagGet(FLAG_RECEIVED_TOGEPI_EGG) == TRUE)
+    {
+        if (   GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_TOGEPI
+            || GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_TOGETIC
+            || GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG, 0) == SPECIES_TOGEKISS)
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+bool8 CheckCelebi(void)
+{
+    struct Pokemon *mon = &gPlayerParty[0];
+
+    if (GetMonData(mon, MON_DATA_SPECIES_OR_EGG, NULL) != SPECIES_CELEBI)
+        return FALSE;
+
+    u16 hp    = GetMonData(mon, MON_DATA_HP, NULL);
+    u16 maxHp = GetMonData(mon, MON_DATA_MAX_HP, NULL);
+    if (hp != maxHp)
+        return FALSE;
+
+    {
+        struct ObjectEvent *obj = GetFollowerObject();
+        if (obj == NULL || obj->invisible)
+            return FALSE;
+    }
+
+    return TRUE;
 }

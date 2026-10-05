@@ -35,16 +35,22 @@ enum DecorationCategory
     DECORCAT_ORNAMENT,
     DECORCAT_MAT,
     DECORCAT_POSTER,
+    #if IS_HNS
+    DECORCAT_CUSHION
+    #else
     DECORCAT_DOLL,
     DECORCAT_CUSHION,
     DECORCAT_COUNT,
+    #endif
 };
 
-struct DecorItem
+#if IS_HNS
+enum DecorationCategory_HnS
 {
-    const u32 *pic;
-    const u16 *pal;
+    DECORCAT_DOLL,
+    DECORCAT_COUNT,
 };
+#endif
 
 struct Decoration
 {
@@ -56,7 +62,6 @@ struct Decoration
     u16 price;
     const u8 *description;
     const u16 *tiles;
-    struct DecorItem icon;
 };
 
 extern const struct Decoration gDecorations[];

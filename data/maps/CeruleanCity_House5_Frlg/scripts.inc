@@ -37,6 +37,7 @@ CeruleanCity_House5_EventScript_ChooseExchangeItem::
 	waitmessage
 	setvar VAR_0x8004, SCROLL_MULTI_BERRY_POWDER_VENDOR
 	special ShowScrollableMultichoice
+	waitstate
 	switch VAR_RESULT
 	case 0, CeruleanCity_House5_EventScript_EnergyPowder
 	case 1, CeruleanCity_House5_EventScript_EnergyRoot
@@ -168,6 +169,7 @@ CeruleanCity_House5_EventScript_NotEnoughBerryPowder::
 CeruleanCity_House5_EventScript_BerryCrushRankings::
 	lockall
 	special ShowBerryCrushRankings
+	waitstate
 	releaseall
 	end
 

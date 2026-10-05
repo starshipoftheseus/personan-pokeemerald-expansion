@@ -1419,12 +1419,6 @@ static void MovePoisonGasCloud(struct Sprite *sprite)
 
 void AnimTask_Hail(u8 taskId)
 {
-    if (!TryLoadSpriteAssets(&gHailParticleSpriteTemplate))
-    {
-        DestroyAnimVisualTask(taskId);
-        return;
-    }
-
     struct Task *task = &gTasks[taskId];
 
     task->func = AnimTask_Hail2;
@@ -1530,7 +1524,7 @@ static bool8 GenerateHailParticle(u8 hailStructId, u8 affineAnimNum, u8 taskId, 
         battlerY = sHailCoordData[hailStructId].y;
     }
     spriteX = battlerX - ((battlerY + 8) / 2);
-    id = CreateSpriteUnchecked(&gHailParticleSpriteTemplate, spriteX, -8, 18);
+    id = CreateSprite(&gHailParticleSpriteTemplate, spriteX, -8, 18);
     if (id == MAX_SPRITES)
     {
         return FALSE;
@@ -1550,12 +1544,6 @@ static bool8 GenerateHailParticle(u8 hailStructId, u8 affineAnimNum, u8 taskId, 
 
 static void AnimHailBegin(struct Sprite *sprite)
 {
-    if (!TryLoadSpriteAssets(&gIceCrystalHitLargeSpriteTemplate))
-    {
-        DestroyAnimSprite(sprite);
-        return;
-    }
-
     u8 spriteId;
 
     sprite->x += 4;
@@ -1566,7 +1554,7 @@ static void AnimHailBegin(struct Sprite *sprite)
 
     if (sprite->sSpawnImpactEffect == 1 && sprite->sAffineAnimNum == 0)
     {
-        spriteId = CreateSpriteUnchecked(&gIceCrystalHitLargeSpriteTemplate,
+        spriteId = CreateSprite(&gIceCrystalHitLargeSpriteTemplate,
                                 sprite->sTargetX, sprite->sTargetY, sprite->subpriority);
 
         sprite->data[0] = spriteId;
@@ -1622,7 +1610,7 @@ static void AnimHailContinue(struct Sprite *sprite)
 // arg 5: arc height (negative)
 static void InitIceBallAnim(struct Sprite *sprite)
 {
-    u32 animNum = gAnimDisableStructPtr->rolloutTimer + 1;
+    u32 animNum = gAnimDisableStructPtr->rolloutTimer;
 
     StartSpriteAffineAnim(sprite, animNum);
     InitSpritePosToAnimAttacker(sprite, TRUE);
@@ -1691,7 +1679,7 @@ static void AnimIceBallParticle(struct Sprite *sprite)
 void AnimTask_GetIceBallCounter(u8 taskId)
 {
     u8 arg = gBattleAnimArgs[0];
-    gBattleAnimArgs[arg] = gAnimDisableStructPtr->rolloutTimer + 1;
+    gBattleAnimArgs[arg] = gAnimDisableStructPtr->rolloutTimer;
     DestroyAnimVisualTask(taskId);
 }
 
@@ -1723,11 +1711,7 @@ const struct SpriteTemplate gSnowFlakesSpriteTemplate =
 
 void AnimTask_CreateSnowflakes(u8 taskId)
 {
-    if (!TryLoadSpriteAssets(&gSnowFlakesSpriteTemplate))
-    {
-        DestroyAnimVisualTask(taskId);
-        return;
-    }
+    u8 x, y;
 
     if (gTasks[taskId].data[0] == 0)
     {
@@ -1738,8 +1722,8 @@ void AnimTask_CreateSnowflakes(u8 taskId)
     gTasks[taskId].data[0]++;
     if (gTasks[taskId].data[0] % gTasks[taskId].data[2] == 1)
     {
-        u32 x = Random2() % DISPLAY_WIDTH;
-        u32 y = Random2() % (DISPLAY_HEIGHT / 2);
+        x = Random2() % DISPLAY_WIDTH;
+        y = Random2() % (DISPLAY_HEIGHT / 2);
         CreateSprite(&gSnowFlakesSpriteTemplate, x, y, 4);
     }
     if (gTasks[taskId].data[0] == gTasks[taskId].data[3])

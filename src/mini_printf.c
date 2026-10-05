@@ -47,7 +47,7 @@ struct mini_buff
     u32 buffer_len;
 };
 
-char mini_pchar_decode(char encoded)
+static inline char mini_pchar_decode(char encoded)
 {
     char ret = '?';
     if (encoded >= CHAR_a && encoded <= CHAR_z)

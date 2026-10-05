@@ -81,8 +81,8 @@ static u32 LoopedTask_TreatAsPokeNavFlyMap(s32);
 extern const u16 gRegionMapCityZoomTiles_Pal[];
 extern const u32 gRegionMapCityZoomText_Gfx[];
 
-static const u16 sMapSecInfoWindow_Pal[] = INCGFX_U16("graphics/pokenav/region_map/info_window.pal", ".gbapal");
-static const u32 sRegionMapCityZoomTiles_Gfx[] = INCGFX_U32("graphics/pokenav/region_map/zoom_tiles.png", ".4bpp.smol");
+static const u16 sMapSecInfoWindow_Pal[] = INCBIN_U16("graphics/pokenav/region_map/info_window.gbapal");
+static const u32 sRegionMapCityZoomTiles_Gfx[] = INCBIN_U32("graphics/pokenav/region_map/zoom_tiles.4bpp.smol");
 
 #include "data/region_map/city_map_tilemaps.h"
 
@@ -142,6 +142,17 @@ static const struct WindowTemplate sMapSecInfoWindowTemplate =
 {
     .bg = 1,
     .tilemapLeft = 17,
+    .tilemapTop = 4,
+    .width = 12,
+    .height = 13,
+    .paletteNum = 1,
+    .baseBlock = 0x4C
+};
+
+static const struct WindowTemplate sMapSecInfoWindowTemplate_Right =
+{
+    .bg = 1,
+    .tilemapLeft = 1,
     .tilemapTop = 4,
     .width = 12,
     .height = 13,
@@ -213,9 +224,13 @@ static u32 HandleRegionMapInput(struct Pokenav_RegionMapMenu *state)
     case MAP_INPUT_MOVE_END:
         return POKENAV_MAP_FUNC_CURSOR_MOVED;
     case MAP_INPUT_A_BUTTON:
+#if !IS_HNS
         if (!IsRegionMapZoomed())
             return POKENAV_MAP_FUNC_ZOOM_IN;
         return POKENAV_MAP_FUNC_ZOOM_OUT;
+#else
+        break;
+#endif
     case MAP_INPUT_B_BUTTON:
         state->callback = GetExitRegionMapMenuId;
         return POKENAV_MAP_FUNC_EXIT;
@@ -535,7 +550,9 @@ static void LoadPokenavRegionMapGfx(struct Pokenav_RegionMapGfx *state)
     BgDmaFill(1, PIXEL_FILL(1), 0x41, 1);
     CpuFill16(0x1040, state->tilemapBuffer, 0x800);
     SetBgTilemapBuffer(1, state->tilemapBuffer);
-    state->infoWindowId = AddWindow(&sMapSecInfoWindowTemplate);
+    state->infoWindowId = AddWindow(FlagGet(FLAG_VISITED_KANTO)
+        ? &sMapSecInfoWindowTemplate_Right
+        : &sMapSecInfoWindowTemplate);
     LoadUserWindowBorderGfx_(state->infoWindowId, 0x42, BG_PLTT_ID(4));
     DrawTextBorderOuter(state->infoWindowId, 0x42, 4);
     DecompressAndCopyTileDataToVram(1, sRegionMapCityZoomTiles_Gfx, 0, 0, 0);
@@ -588,7 +605,7 @@ static void UpdateMapSecInfoWindow(struct Pokenav_RegionMapGfx *state)
         SetCityZoomTextInvisibility(TRUE);
         break;
     case MAPSECTYPE_NONE:
-        FillBgTilemapBufferRect(1, 0x1041, 17, 4, 12, 13, 17);
+        FillBgTilemapBufferRect(1, 0x1041, GetWindowAttribute(state->infoWindowId, WINDOW_TILEMAP_LEFT), 4, 12, 13, 17);
         CopyBgTilemapBufferToVram(1);
         SetCityZoomTextInvisibility(TRUE);
         break;

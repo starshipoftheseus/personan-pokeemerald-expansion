@@ -13,13 +13,11 @@
 #include "region_map.h"
 #include "rtc.h"
 #include "start_menu.h"
-#include "strings.h"
 #include "string_util.h"
 #include "task.h"
 #include "text.h"
 #include "constants/battle_frontier.h"
 #include "constants/layouts.h"
-#include "constants/map_types.h"
 #include "constants/region_map_sections.h"
 #include "constants/weather.h"
 #include "config/general.h"
@@ -34,6 +32,20 @@ enum MapPopUp_Themes
     MAPPOPUP_THEME_BRICK,
     MAPPOPUP_THEME_UNDERWATER,
     MAPPOPUP_THEME_STONE2,
+#if IS_HNS
+    MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    MAPPOPUP_THEME_CAVE_GREY_HNS,
+    MAPPOPUP_THEME_FALL_HNS,
+    MAPPOPUP_THEME_WOODS_HNS,
+    MAPPOPUP_THEME_CHERRY_HNS,
+    MAPPOPUP_THEME_CITY_HNS,
+    MAPPOPUP_THEME_CLIFF_HNS,
+    MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    MAPPOPUP_THEME_HISTORIC_HNS,
+    MAPPOPUP_THEME_TOWN_HNS,
+    MAPPOPUP_THEME_OCEAN_HNS,
+#endif
 };
 
 enum MapPopUp_Themes_BW
@@ -53,39 +65,212 @@ EWRAM_DATA u8 gPopupTaskId = 0;
 // .rodata
 static const u8 sMapPopUp_Table[][960] =
 {
-    [MAPPOPUP_THEME_WOOD]       = INCGFX_U8("graphics/map_popup/wood.png", ".4bpp"),
-    [MAPPOPUP_THEME_MARBLE]     = INCGFX_U8("graphics/map_popup/marble.png", ".4bpp"),
-    [MAPPOPUP_THEME_STONE]      = INCGFX_U8("graphics/map_popup/stone.png", ".4bpp"),
-    [MAPPOPUP_THEME_BRICK]      = INCGFX_U8("graphics/map_popup/brick.png", ".4bpp"),
-    [MAPPOPUP_THEME_UNDERWATER] = INCGFX_U8("graphics/map_popup/underwater.png", ".4bpp"),
-    [MAPPOPUP_THEME_STONE2]     = INCGFX_U8("graphics/map_popup/stone2.png", ".4bpp"),
+    [MAPPOPUP_THEME_WOOD]       = INCBIN_U8("graphics/map_popup/wood.4bpp"),
+    [MAPPOPUP_THEME_MARBLE]     = INCBIN_U8("graphics/map_popup/marble.4bpp"),
+    [MAPPOPUP_THEME_STONE]      = INCBIN_U8("graphics/map_popup/stone.4bpp"),
+    [MAPPOPUP_THEME_BRICK]      = INCBIN_U8("graphics/map_popup/brick.4bpp"),
+    [MAPPOPUP_THEME_UNDERWATER] = INCBIN_U8("graphics/map_popup/underwater.4bpp"),
+    [MAPPOPUP_THEME_STONE2]     = INCBIN_U8("graphics/map_popup/stone2.4bpp"),
+#if IS_HNS
+    [MAPPOPUP_THEME_CAVE_BROWN_HNS]  = INCBIN_U8("graphics/map_popup/cave_brown_hns.4bpp"),
+    [MAPPOPUP_THEME_CAVE_GREY_HNS]   = INCBIN_U8("graphics/map_popup/cave_grey_hns.4bpp"),
+    [MAPPOPUP_THEME_FALL_HNS]        = INCBIN_U8("graphics/map_popup/fall_hns.4bpp"),
+    [MAPPOPUP_THEME_WOODS_HNS]       = INCBIN_U8("graphics/map_popup/woods_hns.4bpp"),
+    [MAPPOPUP_THEME_CHERRY_HNS]      = INCBIN_U8("graphics/map_popup/cherry_hns.4bpp"),
+    [MAPPOPUP_THEME_CITY_HNS]        = INCBIN_U8("graphics/map_popup/city_hns.4bpp"),
+    [MAPPOPUP_THEME_CLIFF_HNS]       = INCBIN_U8("graphics/map_popup/cliff_hns.4bpp"),
+    [MAPPOPUP_THEME_JOHTO_ROUTE_HNS] = INCBIN_U8("graphics/map_popup/johto_hns.4bpp"),
+    [MAPPOPUP_THEME_KANTO_ROUTE_HNS] = INCBIN_U8("graphics/map_popup/kanto_hns.4bpp"),
+    [MAPPOPUP_THEME_HISTORIC_HNS]    = INCBIN_U8("graphics/map_popup/historic_hns.4bpp"),
+    [MAPPOPUP_THEME_TOWN_HNS]        = INCBIN_U8("graphics/map_popup/town_hns.4bpp"),
+    [MAPPOPUP_THEME_OCEAN_HNS]       = INCBIN_U8("graphics/map_popup/ocean_hns.4bpp"),
+#endif
 };
 
 static const u8 sMapPopUp_OutlineTable[][960] =
 {
-    [MAPPOPUP_THEME_WOOD]       = INCGFX_U8("graphics/map_popup/wood_outline.png", ".4bpp"),
-    [MAPPOPUP_THEME_MARBLE]     = INCGFX_U8("graphics/map_popup/marble_outline.png", ".4bpp"),
-    [MAPPOPUP_THEME_STONE]      = INCGFX_U8("graphics/map_popup/stone_outline.png", ".4bpp"),
-    [MAPPOPUP_THEME_BRICK]      = INCGFX_U8("graphics/map_popup/brick_outline.png", ".4bpp"),
-    [MAPPOPUP_THEME_UNDERWATER] = INCGFX_U8("graphics/map_popup/underwater_outline.png", ".4bpp"),
-    [MAPPOPUP_THEME_STONE2]     = INCGFX_U8("graphics/map_popup/stone2_outline.png", ".4bpp"),
+    [MAPPOPUP_THEME_WOOD]       = INCBIN_U8("graphics/map_popup/wood_outline.4bpp"),
+    [MAPPOPUP_THEME_MARBLE]     = INCBIN_U8("graphics/map_popup/marble_outline.4bpp"),
+    [MAPPOPUP_THEME_STONE]      = INCBIN_U8("graphics/map_popup/stone_outline.4bpp"),
+    [MAPPOPUP_THEME_BRICK]      = INCBIN_U8("graphics/map_popup/brick_outline.4bpp"),
+    [MAPPOPUP_THEME_UNDERWATER] = INCBIN_U8("graphics/map_popup/underwater_outline.4bpp"),
+    [MAPPOPUP_THEME_STONE2]     = INCBIN_U8("graphics/map_popup/stone2_outline.4bpp"),
+#if IS_HNS
+    [MAPPOPUP_THEME_CAVE_BROWN_HNS]  = INCBIN_U8("graphics/map_popup/cave_brown_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_CAVE_GREY_HNS]   = INCBIN_U8("graphics/map_popup/cave_grey_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_FALL_HNS]        = INCBIN_U8("graphics/map_popup/fall_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_WOODS_HNS]       = INCBIN_U8("graphics/map_popup/woods_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_CHERRY_HNS]      = INCBIN_U8("graphics/map_popup/cherry_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_CITY_HNS]        = INCBIN_U8("graphics/map_popup/city_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_CLIFF_HNS]       = INCBIN_U8("graphics/map_popup/cliff_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_JOHTO_ROUTE_HNS] = INCBIN_U8("graphics/map_popup/johto_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_KANTO_ROUTE_HNS] = INCBIN_U8("graphics/map_popup/kanto_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_HISTORIC_HNS]    = INCBIN_U8("graphics/map_popup/historic_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_TOWN_HNS]        = INCBIN_U8("graphics/map_popup/town_outline_hns.4bpp"),
+    [MAPPOPUP_THEME_OCEAN_HNS]       = INCBIN_U8("graphics/map_popup/ocean_outline_hns.4bpp"),
+#endif
 };
 
 static const u16 sMapPopUp_PaletteTable[][16] =
 {
-    [MAPPOPUP_THEME_WOOD]       = INCGFX_U16("graphics/map_popup/wood.png", ".gbapal"),
-    [MAPPOPUP_THEME_MARBLE]     = INCGFX_U16("graphics/map_popup/marble_outline.png", ".gbapal"),
-    [MAPPOPUP_THEME_STONE]      = INCGFX_U16("graphics/map_popup/stone_outline.png", ".gbapal"),
-    [MAPPOPUP_THEME_BRICK]      = INCGFX_U16("graphics/map_popup/brick_outline.png", ".gbapal"),
-    [MAPPOPUP_THEME_UNDERWATER] = INCGFX_U16("graphics/map_popup/underwater_outline.png", ".gbapal"),
-    [MAPPOPUP_THEME_STONE2]     = INCGFX_U16("graphics/map_popup/stone2_outline.png", ".gbapal"),
+    [MAPPOPUP_THEME_WOOD]       = INCBIN_U16("graphics/map_popup/wood.gbapal"),
+    [MAPPOPUP_THEME_MARBLE]     = INCBIN_U16("graphics/map_popup/marble_outline.gbapal"),
+    [MAPPOPUP_THEME_STONE]      = INCBIN_U16("graphics/map_popup/stone_outline.gbapal"),
+    [MAPPOPUP_THEME_BRICK]      = INCBIN_U16("graphics/map_popup/brick_outline.gbapal"),
+    [MAPPOPUP_THEME_UNDERWATER] = INCBIN_U16("graphics/map_popup/underwater_outline.gbapal"),
+    [MAPPOPUP_THEME_STONE2]     = INCBIN_U16("graphics/map_popup/stone2_outline.gbapal"),
+#if IS_HNS
+    [MAPPOPUP_THEME_CAVE_BROWN_HNS]  = INCBIN_U16("graphics/map_popup/cave_brown_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_CAVE_GREY_HNS]   = INCBIN_U16("graphics/map_popup/cave_grey_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_FALL_HNS]        = INCBIN_U16("graphics/map_popup/fall_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_WOODS_HNS]       = INCBIN_U16("graphics/map_popup/woods_hns.gbapal"),
+    [MAPPOPUP_THEME_CHERRY_HNS]      = INCBIN_U16("graphics/map_popup/cherry_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_CITY_HNS]        = INCBIN_U16("graphics/map_popup/city_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_CLIFF_HNS]       = INCBIN_U16("graphics/map_popup/cliff_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_JOHTO_ROUTE_HNS] = INCBIN_U16("graphics/map_popup/johto_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_KANTO_ROUTE_HNS] = INCBIN_U16("graphics/map_popup/kanto_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_HISTORIC_HNS]    = INCBIN_U16("graphics/map_popup/historic_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_TOWN_HNS]        = INCBIN_U16("graphics/map_popup/town_outline_hns.gbapal"),
+    [MAPPOPUP_THEME_OCEAN_HNS]       = INCBIN_U16("graphics/map_popup/ocean_outline_hns.gbapal"),
+#endif
 };
 
-static const u16 sMapPopUp_Palette_Underwater[16] = INCGFX_U16("graphics/map_popup/underwater.pal", ".gbapal");
+static const u16 sMapPopUp_Palette_Underwater[16] = INCBIN_U16("graphics/map_popup/underwater.gbapal");
 
 // -1 in the size excludes MAPSEC_NONE.
 // The MAPSEC values for Kanto (between MAPSEC_DYNAMIC and MAPSEC_AQUA_HIDEOUT) are also excluded,
 // and this is then handled by subtracting KANTO_MAPSEC_COUNT here and in LoadMapNamePopUpWindowBg.
+#if IS_HNS
+static const u8 sMapSectionToThemeId[MAPSEC_COUNT - 1] =
+{
+    // Shared / non-regional
+    [MAPSEC_ABANDONED_SHIP] = MAPPOPUP_THEME_WOODS_HNS,
+    [MAPSEC_BATTLE_FRONTIER] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_BIRTH_ISLAND] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_FARAWAY_ISLAND] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_LILYCOVE_CITY] = MAPPOPUP_THEME_CHERRY_HNS,
+    [MAPSEC_SAFARI_ZONE] = MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    [MAPSEC_SOUTHERN_ISLAND] = MAPPOPUP_THEME_WOOD,
+    [MAPSEC_TRAINER_HILL] = MAPPOPUP_THEME_MARBLE,
+    [MAPSEC_VICTORY_ROAD_HNS] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    // Kanto
+    [MAPSEC_PALLET_TOWN] = MAPPOPUP_THEME_TOWN_HNS,
+    [MAPSEC_VIRIDIAN_CITY] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_PEWTER_CITY] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_CERULEAN_CITY] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_LAVENDER_TOWN] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_VERMILION_CITY] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_CELADON_CITY] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_FUCHSIA_CITY] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_CINNABAR_ISLAND] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_INDIGO_PLATEAU] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_SAFFRON_CITY] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_ROUTE_1] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_2] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_3] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_4] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_5] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_6] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_7] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_8] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_9] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_10] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_11] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_12] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_13] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_14] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_15] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_16] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_17] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_18] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_19] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_ROUTE_20] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_ROUTE_21] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_ROUTE_22] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_24] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_25] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_VIRIDIAN_FOREST] = MAPPOPUP_THEME_WOODS_HNS,
+    [MAPSEC_MT_MOON] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    [MAPSEC_DIGLETTS_CAVE] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    [MAPSEC_ROCKET_HIDEOUT_HNS] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    [MAPSEC_ROCK_TUNNEL] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    [MAPSEC_SEAFOAM_ISLANDS] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_CERULEAN_CAVE] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    [MAPSEC_POWER_PLANT] = MAPPOPUP_THEME_CITY_HNS,
+    // Johto
+    [MAPSEC_NEW_BARK_TOWN] = MAPPOPUP_THEME_TOWN_HNS,
+    [MAPSEC_CHERRYGROVE_CITY] = MAPPOPUP_THEME_CHERRY_HNS,
+    [MAPSEC_VIOLET_CITY] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_AZALEA_TOWN] = MAPPOPUP_THEME_TOWN_HNS,
+    [MAPSEC_GOLDENROD_CITY] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_ECRUTEAK_CITY] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_OLIVINE_CITY] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_CIANWOOD_CITY] = MAPPOPUP_THEME_TOWN_HNS,
+    [MAPSEC_MAHOGANY_TOWN] = MAPPOPUP_THEME_TOWN_HNS,
+    [MAPSEC_BLACKTHORN_CITY] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_ROUTE_26] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_27] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_28] = MAPPOPUP_THEME_KANTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_29] = MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_30] = MAPPOPUP_THEME_CHERRY_HNS,
+    [MAPSEC_ROUTE_31] = MAPPOPUP_THEME_CHERRY_HNS,
+    [MAPSEC_ROUTE_32] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_ROUTE_33] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_ROUTE_34] = MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_35] = MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_36] = MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_37] = MAPPOPUP_THEME_FALL_HNS,
+    [MAPSEC_ROUTE_38] = MAPPOPUP_THEME_FALL_HNS,
+    [MAPSEC_ROUTE_39] = MAPPOPUP_THEME_FALL_HNS,
+    [MAPSEC_ROUTE_40] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_ROUTE_41] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_ROUTE_42] = MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_43] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_ROUTE_44] = MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_45] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_ROUTE_46] = MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    [MAPSEC_ROUTE_47] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_ROUTE_48] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_BURNED_TOWER] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_CLIFF_CAVE] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    [MAPSEC_DARK_CAVE] = MAPPOPUP_THEME_CAVE_GREY_HNS,
+    [MAPSEC_DRAGONS_DEN] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_EMBEDDED_TOWER] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_ICE_PATH] = MAPPOPUP_THEME_CAVE_GREY_HNS,
+    [MAPSEC_ILEX_FOREST] = MAPPOPUP_THEME_WOODS_HNS,
+    [MAPSEC_LAKE_OF_RAGE] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_MT_MORTAR] = MAPPOPUP_THEME_CAVE_GREY_HNS,
+    [MAPSEC_MT_SILVER] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    [MAPSEC_NATIONAL_PARK] = MAPPOPUP_THEME_JOHTO_ROUTE_HNS,
+    [MAPSEC_OLIVINE_LIGHTHOUSE] = MAPPOPUP_THEME_CITY_HNS,
+    [MAPSEC_RUINS_OF_ALPH] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_SAFARI_ZONE_GATE] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_SLOWPOKE_WELL] = MAPPOPUP_THEME_CAVE_GREY_HNS,
+    [MAPSEC_SPROUT_TOWER] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_SS_AQUA] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_TIN_TOWER] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_TOHJO_FALLS] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    [MAPSEC_UNION_CAVE] = MAPPOPUP_THEME_CAVE_GREY_HNS,
+    [MAPSEC_WHIRL_ISLANDS] = MAPPOPUP_THEME_CAVE_GREY_HNS,
+    // Alola
+    [MAPSEC_MELEMELE_ISLAND] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_AKALA_ISLAND] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_ULAULA_ISLAND] = MAPPOPUP_THEME_CLIFF_HNS,
+    [MAPSEC_PONI_ISLAND] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_ALOLA_OCEAN] = MAPPOPUP_THEME_OCEAN_HNS,
+    [MAPSEC_AKALA_CAVE] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    [MAPSEC_AKALA_FOREST] = MAPPOPUP_THEME_WOODS_HNS,
+    [MAPSEC_PONI_CAVE] = MAPPOPUP_THEME_CAVE_GREY_HNS,
+    [MAPSEC_ULAULA_CAVE] = MAPPOPUP_THEME_CAVE_GREY_HNS,
+    [MAPSEC_ULAULA_CAVE_2] = MAPPOPUP_THEME_CAVE_BROWN_HNS,
+    // Sinjoh
+    [MAPSEC_SNOWSWEPT_CAVERN] = MAPPOPUP_THEME_CAVE_GREY_HNS,
+    [MAPSEC_ROUTE_49] = MAPPOPUP_THEME_WOODS_HNS,
+    [MAPSEC_ROUTE_50] = MAPPOPUP_THEME_WOODS_HNS,
+    [MAPSEC_NEW_SINJOH] = MAPPOPUP_THEME_HISTORIC_HNS,
+    [MAPSEC_SINJOH_RUINS] = MAPPOPUP_THEME_HISTORIC_HNS,
+};
+#else
 static const u8 sMapSectionToThemeId[MAPSEC_COUNT - KANTO_MAPSEC_COUNT - 1] =
 {
     [MAPSEC_LITTLEROOT_TOWN] = MAPPOPUP_THEME_WOOD,
@@ -193,13 +378,14 @@ static const u8 sMapSectionToThemeId[MAPSEC_COUNT - KANTO_MAPSEC_COUNT - 1] =
     [MAPSEC_NAVEL_ROCK - KANTO_MAPSEC_COUNT] = MAPPOPUP_THEME_STONE,
     [MAPSEC_TRAINER_HILL - KANTO_MAPSEC_COUNT] = MAPPOPUP_THEME_MARBLE,
 };
+#endif // !IS_HNS
 
 #if OW_POPUP_GENERATION == GEN_5
 // Gen5 assets
-static const u8 sMapPopUpTilesPrimary_BW[] = INCGFX_U8("graphics/map_popup/bw/bw_primary.png", ".4bpp");
-static const u8 sMapPopUpTilesSecondary_BW[] = INCGFX_U8("graphics/map_popup/bw/bw_secondary.png", ".4bpp");
-static const u16 sMapPopUpTilesPalette_BW_Black[16] = INCGFX_U16("graphics/map_popup/bw/black.pal", ".gbapal");
-static const u16 sMapPopUpTilesPalette_BW_White[16] = INCGFX_U16("graphics/map_popup/bw/white.pal", ".gbapal");
+static const u8 sMapPopUpTilesPrimary_BW[] = INCBIN_U8("graphics/map_popup/bw/bw_primary.4bpp");
+static const u8 sMapPopUpTilesSecondary_BW[] = INCBIN_U8("graphics/map_popup/bw/bw_secondary.4bpp");
+static const u16 sMapPopUpTilesPalette_BW_Black[16] = INCBIN_U16("graphics/map_popup/bw/black.gbapal");
+static const u16 sMapPopUpTilesPalette_BW_White[16] = INCBIN_U16("graphics/map_popup/bw/white.gbapal");
 #else
 static const u8 sMapPopUpTilesPrimary_BW[] = {0};
 static const u8 sMapPopUpTilesSecondary_BW[] = {0};
@@ -209,6 +395,9 @@ static const u16 sMapPopUpTilesPalette_BW_White[] = {0};
 
 static const u8 sRegionMapSectionId_To_PopUpThemeIdMapping_BW[] =
 {
+#if IS_HNS
+    [0] = MAPPOPUP_THEME_BW_DEFAULT,
+#else
     [MAPSEC_LITTLEROOT_TOWN] = MAPPOPUP_THEME_BW_DEFAULT,
     [MAPSEC_OLDALE_TOWN] = MAPPOPUP_THEME_BW_DEFAULT,
     [MAPSEC_DEWFORD_TOWN] = MAPPOPUP_THEME_BW_DEFAULT,
@@ -313,6 +502,7 @@ static const u8 sRegionMapSectionId_To_PopUpThemeIdMapping_BW[] =
     [MAPSEC_ALTERING_CAVE - KANTO_MAPSEC_COUNT] = MAPPOPUP_THEME_BW_DEFAULT,
     [MAPSEC_NAVEL_ROCK - KANTO_MAPSEC_COUNT] = MAPPOPUP_THEME_BW_DEFAULT,
     [MAPSEC_TRAINER_HILL - KANTO_MAPSEC_COUNT] = MAPPOPUP_THEME_BW_DEFAULT,
+#endif
 };
 
 static const u8 sText_PyramidFloor1[] = _("PYRAMID FLOOR 1");
@@ -520,61 +710,9 @@ static void UpdateSecondaryPopUpWindow(u8 secondaryPopUpWindowId)
     CopyWindowToVram(secondaryPopUpWindowId, COPYWIN_FULL);
 }
 
-static void MapNamePopupAppendFloorNum(u8 *map_name, s8 floorNum)
-{
-    if (floorNum == 0)
-        return;
-    u8 *dest = map_name;
-    while (*dest != EOS)
-        dest++;
-    *dest++ = CHAR_SPACE;
-    if (floorNum == FLOOR_ROOFTOP)
-    {
-        StringCopy(dest, gText_Rooftop);
-        return;
-    }
-    if (floorNum < 0)
-    {
-        *dest++ = CHAR_B;
-        floorNum *= -1;
-    }
-    dest = ConvertIntToDecimalStringN(dest, floorNum, STR_CONV_MODE_LEFT_ALIGN, 2);
-    *dest++ = CHAR_F;
-    *dest = EOS;
-}
-
-static bool32 IsCeladonDeptStore(const struct MapHeader *mapHeader)
-{
-    if (mapHeader->regionMapSectionId != MAPSEC_CELADON_CITY)
-        return FALSE;
-    if (mapHeader->mapLayoutId != LAYOUT_CELADON_CITY_DEPARTMENT_STORE_1F
-     && mapHeader->mapLayoutId != LAYOUT_CELADON_CITY_DEPARTMENT_STORE_2F
-     && mapHeader->mapLayoutId != LAYOUT_CELADON_CITY_DEPARTMENT_STORE_3F
-     && mapHeader->mapLayoutId != LAYOUT_CELADON_CITY_DEPARTMENT_STORE_4F
-     && mapHeader->mapLayoutId != LAYOUT_CELADON_CITY_DEPARTMENT_STORE_5F
-     && mapHeader->mapLayoutId != LAYOUT_CELADON_CITY_DEPARTMENT_STORE_ROOF
-     && mapHeader->mapLayoutId != LAYOUT_CELADON_CITY_DEPARTMENT_STORE_ELEVATOR)
-    {
-        return FALSE;
-    }
-    return TRUE;
-}
-
-u8 *GetPopUpMapName(u8 *dest, const struct MapHeader *mapHeader)
-{
-    if (IsCeladonDeptStore(mapHeader))
-        StringCopy(dest, COMPOUND_STRING("CELADON DEPT."));
-    else
-        GetMapName(dest, mapHeader->regionMapSectionId, 0);
-    if (mapHeader->floorNumber == 0)
-        return dest;
-    MapNamePopupAppendFloorNum(dest, mapHeader->floorNumber);
-    return dest;
-}
-
 static void ShowMapNamePopUpWindow(void)
 {
-    u8 mapDisplayHeader[MAP_POPUP_STRING_BUFFER_LENGTH];
+    u8 mapDisplayHeader[27];
     u8 *withoutPrefixPtr;
     u8 x;
     const u8 *mapDisplayHeaderSource;
@@ -582,22 +720,22 @@ static void ShowMapNamePopUpWindow(void)
 
     if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
     {
-        if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP)
+        if ((gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_TOP_HNS))
         {
-            withoutPrefixPtr = &(mapDisplayHeader[MAP_POPUP_PREFIX_BUFFER_LENGTH]);
+            withoutPrefixPtr = &(mapDisplayHeader[6]);
             mapDisplayHeaderSource = sBattlePyramid_MapHeaderStrings[FRONTIER_STAGES_PER_CHALLENGE];
         }
         else
         {
-            withoutPrefixPtr = &(mapDisplayHeader[MAP_POPUP_PREFIX_BUFFER_LENGTH]);
+            withoutPrefixPtr = &(mapDisplayHeader[6]);
             mapDisplayHeaderSource = sBattlePyramid_MapHeaderStrings[gSaveBlock2Ptr->frontier.curChallengeBattleNum];
         }
         StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
     }
     else
     {
-        withoutPrefixPtr = &(mapDisplayHeader[MAP_POPUP_PREFIX_BUFFER_LENGTH]);
-        GetPopUpMapName(withoutPrefixPtr, &gMapHeader);
+        withoutPrefixPtr = &(mapDisplayHeader[6]);
+        GetMapName(withoutPrefixPtr, gMapHeader.regionMapSectionId, 0);
     }
 
     if (OW_POPUP_GENERATION == GEN_5)
@@ -630,9 +768,8 @@ static void ShowMapNamePopUpWindow(void)
     }
     else
     {
-        u32 fontId = GetFontIdToFit(withoutPrefixPtr, FONT_NORMAL, -1, 80);
-        x = GetStringCenterAlignXOffset(fontId, withoutPrefixPtr, 80);
-        AddTextPrinterParameterized(GetMapNamePopUpWindowId(), fontId, mapDisplayHeader, x, 3, TEXT_SKIP_DRAW, NULL);
+        x = GetStringCenterAlignXOffset(FONT_NARROW, withoutPrefixPtr, 80);
+        AddTextPrinterParameterized(GetMapNamePopUpWindowId(), FONT_NARROW, mapDisplayHeader, x, 3, TEXT_SKIP_DRAW, NULL);
         CopyWindowToVram(GetMapNamePopUpWindowId(), COPYWIN_FULL);
     }
 }
@@ -679,6 +816,7 @@ static void LoadMapNamePopUpWindowBg(void)
     if (OW_POPUP_GENERATION == GEN_5)
         secondaryPopUpWindowId = GetSecondaryPopUpWindowId();
 
+#if !IS_HNS
     if (regionMapSectionId >= KANTO_MAPSEC_START)
     {
         if (regionMapSectionId > KANTO_MAPSEC_END)
@@ -686,6 +824,7 @@ static void LoadMapNamePopUpWindowBg(void)
         else
             regionMapSectionId = 0; // Discard kanto region sections;
     }
+#endif
 
     if (OW_POPUP_GENERATION == GEN_5)
     {

@@ -8,13 +8,12 @@ ASSUMPTIONS
     ASSUME(gItemsInfo[ITEM_LIECHI_BERRY].holdEffect == HOLD_EFFECT_ATTACK_UP);
 }
 
-SINGLE_BATTLE_TEST("Stuff Cheeks cannot be used if the user doesn't hold a berry (Gen8-9)")
+SINGLE_BATTLE_TEST("Stuff Cheeks cannot be used if the user doesn't hold a berry")
 {
     enum Item item = ITEM_NONE;
     PARAMETRIZE { item = ITEM_NONE; }
     PARAMETRIZE { item = ITEM_LIECHI_BERRY; }
     GIVEN {
-        WITH_CONFIG(B_STUFF_CHEEKS_SELECTABLE, GEN_9);
         PLAYER(SPECIES_SKWOVET) { Item(item); }
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
@@ -33,7 +32,6 @@ SINGLE_BATTLE_TEST("Stuff Cheeks cannot be used if the user doesn't hold a berry
 SINGLE_BATTLE_TEST("Stuff Cheeks forces Struggle if it's the only move is blocked")
 {
     GIVEN {
-        WITH_CONFIG(B_STUFF_CHEEKS_SELECTABLE, GEN_9);
         PLAYER(SPECIES_SKWOVET) { Moves(MOVE_STUFF_CHEEKS); }
         OPPONENT(SPECIES_WOBBUFFET);
     } WHEN {
@@ -53,8 +51,8 @@ SINGLE_BATTLE_TEST("Stuff Cheeks raises Defense by 2 stages after consuming the 
     } SCENE {
         MESSAGE("Skwovet used Stuff Cheeks!");
         ANIMATION(ANIM_TYPE_MOVE, MOVE_STUFF_CHEEKS, player);
-        MESSAGE("The Liechi Berry boosted Skwovet's Attack!");
-        MESSAGE("Skwovet's Defense rose sharply!");
+        MESSAGE("Using Liechi Berry, the Attack of Skwovet rose!");
+        MESSAGE("Skwovet's Defense sharply rose!");
     } THEN {
         EXPECT_EQ(player->statStages[STAT_DEF], DEFAULT_STAT_STAGE + 2);
         EXPECT_EQ(player->item, ITEM_NONE);
@@ -87,7 +85,7 @@ SINGLE_BATTLE_TEST("Stuff Cheeks can be used even if Magic Room is active")
     } SCENE {
         MESSAGE("Skwovet used Stuff Cheeks!");
         ANIMATION(ANIM_TYPE_MOVE, MOVE_STUFF_CHEEKS, player);
-        MESSAGE("The Liechi Berry boosted Skwovet's Attack!");
+        MESSAGE("Using Liechi Berry, the Attack of Skwovet rose!");
     }
 }
 

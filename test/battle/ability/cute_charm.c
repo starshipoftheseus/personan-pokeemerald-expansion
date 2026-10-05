@@ -18,13 +18,13 @@ SINGLE_BATTLE_TEST("Cute Charm inflicts infatuation on contact")
         if (MoveMakesContact(move)) {
             ABILITY_POPUP(opponent, ABILITY_CUTE_CHARM);
             ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_INFATUATION, player);
-            MESSAGE("Wobbuffet fell in love!");
+            MESSAGE("The opposing Clefairy's Cute Charm infatuated Wobbuffet!");
             MESSAGE("Wobbuffet is in love with the opposing Clefairy!");
         } else {
             NONE_OF {
                 ABILITY_POPUP(opponent, ABILITY_CUTE_CHARM);
                 ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_INFATUATION, player);
-                MESSAGE("Wobbuffet fell in love!");
+                MESSAGE("The opposing Clefairy's Cute Charm infatuated Wobbuffet!");
                 MESSAGE("Wobbuffet is in love with the opposing Clefairy!");
             }
         }
@@ -46,29 +46,7 @@ SINGLE_BATTLE_TEST("Cute Charm cannot infatuate same gender")
     }
 }
 
-SINGLE_BATTLE_TEST("Cute Charm cannot infatuate if either Pokémon is genderless")
-{
-    enum Species playerSpecies, opponentSpecies;
-
-    PARAMETRIZE { playerSpecies = SPECIES_STARMIE; opponentSpecies = SPECIES_NIDOQUEEN; }
-    PARAMETRIZE { playerSpecies = SPECIES_NIDOKING; opponentSpecies = SPECIES_STARMIE; }
-
-    GIVEN {
-        ASSUME(MoveMakesContact(MOVE_SCRATCH));
-        ASSUME(gSpeciesInfo[SPECIES_NIDOKING].genderRatio == MON_MALE);
-        ASSUME(gSpeciesInfo[SPECIES_NIDOQUEEN].genderRatio == MON_FEMALE);
-        ASSUME(gSpeciesInfo[SPECIES_STARMIE].genderRatio == MON_GENDERLESS);
-        PLAYER(playerSpecies);
-        OPPONENT(opponentSpecies) { Ability(ABILITY_CUTE_CHARM); }
-    } WHEN {
-        TURN { MOVE(player, MOVE_SCRATCH, WITH_RNG(RNG_CUTE_CHARM, 1)); }
-    } SCENE {
-        ANIMATION(ANIM_TYPE_MOVE, MOVE_SCRATCH, player);
-        NOT ABILITY_POPUP(opponent, ABILITY_CUTE_CHARM);
-    } THEN {
-        EXPECT(!(player->volatiles.infatuation));
-    }
-}
+TO_DO_BATTLE_TEST("Cute Charm cannot infatuate if either Pokémon are Gender-unknown")
 
 SINGLE_BATTLE_TEST("Cute Charm triggers 1/3 times (Gen3) or 30% (Gen 4+) of the time")
 {
@@ -87,7 +65,7 @@ SINGLE_BATTLE_TEST("Cute Charm triggers 1/3 times (Gen3) or 30% (Gen 4+) of the 
     } SCENE {
         ABILITY_POPUP(opponent, ABILITY_CUTE_CHARM);
         ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_INFATUATION, player);
-        MESSAGE("Wobbuffet fell in love!");
+        MESSAGE("The opposing Clefairy's Cute Charm infatuated Wobbuffet!");
         MESSAGE("Wobbuffet is in love with the opposing Clefairy!");
     }
 }

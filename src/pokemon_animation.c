@@ -5,7 +5,6 @@
 #include "pokemon_animation.h"
 #include "sprite.h"
 #include "task.h"
-#include "test/battle.h"
 #include "test_runner.h"
 #include "trig.h"
 #include "util.h"
@@ -469,7 +468,7 @@ static void SetPosForRotation(struct Sprite *sprite, u16 index, s16 amplitudeX, 
     sprite->y2 = yAdder + amplitudeY;
 }
 
-enum BackAnim GetSpeciesBackAnimSet(enum Species species)
+enum BackAnim GetSpeciesBackAnimSet(u16 species)
 {
     if (gSpeciesInfo[species].backAnimId != BACK_ANIM_NONE)
         return gSpeciesInfo[species].backAnimId - 1;
@@ -510,7 +509,7 @@ static void Task_HandleMonAnimation(u8 taskId)
         for (i = 2; i < ARRAY_COUNT(sprite->data); i++)
             sprite->data[i] = 0;
 
-        if (gTestRunnerHeadless && !gBattleTestRunnerState->forceMoveAnim)
+        if (gTestRunnerHeadless)
             sprite->callback = WaitAnimEnd;
         else
             sprite->callback = sMonAnimFunctions[gTasks[taskId].tAnimId];
@@ -909,6 +908,7 @@ static void Zigzag(struct Sprite *sprite)
         if (sZigzagData[sprite->data[3]][2] == 0)
         {
             sprite->callback = WaitAnimEnd;
+            sprite->x2 = 0;
         }
         else
         {
@@ -920,6 +920,7 @@ static void Zigzag(struct Sprite *sprite)
     if (sZigzagData[sprite->data[3]][2] == 0)
     {
         sprite->callback = WaitAnimEnd;
+        sprite->x2 = 0;
     }
     else
     {
@@ -1890,6 +1891,7 @@ static void BackFlipBig_2(struct Sprite *sprite)
     {
         ResetSpriteAfterAnim(sprite);
         sprite->callback = WaitAnimEnd;
+        sprite->x2 = 0;
     }
 
     TryFlipX(sprite);
@@ -2020,6 +2022,7 @@ static void TumblingFrontFlip(struct Sprite *sprite)
             {
                 ResetSpriteAfterAnim(sprite);
                 sprite->callback = WaitAnimEnd;
+                sprite->x2 = 0;
             }
         }
 
@@ -2747,6 +2750,7 @@ static void TipAndShake_3(struct Sprite *sprite)
         sprite->data[7] = 0;
         ResetSpriteAfterAnim(sprite);
         sprite->callback = WaitAnimEnd;
+        sprite->x2 = 0;
     }
     else
     {
@@ -3165,9 +3169,8 @@ static void Anim_RapidHorizontalHops(struct Sprite *sprite)
     TryFlipX(sprite);
     if (sprite->data[2] > 2048)
     {
-        sprite->x2 = 0;
-        sprite->y2 = 0;
         sprite->callback = WaitAnimEnd;
+        sprite->x2 = 0;
         sprite->data[6] = 0;
     }
     else
@@ -3508,6 +3511,7 @@ static void Anim_VerticalShakeHorizontalSlide_Slow(struct Sprite *sprite)
     if (sprite->data[2] > 2048)
     {
         sprite->callback = WaitAnimEnd;
+        sprite->x2 = 0;
         sprite->data[6] = 0;
     }
     else
@@ -3865,6 +3869,7 @@ static void Anim_VerticalShakeHorizontalSlide(struct Sprite *sprite)
     if (sprite->data[2] > 2048)
     {
         sprite->callback = WaitAnimEnd;
+        sprite->x2 = 0;
         sprite->data[6] = 0;
     }
     else
@@ -3899,6 +3904,7 @@ static void Anim_VerticalShakeHorizontalSlide_Fast(struct Sprite *sprite)
     if (sprite->data[2] > 2048)
     {
         sprite->callback = WaitAnimEnd;
+        sprite->x2 = 0;
         sprite->data[6] = 0;
     }
     else
@@ -3951,7 +3957,10 @@ static void TriangleDown(struct Sprite *sprite)
     if (sTriangleDownData[sprite->data[3]][2] / sprite->data[5] == 0)
     {
         if (--sprite->data[6] == 0)
+        {
             sprite->callback = WaitAnimEnd;
+            sprite->x2 = 0;
+        }
         else
             sprite->data[2] = 0;
     }
@@ -4918,6 +4927,7 @@ static void ShakeGlow_Blend(struct Sprite *sprite)
     if (sprite->data[2] > 127)
     {
         BlendPalette(sprite->data[7], 16, 0, RGB_RED);
+        sprite->x2 = 0;
         sprite->callback = WaitAnimEnd;
     }
     else

@@ -18,10 +18,12 @@
 #include "constants/field_poison.h"
 #include "constants/form_change_types.h"
 #include "constants/party_menu.h"
+#include "save.h"
+#include "nuzlocke.h"
 
 static bool32 IsMonValidSpecies(struct Pokemon *pokemon)
 {
-    enum Species species = GetMonData(pokemon, MON_DATA_SPECIES_OR_EGG);
+    u16 species = GetMonData(pokemon, MON_DATA_SPECIES_OR_EGG);
     if (species == SPECIES_NONE || species == SPECIES_EGG)
         return FALSE;
 
@@ -31,7 +33,7 @@ static bool32 IsMonValidSpecies(struct Pokemon *pokemon)
 static bool32 AllMonsFainted(void)
 {
     int i;
-    struct Pokemon *pokemon = gParties[B_TRAINER_PLAYER];
+    struct Pokemon *pokemon = gPlayerParty;
 
     for (i = 0; i < PARTY_SIZE; i++, pokemon++)
     {
@@ -43,21 +45,24 @@ static bool32 AllMonsFainted(void)
 
 static void FaintFromFieldPoison(u8 partyIdx)
 {
-    struct Pokemon *pokemon = &gParties[B_TRAINER_PLAYER][partyIdx];
+    struct Pokemon *pokemon = &gPlayerParty[partyIdx];
     u32 status = STATUS1_NONE;
 
-    if (OW_POISON_DAMAGE < GEN_4)
+    if (gSaveBlock3Ptr->challengeSettings.tx_Mode_PoisonSurvive == 0)
         AdjustFriendship(pokemon, FRIENDSHIP_EVENT_FAINT_FIELD_PSN);
 
     SetMonData(pokemon, MON_DATA_STATUS, &status);
     GetMonData(pokemon, MON_DATA_NICKNAME, gStringVar1);
     StringGet_Nickname(gStringVar1);
+    if (IsNuzlockeActive() || IsNuzlockeEasyActive())
+        NuzlockeDeleteFaintedPartyPokemon();
 }
 
 static bool32 MonFaintedFromPoison(u8 partyIdx)
 {
-    struct Pokemon *pokemon = &gParties[B_TRAINER_PLAYER][partyIdx];
-    if (IsMonValidSpecies(pokemon) && GetMonData(pokemon, MON_DATA_HP) == ((OW_POISON_DAMAGE < GEN_4) ? 0 : 1) && GetAilmentFromStatus(GetMonData(pokemon, MON_DATA_STATUS)) == AILMENT_PSN)
+    struct Pokemon *pokemon = &gPlayerParty[partyIdx];
+    u32 threshold = (gSaveBlock3Ptr->challengeSettings.tx_Mode_PoisonSurvive == 0) ? 0 : 1;
+    if (IsMonValidSpecies(pokemon) && GetMonData(pokemon, MON_DATA_HP) == threshold && GetAilmentFromStatus(GetMonData(pokemon, MON_DATA_STATUS)) == AILMENT_PSN)
         return TRUE;
 
     return FALSE;
@@ -77,7 +82,10 @@ static void Task_TryFieldPoisonWhiteOut(u8 taskId)
             if (MonFaintedFromPoison(tPartyIdx))
             {
                 FaintFromFieldPoison(tPartyIdx);
-                ShowFieldMessage(gText_PkmnFainted_FldPsn);
+                if (gSaveBlock3Ptr->challengeSettings.tx_Mode_PoisonSurvive == 0)
+                    ShowFieldMessage(gText_PkmnFainted_FldPsn);
+                else
+                    ShowFieldMessage(gText_PkmnSurvived_FldPsn);
                 tState++;
                 return;
             }
@@ -126,7 +134,7 @@ s32 DoPoisonFieldEffect(void)
 {
     int i;
     u32 hp;
-    struct Pokemon *pokemon = gParties[B_TRAINER_PLAYER];
+    struct Pokemon *pokemon = gPlayerParty;
     u32 numPoisoned = 0;
     u32 numFainted = 0;
 
@@ -136,12 +144,12 @@ s32 DoPoisonFieldEffect(void)
         {
             // Apply poison damage
             hp = GetMonData(pokemon, MON_DATA_HP);
-            if (OW_POISON_DAMAGE < GEN_4 && (hp == 0 || --hp == 0))
+            if (gSaveBlock3Ptr->challengeSettings.tx_Mode_PoisonSurvive == 0 && (hp == 0 || --hp == 0))
             {
-                TryFormChange(&gParties[B_TRAINER_PLAYER][i], FORM_CHANGE_FAINT, B_TRAINER_PLAYER);
+                TryFormChange(&gPlayerParty[i], FORM_CHANGE_FAINT);
                 numFainted++;
             }
-            else if (OW_POISON_DAMAGE >= GEN_4 && (hp == 1 || --hp == 1))
+            else if (gSaveBlock3Ptr->challengeSettings.tx_Mode_PoisonSurvive == 1 && (hp == 1 || --hp == 1))
                 numFainted++;
 
             SetMonData(pokemon, MON_DATA_HP, &hp);

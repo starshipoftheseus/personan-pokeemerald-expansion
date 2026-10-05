@@ -1,25 +1,7 @@
 #include "global.h"
 #include "test/battle.h"
 
-SINGLE_BATTLE_TEST("Conversion 2's type change considers Inverse Battles")
-{
-    u32 config;
-    PARAMETRIZE { config = GEN_4; }
-    PARAMETRIZE { config = GEN_5; }
-
-    GIVEN {
-        WITH_CONFIG(B_UPDATED_CONVERSION_2, config);
-        FLAG_SET(B_FLAG_INVERSE_BATTLE);
-        ASSUME(GetMoveType(MOVE_OMINOUS_WIND) == TYPE_GHOST);
-        PLAYER(SPECIES_WOBBUFFET) { Speed(2); }
-        OPPONENT(SPECIES_WOBBUFFET) { Speed(1); }
-    } WHEN {
-        TURN { MOVE(opponent, MOVE_OMINOUS_WIND); }
-        TURN { MOVE(player, MOVE_CONVERSION_2); }
-    } SCENE {
-        MESSAGE("Wobbuffet transformed into the Ghost type!");
-    }
-}
+TO_DO_BATTLE_TEST("Conversion 2's type change considers Inverse Battles");
 
 SINGLE_BATTLE_TEST("Conversion 2 randomly changes the type of the user to a type that resists the last move that hit the user (Gen 1-4)")
 {

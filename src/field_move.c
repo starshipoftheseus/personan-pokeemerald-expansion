@@ -4,125 +4,198 @@
 #include "fldeff.h"
 #include "fldeff_misc.h"
 #include "party_menu.h"
-#include "strings.h"
 #include "constants/field_move.h"
 #include "constants/moves.h"
 #include "constants/party_menu.h"
 
-static bool32 IsAlwaysFalse(enum FieldMove fieldMove)
+static bool32 IsFieldMoveUnlocked_Cut(void)
 {
-    return FALSE;
+    if (IS_HNS)
+        return FlagGet(FLAG_BADGE02_GET);
+    if (IS_FRLG)
+        return FlagGet(FLAG_BADGE02_GET);
+
+    return FlagGet(FLAG_BADGE01_GET);
 }
 
-static bool32 IsAlwaysTrue(enum FieldMove fieldMove)
+static bool32 IsFieldMoveUnlocked_Flash(void)
+{
+    if (IS_HNS)
+        return FlagGet(FLAG_BADGE01_GET);
+    if (IS_FRLG)
+        return FlagGet(FLAG_BADGE01_GET);
+
+    return FlagGet(FLAG_BADGE02_GET);
+}
+
+static bool32 IsFieldMoveUnlocked_RockSmash(void)
+{
+    if (IS_HNS)
+        return FlagGet(FLAG_BADGE01_GET);
+    if (IS_FRLG)
+        return FlagGet(FLAG_BADGE06_GET);
+
+    return FlagGet(FLAG_BADGE03_GET);
+}
+
+static bool32 IsFieldMoveUnlocked_Strength(void)
+{
+    if (IS_HNS)
+        return FlagGet(FLAG_BADGE03_GET);
+
+    return FlagGet(FLAG_BADGE04_GET);
+}
+
+static bool32 IsFieldMoveUnlocked_Surf(void)
+{
+    if (IS_HNS)
+        return FlagGet(FLAG_BADGE04_GET);
+
+    return FlagGet(FLAG_BADGE05_GET);
+}
+
+static bool32 IsFieldMoveUnlocked_Fly(void)
+{
+    if (IS_HNS)
+        return FlagGet(FLAG_BADGE05_GET);
+    if (IS_FRLG)
+        return FlagGet(FLAG_BADGE03_GET);
+
+    return FlagGet(FLAG_BADGE06_GET);
+}
+
+static bool32 IsFieldMoveUnlocked_Dive(void)
+{
+    if (IS_HNS)
+        return FlagGet(FLAG_BADGE07_GET);
+
+    return FlagGet(FLAG_BADGE07_GET);
+}
+
+static bool32 IsFieldMoveUnlocked_Waterfall(void)
+{
+    if (IS_HNS)
+        return FlagGet(FLAG_BADGE08_GET);
+    if (IS_FRLG)
+        return FlagGet(FLAG_BADGE07_GET);
+
+    return FlagGet(FLAG_BADGE08_GET);
+}
+
+#if OW_ROCK_CLIMB_FIELD_MOVE == TRUE
+static bool32 IsFieldMoveUnlocked_RockClimb(void)
+{
+    return TRUE;
+}
+#endif
+
+static bool32 IsFieldMoveUnlocked_Teleport(void)
 {
     return TRUE;
 }
 
-static bool32 HasBadgeForFieldMove(enum FieldMove fieldMove)
+static bool32 IsFieldMoveUnlocked_Dig(void)
 {
-    return FlagGet(gFieldMoveInfo[fieldMove].arg + FLAG_BADGE01_GET);
+    return TRUE;
 }
 
-const struct FieldMoveUnlock gFieldMoveUnlocks[FIELD_MOVE_UNLOCK_COUNT] =
+static bool32 IsFieldMoveUnlocked_SecretPower(void)
 {
-    [CANT_UNLOCK] =
-    {
-        .isUnlockedFunc = IsAlwaysFalse,
-        .lockedMessage = gText_EmptyString2,
-    },
-    [ALWAYS_UNLOCKED] =
-    {
-        .isUnlockedFunc = IsAlwaysTrue,
-        .lockedMessage = gText_EmptyString2,
-    },
-    [BADGE_UNLOCK] =
-    {
-        .isUnlockedFunc = HasBadgeForFieldMove,
-        .lockedMessage = gText_CantUseUntilNewBadge,
-    },
-};
+    return TRUE;
+}
 
-#define FLAG_TO_BADGE(flag) flag - FLAG_BADGE01_GET
+static bool32 IsFieldMoveUnlocked_MilkDrink(void)
+{
+    return TRUE;
+}
+
+static bool32 IsFieldMoveUnlocked_SoftBoiled(void)
+{
+    return TRUE;
+}
+
+static bool32 IsFieldMoveUnlocked_SweetScent(void)
+{
+    return TRUE;
+}
+
+#if OW_DEFOG_FIELD_MOVE == TRUE
+static bool32 IsFieldMoveUnlocked_Defog(void)
+{
+    return TRUE;
+}
+#endif
 
 const struct FieldMoveInfo gFieldMoveInfo[FIELD_MOVES_COUNT] =
 {
     [FIELD_MOVE_CUT] =
     {
         .fieldMoveFunc = SetUpFieldMove_Cut,
-        .unlockType = BADGE_UNLOCK,
+        .isUnlockedFunc = IsFieldMoveUnlocked_Cut,
         .moveID = MOVE_CUT,
         .partyMsgID = PARTY_MSG_NOTHING_TO_CUT,
-        .arg = IS_FRLG ? FLAG_TO_BADGE(FLAG_BADGE02_GET) : FLAG_TO_BADGE(FLAG_BADGE01_GET),
     },
 
     [FIELD_MOVE_FLASH] =
     {
         .fieldMoveFunc = SetUpFieldMove_Flash,
-        .unlockType = BADGE_UNLOCK,
+        .isUnlockedFunc = IsFieldMoveUnlocked_Flash,
         .moveID = MOVE_FLASH,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
-        .arg = IS_FRLG ? FLAG_TO_BADGE(FLAG_BADGE01_GET) : FLAG_TO_BADGE(FLAG_BADGE02_GET),
     },
 
     [FIELD_MOVE_ROCK_SMASH] =
     {
         .fieldMoveFunc = SetUpFieldMove_RockSmash,
-        .unlockType = BADGE_UNLOCK,
+        .isUnlockedFunc = IsFieldMoveUnlocked_RockSmash,
         .moveID = MOVE_ROCK_SMASH,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
-        .arg = IS_FRLG ? FLAG_TO_BADGE(FLAG_BADGE06_GET) : FLAG_TO_BADGE(FLAG_BADGE03_GET),
     },
 
     [FIELD_MOVE_STRENGTH] =
     {
         .fieldMoveFunc = SetUpFieldMove_Strength,
-        .unlockType = BADGE_UNLOCK,
+        .isUnlockedFunc = IsFieldMoveUnlocked_Strength,
         .moveID = MOVE_STRENGTH,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
-        .arg = FLAG_TO_BADGE(FLAG_BADGE04_GET),
     },
 
     [FIELD_MOVE_SURF] =
     {
         .fieldMoveFunc = SetUpFieldMove_Surf,
-        .unlockType = BADGE_UNLOCK,
+        .isUnlockedFunc = IsFieldMoveUnlocked_Surf,
         .moveID = MOVE_SURF,
         .partyMsgID = PARTY_MSG_CANT_SURF_HERE,
-        .arg = FLAG_TO_BADGE(FLAG_BADGE05_GET),
     },
 
     [FIELD_MOVE_FLY] =
     {
         .fieldMoveFunc = SetUpFieldMove_Fly,
-        .unlockType = BADGE_UNLOCK,
+        .isUnlockedFunc = IsFieldMoveUnlocked_Fly,
         .moveID = MOVE_FLY,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
-        .arg = IS_FRLG ? FLAG_TO_BADGE(FLAG_BADGE03_GET) : FLAG_TO_BADGE(FLAG_BADGE06_GET),
     },
 
     [FIELD_MOVE_DIVE] =
     {
         .fieldMoveFunc = SetUpFieldMove_Dive,
-        .unlockType = BADGE_UNLOCK,
+        .isUnlockedFunc = IsFieldMoveUnlocked_Dive,
         .moveID = MOVE_DIVE,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
-        .arg = FLAG_TO_BADGE(FLAG_BADGE07_GET),
     },
 
     [FIELD_MOVE_WATERFALL] =
     {
         .fieldMoveFunc = SetUpFieldMove_Waterfall,
-        .unlockType = BADGE_UNLOCK,
+        .isUnlockedFunc = IsFieldMoveUnlocked_Waterfall,
         .moveID = MOVE_WATERFALL,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
-        .arg = IS_FRLG ? FLAG_TO_BADGE(FLAG_BADGE07_GET) : FLAG_TO_BADGE(FLAG_BADGE08_GET),
     },
 
     [FIELD_MOVE_TELEPORT] =
     {
         .fieldMoveFunc = SetUpFieldMove_Teleport,
-        .unlockType = ALWAYS_UNLOCKED,
+        .isUnlockedFunc = IsFieldMoveUnlocked_Teleport,
         .moveID = MOVE_TELEPORT,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
     },
@@ -130,7 +203,7 @@ const struct FieldMoveInfo gFieldMoveInfo[FIELD_MOVES_COUNT] =
     [FIELD_MOVE_DIG] =
     {
         .fieldMoveFunc = SetUpFieldMove_Dig,
-        .unlockType = ALWAYS_UNLOCKED,
+        .isUnlockedFunc = IsFieldMoveUnlocked_Dig,
         .moveID = MOVE_DIG,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
     },
@@ -138,7 +211,7 @@ const struct FieldMoveInfo gFieldMoveInfo[FIELD_MOVES_COUNT] =
     [FIELD_MOVE_SECRET_POWER] =
     {
         .fieldMoveFunc = SetUpFieldMove_SecretPower,
-        .unlockType = ALWAYS_UNLOCKED,
+        .isUnlockedFunc = IsFieldMoveUnlocked_SecretPower,
         .moveID = MOVE_SECRET_POWER,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
     },
@@ -146,7 +219,7 @@ const struct FieldMoveInfo gFieldMoveInfo[FIELD_MOVES_COUNT] =
     [FIELD_MOVE_MILK_DRINK] =
     {
         .fieldMoveFunc = SetUpFieldMove_SoftBoiled,
-        .unlockType = ALWAYS_UNLOCKED,
+        .isUnlockedFunc = IsFieldMoveUnlocked_MilkDrink,
         .moveID = MOVE_MILK_DRINK,
         .partyMsgID = PARTY_MSG_NOT_ENOUGH_HP,
     },
@@ -154,7 +227,7 @@ const struct FieldMoveInfo gFieldMoveInfo[FIELD_MOVES_COUNT] =
     [FIELD_MOVE_SOFT_BOILED] =
     {
         .fieldMoveFunc = SetUpFieldMove_SoftBoiled,
-        .unlockType = ALWAYS_UNLOCKED,
+        .isUnlockedFunc = IsFieldMoveUnlocked_SoftBoiled,
         .moveID = MOVE_SOFT_BOILED,
         .partyMsgID = PARTY_MSG_NOT_ENOUGH_HP,
     },
@@ -162,32 +235,26 @@ const struct FieldMoveInfo gFieldMoveInfo[FIELD_MOVES_COUNT] =
     [FIELD_MOVE_SWEET_SCENT] =
     {
         .fieldMoveFunc = SetUpFieldMove_SweetScent,
-        .unlockType = ALWAYS_UNLOCKED,
+        .isUnlockedFunc = IsFieldMoveUnlocked_SweetScent,
         .moveID = MOVE_SWEET_SCENT,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
     },
+#if OW_ROCK_CLIMB_FIELD_MOVE == TRUE
     [FIELD_MOVE_ROCK_CLIMB] =
     {
         .fieldMoveFunc = SetUpFieldMove_RockClimb,
-#if OW_ROCK_CLIMB_FIELD_MOVE
-        .unlockType = ALWAYS_UNLOCKED,
-#else
-        .unlockType = CANT_UNLOCK,
-#endif
+        .isUnlockedFunc = IsFieldMoveUnlocked_RockClimb,
         .moveID = MOVE_ROCK_CLIMB,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
-        .hideIfLocked = TRUE,
     },
+#endif
+#if OW_DEFOG_FIELD_MOVE == TRUE
     [FIELD_MOVE_DEFOG] =
     {
         .fieldMoveFunc = SetUpFieldMove_Defog,
-#if OW_DEFOG_FIELD_MOVE
-        .unlockType = ALWAYS_UNLOCKED,
-#else
-        .unlockType = CANT_UNLOCK,
-#endif
+        .isUnlockedFunc = IsFieldMoveUnlocked_Defog,
         .moveID = MOVE_DEFOG,
         .partyMsgID = PARTY_MSG_CANT_USE_HERE,
-        .hideIfLocked = TRUE,
     },
+#endif
 };

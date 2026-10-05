@@ -8,6 +8,7 @@
 #include "data.h"
 #include "item_menu.h"
 #include "link.h"
+#include "load_save.h"
 #include "main.h"
 #include "m4a.h"
 #include "palette.h"
@@ -16,10 +17,10 @@
 #include "pokeblock.h"
 #include "pokemon.h"
 #include "reshow_battle_screen.h"
+#include "safari_zone.h"
 #include "sound.h"
 #include "task.h"
 #include "text.h"
-#include "trainer.h"
 #include "util.h"
 #include "window.h"
 #include "line_break.h"
@@ -40,6 +41,11 @@ static void SafariHandleEndLinkBattle(enum BattlerId battler);
 static void SafariBufferRunCommand(enum BattlerId battler);
 static void CompleteWhenChosePokeblock(enum BattlerId battler);
 static void WaitForMonSelection(enum BattlerId battler);
+#if IS_HNS
+static void SafariOpenBagAndChooseItem(enum BattlerId battler);
+static void SafariCompleteWhenChoseItem(enum BattlerId battler);
+static void CB2_SafariBagExitAndReshow(void);
+#endif
 
 static void (*const sSafariBufferCommands[CONTROLLER_CMDS_COUNT])(enum BattlerId battler) =
 {
@@ -125,7 +131,11 @@ static void HandleInputChooseAction(enum BattlerId battler)
         switch (gActionSelectionCursor[battler])
         {
         case 0:
+#if IS_HNS
+            BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_USE_ITEM, 0);
+#else
             BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_SAFARI_BALL, 0);
+#endif
             break;
         case 1:
             BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_SAFARI_POKEBLOCK, 0);
@@ -179,7 +189,7 @@ static void HandleInputChooseAction(enum BattlerId battler)
             ActionSelectionCreateCursorAt(gActionSelectionCursor[battler], 0);
         }
     }
-    else if (B_QUICK_MOVE_CURSOR_TO_RUN && JOY_NEW(B_BUTTON))
+    else if ((B_QUICK_MOVE_CURSOR_TO_RUN || gSaveblock3.challengeSettings.runType == 2) && JOY_NEW(B_BUTTON))
     {
         PlaySE(SE_SELECT);
         ActionSelectionDestroyCursorAt(gActionSelectionCursor[battler]);
@@ -209,7 +219,7 @@ static void SafariOpenPokeblockCase(enum BattlerId battler)
     if (!gPaletteFade.active)
     {
         gBattlerControllerFuncs[battler] = CompleteWhenChosePokeblock;
-        CloseMainBattleScreen();
+        FreeAllWindowBuffers();
         OpenPokeblockCaseInBattle();
     }
 }
@@ -223,6 +233,40 @@ static void CompleteWhenChosePokeblock(enum BattlerId battler)
     }
 }
 
+#if IS_HNS
+static void CB2_SafariBagExitAndReshow(void)
+{
+    if (gSpecialVar_ItemId != ITEM_NONE)
+        gNumSafariBalls--;
+    CB2_SetUpReshowBattleScreenAfterMenu2();
+}
+
+static void SafariOpenBagAndChooseItem(enum BattlerId battler)
+{
+    if (!gPaletteFade.active)
+    {
+        gBattlerControllerFuncs[battler] = SafariCompleteWhenChoseItem;
+        ReshowBattleScreenDummy();
+        FreeAllWindowBuffers();
+        GoToBagMenu(ITEMMENULOCATION_BATTLE, POCKET_POKE_BALLS, CB2_SafariBagExitAndReshow);
+    }
+}
+
+static void SafariCompleteWhenChoseItem(enum BattlerId battler)
+{
+    if (gMain.callback2 == BattleMainCB2 && !gPaletteFade.active)
+    {
+        if (gSpecialVar_ItemId != ITEM_NONE)
+        {
+            gBallToDisplay = gSpecialVar_ItemId;
+            gChosenActionByBattler[battler] = B_ACTION_SAFARI_BALL;
+        }
+        BtlController_EmitOneReturnValue(battler, B_COMM_TO_ENGINE, gSpecialVar_ItemId);
+        BtlController_Complete(battler);
+    }
+}
+#endif
+
 static void OpenPartyMenuToChooseMon(enum BattlerId battler)
 {
     if (!gPaletteFade.active)
@@ -230,7 +274,7 @@ static void OpenPartyMenuToChooseMon(enum BattlerId battler)
         gBattlerControllerFuncs[battler] = WaitForMonSelection;
         u8 caseId = gTasks[gBattleControllerData[battler]].data[0];
         DestroyTask(gBattleControllerData[battler]);
-        CloseMainBattleScreen();
+        FreeAllWindowBuffers();
         OpenPartyMenuInBattle(caseId);
     }
 }
@@ -276,10 +320,10 @@ void SafariBufferExecCompleted(enum BattlerId battler)
 
 static void SafariHandleDrawTrainerPic(enum BattlerId battler)
 {
-    enum TrainerPicID trainerPicId = GetPlayerTrainerPic(gSaveBlock2Ptr->playerGender, GAME_VERSION);
+    enum TrainerPicID trainerPicId = gSaveBlock2Ptr->playerGender == FEMALE ? TRAINER_BACK_PIC_PLAYER_FEMALE : TRAINER_BACK_PIC_PLAYER_MALE;
 
     BtlController_HandleDrawTrainerPic(battler, trainerPicId, FALSE,
-                                       80, 80 + 4 * (8 - GetTrainerBackPicCoords(trainerPicId)->size),
+                                       80, 80 + 4 * (8 - gTrainerBacksprites[trainerPicId].coordinates.size),
                                        30);
 }
 
@@ -311,7 +355,12 @@ static void SafariHandleChooseAction(enum BattlerId battler)
 static void SafariHandleChooseItem(enum BattlerId battler)
 {
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
-    gBattlerControllerFuncs[battler] = SafariOpenPokeblockCase;
+#if IS_HNS
+    if (gChosenActionByBattler[battler] == B_ACTION_USE_ITEM)
+        gBattlerControllerFuncs[battler] = SafariOpenBagAndChooseItem;
+    else
+#endif
+        gBattlerControllerFuncs[battler] = SafariOpenPokeblockCase;
     gBattlerInMenuId = battler;
 }
 
@@ -341,10 +390,10 @@ static void SafariHandleChoosePokemon(enum BattlerId battler)
 }
 
 // All of the other controllers(except Wally's) use CRY_MODE_FAINT.
-// Player is not a Pokémon, so it can't really faint in the Safari anyway.
+// Player is not a pokemon, so it can't really faint in the Safari anyway.
 static void SafariHandleFaintingCry(enum BattlerId battler)
 {
-    enum Species species = GetMonData(GetBattlerMon(battler), MON_DATA_SPECIES);
+    u16 species = GetMonData(GetBattlerMon(battler), MON_DATA_SPECIES);
 
     PlayCry_Normal(species, 25);
     BtlController_Complete(battler);

@@ -37,25 +37,6 @@ extern const u8 EventScript_TryDoNormalTrainerBattle[];
 extern const u8 EventScript_TryDoDoubleRematchBattle[];
 extern const u8 EventScript_TryDoRematchBattle[];
 extern const u8 EventScript_ObjectApproachPlayer[];
-extern const u8 EventScript_ShowTrainerIntroMsg[];
-extern const u8 EventScript_NotEnoughMonsForDoubleBattle[];
-
-extern const u8 EventSnippet_Lock[];
-extern const u8 EventSnippet_FacePlayer[];
-extern const u8 EventSnippet_StartTrainerApproach[];
-extern const u8 EventSnippet_TryDoNormalTrainerBattle[];
-extern const u8 EventSnippet_RevealTrainer[];
-extern const u8 EventSnippet_GetTrainerFlag[];
-extern const u8 EventSnippet_PlayTrainerEncounterMusic[];
-extern const u8 EventSnippet_SetTrainerFacingDirection[];
-extern const u8 EventSnippet_TrainerApproach[];
-extern const u8 EventSnippet_PrepareSecondTrainerApproach[];
-extern const u8 EventSnippet_ShowTrainerIntroMsg[];
-extern const u8 EventSnippet_GotoPostBattleScript[];
-extern const u8 EventSnippet_DoTrainerBattle[];
-extern const u8 EventSnippet_DoRematchTrainerBattle[];
-extern const u8 EventSnippet_EndTrainerBattle[];
-extern const u8 EventSnippet_NotEnoughMonsForDoubleBattle[];
 
 extern const u8 BerryTreeScript[];
 
@@ -432,6 +413,7 @@ extern const u8 EventScript_UseDefog[];
 extern const u8 EventScript_PalletTown_PlayersHouse_2F_ShutDownPC[];
 extern const u8 LittlerootTown_BrendansHouse_2F_EventScript_TurnOffPlayerPC[];
 extern const u8 LittlerootTown_MaysHouse_2F_EventScript_TurnOffPlayerPC[];
+extern const u8 NewBarkTown_PlayersHouse_2F_EventScript_TurnOffPlayerPC[];
 
 // Mauville Old Man (Giddy)
 extern const u8 GiddyText_Is[];
@@ -567,6 +549,7 @@ extern const u8 LittlerootTown_BrendansHouse_2F_EventScript_PC[];
 extern const u8 LittlerootTown_MaysHouse_2F_EventScript_PC[];
 extern const u8 EventScript_PalletTown_PlayersHouse_2F_TurnOnPC[];
 extern const u8 EventScript_PC[];
+extern const u8 EventScript_Headbutt[];
 extern const u8 EventScript_AccessPokemonBoxLink[];
 extern const u8 EventScript_TestSignpostMsg[];
 extern const u8 EventScript_HiddenItemScript[];
@@ -608,6 +591,7 @@ extern const u8 RustboroCity_Gym_EventScript_RegisterRoxanne[];
 extern const u8 MossdeepCity_SpaceCenter_2F_EventScript_RivalRayquazaCall[];
 extern const u8 SSTidalCorridor_EventScript_ReachedStepCount[];
 extern const u8 EventScript_FallDownHoleMtPyre[];
+extern const u8 GoldenrodCity_RadioTower_5F_EventScript_Petrel[];
 
 // Secret Base
 extern const u8 SecretBase_EventScript_PC[];
@@ -629,6 +613,10 @@ extern const u8 BattlePyramid_Retire[];
 extern const u8 BattlePyramid_WarpToNextFloor[];
 extern const u8 BattlePyramid_TrainerBattle[];
 extern const u8 BattlePyramid_FindItemBall[];
+extern const u8 BattlePyramid_Retire_hns[];
+extern const u8 BattlePyramid_WarpToNextFloor_hns[];
+extern const u8 BattlePyramid_TrainerBattle_hns[];
+extern const u8 BattlePyramid_FindItemBall_hns[];
 
 // fldeff misc
 extern const u8 SecretBase_EventScript_CaveUseSecretPower[];
@@ -644,6 +632,7 @@ extern const u8 BerryTree_EventScript_ItemUseWailmerPail[];
 extern const u8 BattleFrontier_OutsideEast_EventScript_WaterSudowoodo[];
 
 extern const u8 EventScript_SelectWithoutRegisteredItem[];
+extern const u8 EventScript_SelectWithoutRegisteredHoldItem[];
 
 // overworld
 extern const u8 EventScript_WhiteOut[];

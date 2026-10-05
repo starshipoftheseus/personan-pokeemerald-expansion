@@ -53,13 +53,13 @@ bool32 IsGimmickSelected(enum BattlerId battler, enum Gimmick gimmick)
 // Sets a battler as having a gimmick active using their party index.
 void SetActiveGimmick(enum BattlerId battler, enum Gimmick gimmick)
 {
-    gBattleStruct->gimmick.activeGimmick[GetBattlerTrainer(battler)][gBattlerPartyIndexes[battler]] = gimmick;
+    gBattleStruct->gimmick.activeGimmick[GetBattlerSide(battler)][gBattlerPartyIndexes[battler]] = gimmick;
 }
 
 // Returns a battler's active gimmick, if any.
 enum Gimmick GetActiveGimmick(enum BattlerId battler)
 {
-    return gBattleStruct->gimmick.activeGimmick[GetBattlerTrainer(battler)][gBattlerPartyIndexes[battler]];
+    return gBattleStruct->gimmick.activeGimmick[GetBattlerSide(battler)][gBattlerPartyIndexes[battler]];
 }
 
 // Returns whether a trainer mon is intended to use an unrestrictive gimmick via .useGimmick (i.e Tera).
@@ -71,14 +71,17 @@ bool32 ShouldTrainerBattlerUseGimmick(enum BattlerId battler, enum Gimmick gimmi
     #else
     // The player can bypass these checks because they can choose through the controller.
     if (IsOnPlayerSide(battler) && !((gBattleTypeFlags & BATTLE_TYPE_MULTI) && GetBattlerPosition(battler) == B_POSITION_PLAYER_RIGHT))
+    {
         return TRUE;
-
-    // When reading trainer party data, we load invalid values in struct Pokemon to indicate the gimmick should not be used
-    struct Pokemon *mon = GetBattlerMon(battler);
-    if (gimmick == GIMMICK_TERA && GetMonData(mon, MON_DATA_TERA_TYPE) != TYPE_MYSTERY)
-        return TRUE;
-    if (gimmick == GIMMICK_DYNAMAX && GetMonData(mon, MON_DATA_DYNAMAX_LEVEL) != BLOCK_AI_DYNAMAX)
-        return TRUE;
+    }
+    // Check the trainer party data to see if a gimmick is intended.
+    else
+    {
+        if (gimmick == GIMMICK_TERA && gBattleStruct->opponentMonCanTera & 1 << gBattlerPartyIndexes[battler])
+            return TRUE;
+        if (gimmick == GIMMICK_DYNAMAX && gBattleStruct->opponentMonCanDynamax & 1 << gBattlerPartyIndexes[battler])
+            return TRUE;
+    }
     #endif
 
     return FALSE;
@@ -89,7 +92,7 @@ bool32 HasTrainerUsedGimmick(enum BattlerId battler, enum Gimmick gimmick)
 {
     if (IsDoubleBattle() && (IsPartnerMonFromSameTrainer(battler) || (gimmick == GIMMICK_DYNAMAX)))
     {
-        enum BattlerId partner = GetPartnerBattler(battler);
+        enum BattlerId partner = BATTLE_PARTNER(battler);
         if (gBattleStruct->gimmick.activated[partner][gimmick]
          || ((gBattleStruct->gimmick.toActivate & (1u << partner)) && gBattleStruct->gimmick.usableGimmick[partner] == gimmick))
             return TRUE;
@@ -103,18 +106,18 @@ void SetGimmickAsActivated(enum BattlerId battler, enum Gimmick gimmick)
 {
     gBattleStruct->gimmick.activated[battler][gimmick] = TRUE;
     if (IsDoubleBattle() && (IsPartnerMonFromSameTrainer(battler) || (gimmick == GIMMICK_DYNAMAX)))
-        gBattleStruct->gimmick.activated[GetPartnerBattler(battler)][gimmick] = TRUE;
+        gBattleStruct->gimmick.activated[BATTLE_PARTNER(battler)][gimmick] = TRUE;
 }
 
 #define SINGLES_GIMMICK_TRIGGER_POS_X_OPTIMAL (30)
 #define SINGLES_GIMMICK_TRIGGER_POS_X_PRIORITY (31)
 #define SINGLES_GIMMICK_TRIGGER_POS_X_SLIDE (15)
-#define SINGLES_GIMMICK_TRIGGER_POS_Y_DIFF (-5)
+#define SINGLES_GIMMICK_TRIGGER_POS_Y_DIFF (-11)
 
 #define DOUBLES_GIMMICK_TRIGGER_POS_X_OPTIMAL (30)
 #define DOUBLES_GIMMICK_TRIGGER_POS_X_PRIORITY (31)
 #define DOUBLES_GIMMICK_TRIGGER_POS_X_SLIDE (15)
-#define DOUBLES_GIMMICK_TRIGGER_POS_Y_DIFF (-2)
+#define DOUBLES_GIMMICK_TRIGGER_POS_Y_DIFF (-4)
 
 #define tBattler    data[0]
 #define tHide       data[1]
@@ -163,18 +166,16 @@ bool32 IsGimmickTriggerSpriteActive(void)
 {
     if (GetSpriteTileStartByTag(TAG_GIMMICK_TRIGGER_TILE) == 0xFFFF)
         return FALSE;
-
-    if (IndexOfSpritePaletteTag(TAG_GIMMICK_TRIGGER_PAL) != 0xFF)
+    else if (IndexOfSpritePaletteTag(TAG_GIMMICK_TRIGGER_PAL) != 0xFF)
         return TRUE;
-
-    return FALSE;
+    else
+        return FALSE;
 }
 
 bool32 IsGimmickTriggerSpriteMatchingBattler(enum BattlerId battler)
 {
     if (battler == gSprites[gBattleStruct->gimmick.triggerSpriteId].tBattler)
         return TRUE;
-
     return FALSE;
 }
 
@@ -286,7 +287,7 @@ static inline u32 GetIndicatorSpriteId(u32 healthboxId)
 
 const u32 *GetIndicatorSpriteSrc(enum BattlerId battler)
 {
-    enum Gimmick gimmick = GetActiveGimmick(battler);
+    u32 gimmick = GetActiveGimmick(battler);
 
     if (IsBattlerPrimalReverted(battler))
     {
@@ -295,19 +296,23 @@ const u32 *GetIndicatorSpriteSrc(enum BattlerId battler)
         else
             return (u32 *)&sAlphaIndicatorGfx;
     }
-
-    if (gimmick == GIMMICK_TERA) // special case
+    else if (gimmick == GIMMICK_TERA) // special case
+    {
         return (u32 *)sTeraIndicatorDataPtrs[GetBattlerTeraType(battler)];
-
-    if (gGimmicksInfo[gimmick].indicatorData != NULL)
+    }
+    else if (gGimmicksInfo[gimmick].indicatorData != NULL)
+    {
         return (u32 *)gGimmicksInfo[gimmick].indicatorData;
-
-    return NULL;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 u32 GetIndicatorPalTag(enum BattlerId battler)
 {
-    enum Gimmick gimmick = GetActiveGimmick(battler);
+    u32 gimmick = GetActiveGimmick(battler);
     if (IsBattlerPrimalReverted(battler))
         return TAG_MISC_INDICATOR_PAL;
     else if (gGimmicksInfo[gimmick].indicatorPalTag != 0)

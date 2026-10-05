@@ -366,6 +366,9 @@ void NewGameInitPCItems(void)
             break;
         i++;
     }
+
+    if (gSaveBlock3Ptr->challengeSettings.tx_Nuzlocke_RareCandy)
+        AddPCItem(ITEM_INFINITE_RARE_CANDIES, 1);
 }
 
 void BedroomPC(void)
@@ -493,6 +496,8 @@ static void PlayerPC_TurnOff(u8 taskId)
     {
         if (gMapHeader.mapLayoutId == LAYOUT_PALLET_TOWN_PLAYERS_HOUSE_2F_FRLG)
             ScriptContext_SetupScript(EventScript_PalletTown_PlayersHouse_2F_ShutDownPC);
+        else if (IS_HNS)
+            ScriptContext_SetupScript(NewBarkTown_PlayersHouse_2F_EventScript_TurnOffPlayerPC);
         else if (gSaveBlock2Ptr->playerGender == MALE)
             ScriptContext_SetupScript(LittlerootTown_BrendansHouse_2F_EventScript_TurnOffPlayerPC);
         else
@@ -1015,7 +1020,7 @@ void CopyItemName_PlayerPC(u8 *string, enum Item itemId)
 static void ItemStorage_MoveCursor(s32 id, bool8 onInit, struct ListMenu *list)
 {
     if (onInit != TRUE)
-        PlaySE(SE_SELECT);
+        PlaySECursorMove(SE_SELECT);
     if (sItemStorageMenu->toSwapPos == NOT_SWAPPING)
     {
         ItemStorage_EraseItemIcon();

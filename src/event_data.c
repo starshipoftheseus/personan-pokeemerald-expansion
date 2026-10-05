@@ -4,7 +4,7 @@
 
 #define SPECIAL_FLAGS_SIZE  (NUM_SPECIAL_FLAGS / 8)  // 8 flags per byte
 #define TEMP_FLAGS_SIZE     (NUM_TEMP_FLAGS / 8)
-#define DAILY_FLAGS_SIZE    (NUM_DAILY_FLAGS / 8)
+#define DAILY_FLAGS_SIZE    ((NUM_DAILY_FLAGS + 7) / 8)
 #define TEMP_VARS_SIZE      (NUM_TEMP_VARS * 2)      // 1/2 var per byte
 
 EWRAM_DATA u16 gSpecialVar_0x8000 = 0;
@@ -36,7 +36,8 @@ EWRAM_DATA static u16 sTestVars[TEST_VARS_SIZE] = {0};
 
 extern u16 *const gSpecialVars[];
 
-const u16 gBadgeFlags[NUM_BADGES] =
+// Capped at 8: every consumer indexes 8-entry tables with the count this yields.
+const u16 gBadgeFlags[NUM_BADGES_CAPPED] =
 {
     FLAG_BADGE01_GET,
     FLAG_BADGE02_GET,
@@ -68,7 +69,13 @@ void ClearTempFieldEventData(void)
 
 void ClearDailyFlags(void)
 {
+#if IS_HNS
+    u16 i;
+    for (i = DAILY_FLAGS_START; i <= DAILY_FLAGS_END; i++)
+        FlagClear(i);
+#else
     memset(&gSaveBlock1Ptr->flags[DAILY_FLAGS_START / 8], 0, DAILY_FLAGS_SIZE);
+#endif
 }
 
 void DisableNationalPokedex(void)
@@ -98,9 +105,29 @@ bool32 IsNationalPokedexEnabled(void)
         return FALSE;
 }
 
+void DisableMysteryEvent(void)
+{
+    FlagClear(FLAG_SYS_MYSTERY_EVENT_ENABLE);
+}
+
+void EnableMysteryEvent(void)
+{
+    FlagSet(FLAG_SYS_MYSTERY_EVENT_ENABLE);
+}
+
 bool32 IsMysteryEventEnabled(void)
 {
     return FlagGet(FLAG_SYS_MYSTERY_EVENT_ENABLE);
+}
+
+void DisableMysteryGift(void)
+{
+    FlagClear(FLAG_SYS_MYSTERY_GIFT_ENABLE);
+}
+
+void EnableMysteryGift(void)
+{
+    FlagSet(FLAG_SYS_MYSTERY_GIFT_ENABLE);
 }
 
 bool32 IsMysteryGiftEnabled(void)
