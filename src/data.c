@@ -235,6 +235,15 @@ const struct Trainer gTrainers[DIFFICULTY_COUNT][TRAINERS_COUNT] =
 #include "data/trainers_frlg.h"
 #elif IS_HNS
 #include "data/trainers_hns.h"
+#ifdef MAPS_EMERALD
+// Hoenn's trainers, numbered after Heart & Soul's (see hoenn_trainers.h). Hoenn's
+// TRAINER_NONE entry goes in Hoenn's first slot instead of overwriting Heart & Soul's.
+#undef TRAINER_NONE
+#define TRAINER_NONE HOENN_TRAINERS_START
+#include "data/trainers.h"
+#undef TRAINER_NONE
+#define TRAINER_NONE 0
+#endif
 #else
 #include "data/trainers.h"
 #endif

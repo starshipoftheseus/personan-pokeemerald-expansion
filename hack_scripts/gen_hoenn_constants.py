@@ -8,6 +8,8 @@ somewhere they don't collide with Johto's:
   flags: HOENN_FLAGS_START + <Emerald value>, a copy of Emerald's whole flag layout above Heart & Soul's
          flags. Hoenn trainer flags land in the same block (HOENN_TRAINER_FLAGS_START).
   vars:  <Emerald value> + 0x100 (0x4120-0x41FF), stored in SaveBlock2 (see GetVarPointer).
+  trainers: HOENN_TRAINERS_START + <Emerald id>, right after Heart & Soul's trainers in gTrainers.
+            Their defeated flags use Emerald's layout in the Hoenn flag block (TRAINER_FLAG in opponents.h).
 
 A flag is moved when Heart & Soul stubs it (value 0), or when no Heart & Soul map or script uses it and
 it isn't one of the engine flags both regions share (KEEP_SHARED_FLAGS). A var is moved when its number
@@ -24,6 +26,7 @@ from name_usage import usage_index
 
 OUT_FLAGS = os.path.join(ROOT, "include/constants/hoenn_flags.h")
 OUT_VARS = os.path.join(ROOT, "include/constants/hoenn_vars.h")
+OUT_TRAINERS = os.path.join(ROOT, "include/constants/hoenn_trainers.h")
 VAR_OFFSET = 0x100
 FIRST_MOVABLE_VAR = 0x4020  # 0x4000-0x401F are temp vars and object graphics vars, shared by every map
 
@@ -130,6 +133,31 @@ def main():
         lines += [f"#undef {name}", f"#define {name} 0x{var_names[name] + VAR_OFFSET:X}"]
     lines += ["", "#endif // GUARD_CONSTANTS_HOENN_VARS_H", ""]
     open(OUT_VARS, "w").write("\n".join(lines))
+    # Trainers: every Emerald trainer constant in opponents.h (TRAINER_NONE stays 0).
+    import re
+    opp = open(os.path.join(ROOT, "include/constants/opponents.h")).read()
+    trainers = [(n, int(v)) for n, v in re.findall(r"#define\s+(TRAINER_\w+)\s+(\d+)\b", opp) if n != "TRAINER_NONE"]
+    lines = header + [
+        "// Hoenn's trainers, numbered after Heart & Soul's for the combined build.",
+        "#ifndef GUARD_CONSTANTS_HOENN_TRAINERS_H",
+        "#define GUARD_CONSTANTS_HOENN_TRAINERS_H",
+        "",
+        "#define HOENN_TRAINERS_START          TRAINERS_COUNT_HNS",
+        "",
+        f"// {len(trainers)} trainers",
+    ]
+    for name, value in trainers:
+        lines += [f"#undef {name}", f"#define {name} (HOENN_TRAINERS_START + {value})"]
+    lines += ["",
+              "#undef TRAINERS_COUNT",
+              "#define TRAINERS_COUNT                (HOENN_TRAINERS_START + TRAINERS_COUNT_EMERALD)",
+              "#undef MAX_TRAINERS_COUNT",
+              "#define MAX_TRAINERS_COUNT            TRAINERS_COUNT",
+              "",
+              "#endif // GUARD_CONSTANTS_HOENN_TRAINERS_H", ""]
+    open(OUT_TRAINERS, "w").write("\n".join(lines))
+    print(f"hoenn_trainers.h: {len(trainers)} trainers moved after Heart & Soul's")
+
     print(f"hoenn_flags.h / hoenn_vars.h: {len(flags)} flags moved to 0x{start:X}-0x{start + emerald_count - 1:X}, "
           f"{len(var_names)} vars moved to 0x{FIRST_MOVABLE_VAR + VAR_OFFSET:X}-0x{0x40FF + VAR_OFFSET:X}")
 

@@ -878,6 +878,20 @@
 #define TRAINERS_COUNT                      TRAINERS_COUNT_EMERALD
 #define MAX_TRAINERS_COUNT                  MAX_TRAINERS_COUNT_EMERALD
 #endif
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+// Heart & Soul with Hoenn maps: Hoenn's trainers come after Heart & Soul's (generated).
+#include "constants/hoenn_trainers.h"
+#endif
+
 #define TRAINER_PARTNER(partner)           (MAX_TRAINERS_COUNT + partner)
+
+// The flag that records whether a trainer has been beaten.
+#ifdef HOENN_TRAINERS_START
+#define TRAINER_FLAG(trainerId) ((trainerId) >= HOENN_TRAINERS_START \
+                                 ? HOENN_TRAINER_FLAGS_START + (trainerId) - HOENN_TRAINERS_START \
+                                 : TRAINER_FLAGS_START + (trainerId))
+#else
+#define TRAINER_FLAG(trainerId) (TRAINER_FLAGS_START + (trainerId))
+#endif
 
 #endif  // GUARD_CONSTANTS_OPPONENTS_H
