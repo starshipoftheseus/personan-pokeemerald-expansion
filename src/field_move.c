@@ -151,13 +151,39 @@ static const u16 sHnsFieldMoveReceivedHmFlags[FIELD_MOVES_COUNT] =
     [FIELD_MOVE_ROCK_SMASH] = FLAG_RECEIVED_HM_ROCK_SMASH,
 };
 
+#ifdef MAPS_FIRERED
+// FireRed Kanto's field move rules: its badge for each move and the flag for getting its HM.
+static const struct {
+    u16 badgeFlag;
+    u16 receivedHmFlag;
+} sFrlgFieldMoveRules[FIELD_MOVES_COUNT] =
+{
+    [FIELD_MOVE_CUT]        = { FLAG_FRLG_BADGE02_GET, FLAG_FRLG_GOT_HM01 },
+    [FIELD_MOVE_FLASH]      = { FLAG_FRLG_BADGE01_GET, FLAG_FRLG_GOT_HM05 },
+    [FIELD_MOVE_ROCK_SMASH] = { FLAG_FRLG_BADGE06_GET, FLAG_FRLG_GOT_HM06 },
+    [FIELD_MOVE_STRENGTH]   = { FLAG_FRLG_BADGE04_GET, FLAG_FRLG_GOT_HM04 },
+    [FIELD_MOVE_SURF]       = { FLAG_FRLG_BADGE05_GET, FLAG_FRLG_GOT_HM03 },
+    [FIELD_MOVE_FLY]        = { FLAG_FRLG_BADGE03_GET, FLAG_FRLG_GOT_HM02 },
+    [FIELD_MOVE_WATERFALL]  = { FLAG_FRLG_BADGE07_GET, FLAG_FRLG_HIDE_FOUR_ISLAND_ICEFALL_CAVE_1F_HM07 },
+};
+#endif
+
+// Hoenn's (and FireRed Kanto's) rule for a field move: that region's badge, and its HM gift if needHm.
 bool32 IsHoennFieldMoveUnlocked(enum FieldMove fieldMove, bool32 needHm)
 {
-    if (fieldMove >= FIELD_MOVES_COUNT || sHoennFieldMoveRules[fieldMove].badgeFlag == 0)
+    if (fieldMove >= FIELD_MOVES_COUNT)
         return FALSE;
-    if (needHm && !FlagGet(sHoennFieldMoveRules[fieldMove].receivedHmFlag))
-        return FALSE;
-    return FlagGet(sHoennFieldMoveRules[fieldMove].badgeFlag);
+    if (sHoennFieldMoveRules[fieldMove].badgeFlag != 0
+     && (!needHm || FlagGet(sHoennFieldMoveRules[fieldMove].receivedHmFlag))
+     && FlagGet(sHoennFieldMoveRules[fieldMove].badgeFlag))
+        return TRUE;
+#ifdef MAPS_FIRERED
+    if (sFrlgFieldMoveRules[fieldMove].badgeFlag != 0
+     && (!needHm || FlagGet(sFrlgFieldMoveRules[fieldMove].receivedHmFlag))
+     && FlagGet(sFrlgFieldMoveRules[fieldMove].badgeFlag))
+        return TRUE;
+#endif
+    return FALSE;
 }
 
 // specialvar: whether the field move in VAR_0x8004 may be used from an overworld script

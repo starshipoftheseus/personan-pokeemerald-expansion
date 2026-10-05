@@ -41,8 +41,9 @@ SHARED_ENGINE_FLAGS = {
 
 # FireRed flags C code needs by name (badges for field moves/obedience, counted in menus).
 C_COPIES = [f"FLAG_BADGE0{i}_GET" for i in range(1, 9)] + [
-    "FLAG_RECEIVED_HM_CUT", "FLAG_RECEIVED_HM_FLASH", "FLAG_RECEIVED_HM_ROCK_SMASH", "FLAG_RECEIVED_HM_STRENGTH",
-    "FLAG_RECEIVED_HM_SURF", "FLAG_RECEIVED_HM_FLY", "FLAG_RECEIVED_HM_WATERFALL",
+    # FireRed's HM gifts: HM01 Cut, 02 Fly, 03 Surf, 04 Strength, 05 Flash, 06 Rock Smash, 07 Waterfall
+    "FLAG_GOT_HM01", "FLAG_GOT_HM02", "FLAG_GOT_HM03", "FLAG_GOT_HM04", "FLAG_GOT_HM05", "FLAG_GOT_HM06",
+    "FLAG_HIDE_FOUR_ISLAND_ICEFALL_CAVE_1F_HM07",  # HM07 Waterfall is an item ball; set once it is picked up
     "FLAG_SYS_GAME_CLEAR", "FLAG_IS_CHAMPION",
 ]
 
@@ -118,6 +119,8 @@ def main():
         "// FireRed's copy of flags C code reads by name",
     ]
     for name in C_COPIES:
+        if fr.get(name, 0) == 0:
+            raise SystemExit(f"{name} is not a real FireRed flag")
         body.append(f"#define FLAG_FRLG_{name[len('FLAG_'):]} (FRLG_FLAGS_START + 0x{fr[name]:X})")
     body += ["", "#undef FLAGS_COUNT", "#define FLAGS_COUNT (FRLG_FLAGS_END + 1)"]
     write(OUT_FLAGS, "GUARD_CONSTANTS_FRLG_FLAGS_H", "// FireRed Kanto's flags in the combined build.", body)

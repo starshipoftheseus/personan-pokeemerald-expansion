@@ -1932,6 +1932,13 @@ void BufferSaveMenuText(u8 textId, u8 *dest, u8 color)
                 badgeCount++;
         }
 #endif
+#ifdef MAPS_FIRERED
+        for (curFlag = FLAG_FRLG_BADGE01_GET; curFlag <= FLAG_FRLG_BADGE08_GET; curFlag++)
+        {
+            if (FlagGet(curFlag))
+                badgeCount++;
+        }
+#endif
 
         string = ConvertIntToDecimalStringN(string, badgeCount, STR_CONV_MODE_LEADING_ZEROS, 2);
         *string = EOS;

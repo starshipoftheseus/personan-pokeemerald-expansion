@@ -2237,6 +2237,13 @@ static void MainMenu_FormatSavegameBadges(void)
             badgeCount++;
     }
 #endif
+#ifdef MAPS_FIRERED
+    for (i = FLAG_FRLG_BADGE01_GET; i <= FLAG_FRLG_BADGE08_GET; i++)
+    {
+        if (FlagGet(i))
+            badgeCount++;
+    }
+#endif
     StringExpandPlaceholders(gStringVar4, gText_ContinueMenuBadges);
     AddTextPrinterParameterized3(2, FONT_NORMAL, 0x6C, 33, sTextColor_MenuInfo, TEXT_SKIP_DRAW, gStringVar4);
     ConvertIntToDecimalStringN(str, badgeCount, STR_CONV_MODE_LEADING_ZEROS, 2);

@@ -5764,6 +5764,23 @@ enum Obedience GetAttackerObedienceForAction(void)
             obedienceLevel = hoennLevel;
     }
 #endif
+#if IS_HNS && defined(MAPS_FIRERED)
+    // FireRed Kanto's badges count too.
+    {
+        u32 frlgLevel = 10;
+        u32 i;
+
+        if (FlagGet(FLAG_FRLG_BADGE08_GET))
+            return OBEYS;
+        for (i = 0; i < 7; i++)
+        {
+            if (FlagGet(FLAG_FRLG_BADGE01_GET + i))
+                frlgLevel = 20 + 10 * i;
+        }
+        if (frlgLevel > obedienceLevel)
+            obedienceLevel = frlgLevel;
+    }
+#endif
 
     if (B_OBEDIENCE_MECHANICS >= GEN_8
      && !IsOtherTrainer(gBattleMons[gBattlerAttacker].otId, gBattleMons[gBattlerAttacker].otName))
