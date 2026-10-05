@@ -16,9 +16,9 @@ Small, specific tasks for Claude. One per request.
 ## Hoenn: still to do
 - [ ] Travel link Johto <-> Hoenn (e.g. a ship between Olivine and Slateport/Lilycove). Right now Hoenn is only reachable with the debug menu warp.
 - [ ] Hoenn's start: Hoenn's story expects a new trainer arriving by truck (Littleroot intro, Birch, starter). Decide how a player who arrives from Johto starts Hoenn's story.
-- [ ] Day Care: Hoenn's Route 117 Day Care and Johto's share one Day Care slot and FLAG_PENDING_DAYCARE_EGG. Separate storage needs ~288 bytes of SaveBlock1 (108 free).
+- [x] Day Cares: one per region (GetActiveDaycare); mons in other regions' Day Cares keep making Eggs. FireRed's single-mon Route 5 Day Care is still FireRed-build-only.
 - [ ] Rematches: Heart & Soul reuses the REMATCH_* table for its own trainers, so Hoenn's VS Seeker/Match Call rematches are off.
-- [ ] End game after all three champions (decided): FLAG_SYS_GAME_CLEAR is still set by Heart & Soul's Hall of Fame; Hoenn sets FLAG_HOENN_SYS_GAME_CLEAR. Needs a per-region champion check.
+- [x] End game after all three champions: each Hall of Fame sets its region's game-clear flag; FLAG_SYS_GAME_CLEAR needs all three. Continue warp goes to that region's hometown.
 - [ ] Trainer card shows 16 badges (Johto + Kanto); Hoenn's 8 are not shown yet.
 - [ ] Town Map / Fly in Hoenn shows the Johto map; switch to Emerald's Hoenn region map when in Hoenn.
 - [ ] Level caps, prize money and the catch malus count only Johto's 8 badges (gBadgeFlags). Open-world design decision.
@@ -34,4 +34,19 @@ Small, specific tasks for Claude. One per request.
 - [ ] FireRed's own start (Oak's lab, Pallet intro, rival name) and how it relates to the player arriving from another region
 - [ ] FireRed-only features compiled for FireRed builds only (Fame Checker UI, Trainer Tower, Sevii pass, help system, teachy TV): check each FireRed script that uses them
 - [ ] Trainer card shows neither Hoenn's nor FireRed's badges; region map/Fly shows Johto
-- [ ] ROM: 31.33 MB, ~2.2 MB free
+- [x] ROM: 30.97 MB, ~2.6 MB free (empty trainer slide table shrunk)
+
+## Your requests: status
+| Request | Status |
+|---|---|
+| Johto, Hoenn and Kanto in one ROM | Done (all three load: smoke test) |
+| FireRed Kanto (first era) + Heart & Soul Kanto (second era) | Both in; the switch between eras (portal / time travel) is to design later |
+| Open world | Regions are separate maps; travel links between them still to build |
+| Every coded Pokémon (Gen 1-9) | Done (as Heart & Soul ships) |
+| Separate badges per region | Done (Johto 1-8, HnS Kanto 9-16, Hoenn, FireRed); trainer card shows only the first 16 |
+| Separate Elite Four + Champion per region; end game after all three | Done |
+| Multiple Day Cares | Done (one per region) |
+| Cries at lower quality | Done (10,512 Hz) |
+| Surf on generic blob | Done |
+| Cloud-only workflow | Done (SessionStart hook, smoke test) |
+| Johto source | Heart & Soul 2.0.6 (credit the HnS team) |
