@@ -34,6 +34,40 @@ const struct RegionMapLocation gRegionMapEntries[] = {
 {% endif %}
     },
 ## endfor
+#ifdef MAPS_EMERALD
+// Hoenn's own sections (see region_map_sections.h). x/y are positions on the Hoenn region map.
+## for map_section in map_sections
+{% if existsIn(map_section, "in_hns") %}{% else %}{% if existsIn(map_section, "frlg_only") %}{% else %}
+    [{{ map_section.id }}] = {
+{% if existsIn(map_section, "x") %}
+        .x = {{ map_section.x }},
+{% else %}
+        .x = 0,
+{% endif %}
+{% if existsIn(map_section, "y") %}
+        .y = {{ map_section.y }},
+{% else %}
+        .y = 0,
+{% endif %}
+{% if existsIn(map_section, "width") %}
+        .width = {{ map_section.width }},
+{% else %}
+        .width = 1,
+{% endif %}
+{% if existsIn(map_section, "height") %}
+        .height = {{ map_section.height }},
+{% else %}
+        .height = 1,
+{% endif %}
+{% if existsIn(map_section, "name") %}
+        .name = COMPOUND_STRING("{{ map_section.name }}"),
+{% else %}
+        .name = (const u8[])_(""),
+{% endif %}
+    },
+{% endif %}{% endif %}
+## endfor
+#endif
 };
 
 #else

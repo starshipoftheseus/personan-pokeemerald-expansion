@@ -802,7 +802,8 @@
       "x": 8,
       "y": 3,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_ROUTE_10_POKECENTER",
@@ -810,7 +811,8 @@
       "x": 18,
       "y": 3,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_ROUTE_1",
@@ -1016,7 +1018,8 @@
       "x": 2,
       "y": 4,
       "width": 1,
-      "height": 4
+      "height": 4,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_ROUTE_24",
@@ -1060,7 +1063,8 @@
       "x": 14,
       "y": 9,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_UNDERGROUND_PATH",
@@ -1068,7 +1072,8 @@
       "x": 14,
       "y": 7,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_UNDERGROUND_PATH_2",
@@ -1076,7 +1081,8 @@
       "x": 12,
       "y": 6,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_DIGLETTS_CAVE",
@@ -1093,7 +1099,8 @@
       "x": 2,
       "y": 4,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_ROCKET_HIDEOUT",
@@ -1110,7 +1117,8 @@
       "x": 14,
       "y": 6,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_POKEMON_MANSION",
@@ -1118,7 +1126,8 @@
       "x": 4,
       "y": 14,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_KANTO_SAFARI_ZONE",
@@ -1126,7 +1135,8 @@
       "x": 12,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_POKEMON_LEAGUE",
@@ -1134,7 +1144,8 @@
       "x": 2,
       "y": 3,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_ROCK_TUNNEL",
@@ -1160,7 +1171,8 @@
       "x": 18,
       "y": 6,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_CERULEAN_CAVE",
@@ -1186,7 +1198,8 @@
       "x": 1,
       "y": 8,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_TWO_ISLAND",
@@ -1194,7 +1207,8 @@
       "x": 9,
       "y": 9,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_THREE_ISLAND",
@@ -1202,7 +1216,8 @@
       "x": 18,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_FOUR_ISLAND",
@@ -1210,7 +1225,8 @@
       "x": 3,
       "y": 4,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_FIVE_ISLAND",
@@ -1218,7 +1234,8 @@
       "x": 16,
       "y": 11,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_SEVEN_ISLAND",
@@ -1226,7 +1243,8 @@
       "x": 5,
       "y": 8,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_SIX_ISLAND",
@@ -1234,7 +1252,8 @@
       "x": 17,
       "y": 5,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_KINDLE_ROAD",
@@ -1242,7 +1261,8 @@
       "x": 2,
       "y": 3,
       "width": 1,
-      "height": 6
+      "height": 6,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_TREASURE_BEACH",
@@ -1250,7 +1270,8 @@
       "x": 1,
       "y": 9,
       "width": 1,
-      "height": 2
+      "height": 2,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_CAPE_BRINK",
@@ -1258,7 +1279,8 @@
       "x": 9,
       "y": 7,
       "width": 1,
-      "height": 2
+      "height": 2,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_BOND_BRIDGE",
@@ -1266,7 +1288,8 @@
       "x": 13,
       "y": 12,
       "width": 4,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_THREE_ISLE_PORT",
@@ -1274,7 +1297,8 @@
       "x": 18,
       "y": 13,
       "width": 2,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_RESORT_GORGEOUS",
@@ -1282,7 +1306,8 @@
       "x": 16,
       "y": 9,
       "width": 3,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_WATER_LABYRINTH",
@@ -1290,7 +1315,8 @@
       "x": 14,
       "y": 10,
       "width": 3,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_FIVE_ISLE_MEADOW",
@@ -1298,7 +1324,8 @@
       "x": 17,
       "y": 10,
       "width": 1,
-      "height": 3
+      "height": 3,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_MEMORIAL_PILLAR",
@@ -1306,7 +1333,8 @@
       "x": 18,
       "y": 12,
       "width": 1,
-      "height": 3
+      "height": 3,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_OUTCAST_ISLAND",
@@ -1314,7 +1342,8 @@
       "x": 15,
       "y": 0,
       "width": 1,
-      "height": 3
+      "height": 3,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_GREEN_PATH",
@@ -1322,7 +1351,8 @@
       "x": 15,
       "y": 3,
       "width": 3,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_WATER_PATH",
@@ -1330,7 +1360,8 @@
       "x": 18,
       "y": 3,
       "width": 1,
-      "height": 5
+      "height": 5,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_RUIN_VALLEY",
@@ -1338,7 +1369,8 @@
       "x": 16,
       "y": 7,
       "width": 2,
-      "height": 2
+      "height": 2,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_TRAINER_TOWER",
@@ -1346,7 +1378,8 @@
       "x": 5,
       "y": 6,
       "width": 1,
-      "height": 2
+      "height": 2,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_CANYON_ENTRANCE",
@@ -1354,7 +1387,8 @@
       "x": 5,
       "y": 9,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_SEVAULT_CANYON",
@@ -1362,7 +1396,8 @@
       "x": 6,
       "y": 9,
       "width": 1,
-      "height": 3
+      "height": 3,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_TANOBY_RUINS",
@@ -1370,7 +1405,8 @@
       "x": 3,
       "y": 12,
       "width": 7,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_SEVII_ISLE_22",
@@ -1378,7 +1414,8 @@
       "x": 9,
       "y": 12,
       "width": 1,
-      "height": 3
+      "height": 3,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_SEVII_ISLE_23",
@@ -1386,7 +1423,8 @@
       "x": 3,
       "y": 14,
       "width": 6,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_SEVII_ISLE_24",
@@ -1394,7 +1432,8 @@
       "x": 2,
       "y": 12,
       "width": 1,
-      "height": 3
+      "height": 3,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_NAVEL_ROCK_FRLG",
@@ -1402,7 +1441,8 @@
       "x": 10,
       "y": 8,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_MT_EMBER",
@@ -1410,7 +1450,8 @@
       "x": 2,
       "y": 3,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_BERRY_FOREST",
@@ -1418,7 +1459,8 @@
       "x": 14,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_ICEFALL_CAVE",
@@ -1426,7 +1468,8 @@
       "x": 3,
       "y": 4,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_ROCKET_WAREHOUSE",
@@ -1434,7 +1477,8 @@
       "x": 17,
       "y": 11,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_TRAINER_TOWER_2",
@@ -1442,7 +1486,8 @@
       "x": 5,
       "y": 6,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_DOTTED_HOLE",
@@ -1450,7 +1495,8 @@
       "x": 16,
       "y": 8,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_LOST_CAVE",
@@ -1458,7 +1504,8 @@
       "x": 18,
       "y": 9,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_PATTERN_BUSH",
@@ -1466,7 +1513,8 @@
       "x": 17,
       "y": 3,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_ALTERING_CAVE_FRLG",
@@ -1474,7 +1522,8 @@
       "x": 15,
       "y": 0,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_TANOBY_CHAMBERS",
@@ -1482,7 +1531,8 @@
       "x": 9,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_THREE_ISLE_PATH",
@@ -1490,7 +1540,8 @@
       "x": 18,
       "y": 13,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_TANOBY_KEY",
@@ -1498,7 +1549,8 @@
       "x": 6,
       "y": 9,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_BIRTH_ISLAND_FRLG",
@@ -1506,7 +1558,8 @@
       "x": 18,
       "y": 13,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_MONEAN_CHAMBER",
@@ -1514,7 +1567,8 @@
       "x": 9,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_LIPTOO_CHAMBER",
@@ -1522,7 +1576,8 @@
       "x": 9,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_WEEPTH_CHAMBER",
@@ -1530,7 +1585,8 @@
       "x": 9,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_DILFORD_CHAMBER",
@@ -1538,7 +1594,8 @@
       "x": 9,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_SCUFIB_CHAMBER",
@@ -1546,7 +1603,8 @@
       "x": 9,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_RIXY_CHAMBER",
@@ -1554,7 +1612,8 @@
       "x": 9,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_VIAPOIS_CHAMBER",
@@ -1562,15 +1621,18 @@
       "x": 9,
       "y": 12,
       "width": 1,
-      "height": 1
+      "height": 1,
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_EMBER_SPA",
-      "name": "EMBER SPA"
+      "name": "EMBER SPA",
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_SPECIAL_AREA",
-      "name": "SPECIAL AREA"
+      "name": "SPECIAL AREA",
+      "frlg_only": true
     },
     {
       "id": "MAPSEC_AQUA_HIDEOUT",

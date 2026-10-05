@@ -7,10 +7,18 @@
 #if IS_HNS
 
 enum {
+    // Emerald sections Heart & Soul doesn't use alias section 0. With Hoenn maps built in
+    // (MAPS_EMERALD), Hoenn's own sections get real values after Heart & Soul's instead.
+    // This entry must stay first: tools/preproc needs the enum to start with a name.
+    MAPSEC_UNUSED_ZERO = 0,
 ## for map_section in map_sections
-{% if existsIn(map_section, "in_hns") %}{% else %}
+{% if existsIn(map_section, "in_hns") %}{% else %}{% if existsIn(map_section, "frlg_only") %}
     {{ map_section.id }} = 0,
-{% endif %}
+{% else %}
+#ifndef MAPS_EMERALD
+    {{ map_section.id }} = 0,
+#endif
+{% endif %}{% endif %}
 ## endfor
 
 ## for map_section in hns_map_sections
@@ -20,6 +28,13 @@ enum {
     {{ map_section.id }},
 {% endif %}
 ## endfor
+#ifdef MAPS_EMERALD
+## for map_section in map_sections
+{% if existsIn(map_section, "in_hns") %}{% else %}{% if existsIn(map_section, "frlg_only") %}{% else %}
+    {{ map_section.id }},
+{% endif %}{% endif %}
+## endfor
+#endif
     MAPSEC_NONE,
     MAPSEC_COUNT,
 };
