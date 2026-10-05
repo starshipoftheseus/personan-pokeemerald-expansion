@@ -338,4 +338,9 @@
 #define TESTING_VAR_UNUSED_7                (TESTING_VARS_START + 0x7)
 #endif // TESTING
 
+#if !defined(FIRERED) && !defined(LEAFGREEN)
+// Combined Hoenn + Kanto build: Kanto-only constants in their own range.
+#include "constants/vars_kanto.h"
+#endif
+
 #endif // GUARD_CONSTANTS_VARS_H

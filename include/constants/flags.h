@@ -2449,4 +2449,9 @@
 #endif // TESTING
 
 
+#if !defined(FIRERED) && !defined(LEAFGREEN)
+// Combined Hoenn + Kanto build: Kanto-only constants in their own range.
+#include "constants/flags_kanto.h"
+#endif
+
 #endif // GUARD_CONSTANTS_FLAGS_H
