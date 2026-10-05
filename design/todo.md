@@ -1,17 +1,32 @@
 # Task list
 Small, specific tasks for Claude. One per request.
 
-## Base switched to Heart & Soul 2.0.6
-The earlier Emerald + FireRed-Kanto flag work (hack_scripts/gen_kanto_constants.py) is in git history
-(commit 6c9cd023). The same method applies to separating Hoenn's flags from HnS's.
+## Done
+- [x] Cloud build (`make hns`), SessionStart hook installs the toolchain and sox
+- [x] Cries resampled to 10,512 Hz (design/rom_budget.md)
+- [x] Base switched to Heart & Soul 2.0.6
+- [x] Hoenn maps, layouts, tilesets and wild encounters built into the hns ROM (`MAP_VERSION := hns+emerald`)
+- [x] Hoenn flags (1290) and vars (174) moved clear of Heart & Soul's; vars live in SaveBlock2 (`hack_scripts/gen_hoenn_constants.py`)
+- [x] Hoenn trainers (854) numbered after Heart & Soul's; trainer-defeated flags via `TRAINER_FLAG()`
+- [x] Hoenn map sections are real (names, met location); `MAPSEC_NONE` = 220
+- [x] Region-specific flags inside Hoenn's scripts: badges, champion, game clear, adventure started, bike/HM/PokéNav/shoes gifts, fossil, safari, loto, Sudowoodo
+- [x] Field moves and obedience accept either region's badges; save/continue screens count Hoenn badges
+- [x] Headless smoke test (`hack_scripts/smoke_test.py`): 516/518 Hoenn maps and 558/560 Johto maps load and run
 
-- [ ] Confirm `make hns` builds from this repo and the ROM plays
-- [x] Kanto = FireRed's (`_Frlg`). HnS's Kanto maps (`_hns` with REGION_KANTO) come out; check HnS Johto scripts that warp into or reference its Kanto.
-- [x] Pokémon: keep every coded species (already the HnS setting).
-- [x] ROM inventory: see design/rom_budget.md. ROM budget (measured): HnS ROM 31.7 MB, ~1.85 MB free. Hoenn adds ~1.6 MB (tilesets 0.69, maps 0.69, events/anims 0.2), FireRed Kanto roughly the same, minus HnS Kanto removed. Expect to be ~1–1.5 MB over.
-  Candidates to cut (no species lost): `src/surfable.o` 2.0 MB (HnS surf sprites; check what it is), Colosseum multiboot 0.16 MB, bard music 0.17 MB, unused Battle Frontier/Ruby-only content, regional forms if needed.
-- [ ] Hoenn: map filtering. `tools/mapjson/mapjson.cpp` keeps only maps whose `game_version` matches the build. Include Hoenn (emerald) maps in the `hns` build.
-- [ ] Hoenn: flags/vars. Separate Hoenn's story flags/vars from HnS's (adapt the generator)
-- [ ] Hoenn: trainers, scripts and engine code that HnS changed or removed
-- [ ] Per region: own badges, Elite Four, Champion, Day Care; end game after all three Champions
-- [ ] First milestone: warp from Johto to Littleroot Town in one ROM
+## Hoenn: still to do
+- [ ] Travel link Johto <-> Hoenn (e.g. a ship between Olivine and Slateport/Lilycove). Right now Hoenn is only reachable with the debug menu warp.
+- [ ] Hoenn's start: Hoenn's story expects a new trainer arriving by truck (Littleroot intro, Birch, starter). Decide how a player who arrives from Johto starts Hoenn's story.
+- [ ] Day Care: Hoenn's Route 117 Day Care and Johto's share one Day Care slot and FLAG_PENDING_DAYCARE_EGG. Separate storage needs ~288 bytes of SaveBlock1 (108 free).
+- [ ] Rematches: Heart & Soul reuses the REMATCH_* table for its own trainers, so Hoenn's VS Seeker/Match Call rematches are off.
+- [ ] End game after all three champions (decided): FLAG_SYS_GAME_CLEAR is still set by Heart & Soul's Hall of Fame; Hoenn sets FLAG_HOENN_SYS_GAME_CLEAR. Needs a per-region champion check.
+- [ ] Trainer card shows 16 badges (Johto + Kanto); Hoenn's 8 are not shown yet.
+- [ ] Town Map / Fly in Hoenn shows the Johto map; switch to Emerald's Hoenn region map when in Hoenn.
+- [ ] Level caps, prize money and the catch malus count only Johto's 8 badges (gBadgeFlags). Open-world design decision.
+- [ ] Hoenn and Johto share some story-gift flags where that seemed harmless (TM Attract/Torment gifts, running shoes effect, Pokédex). Revisit if it matters.
+
+## FireRed Kanto (next)
+- [ ] Decide: FireRed Kanto replaces Heart & Soul's Kanto, whose post-game (Kanto gyms, Red, Snorlax, Power Plant, Magnet Train, S.S. Aqua) is wired into Johto's story.
+- [ ] Map sections: only 33 values are left below 0xFD; FireRed adds 62 sections of its own (Sevii Islands, Silph Co., S.S. Anne...). Reuse Heart & Soul's Kanto sections and decide what to do with Sevii.
+- [ ] Save space: FireRed flags need ~288 bytes of SaveBlock1 (108 free). Candidates: dex padding (110), roamer padding (84), link-only trainer name records (240).
+- [ ] ROM space: FireRed tilesets, scripts, text and trainers are not in the ROM yet; expect 2+ MB, ~1.9 MB free. Needs a cut (see design/rom_budget.md).
+- [ ] Same steps as Hoenn: MAPS_FIRERED in MAP_VERSION, flags/vars/trainers generator, region-specific names, smoke test.
