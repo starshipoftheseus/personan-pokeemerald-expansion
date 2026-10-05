@@ -710,6 +710,9 @@ struct SaveBlock2
     /*0x624*/ u16 contestLinkResults[CONTEST_CATEGORIES_COUNT][CONTESTANT_COUNT];
     /*0x64C*/ struct BattleFrontier frontier;
              u8 rivalName[PLAYER_NAME_LENGTH + 1];
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+             u16 hoennVars[HOENN_VARS_COUNT]; // Hoenn's vars in the combined build, see GetVarPointer
+#endif
 }; // sizeof=0xF2C
 
 extern struct SaveBlock2 *gSaveBlock2Ptr;

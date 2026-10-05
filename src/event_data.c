@@ -53,6 +53,9 @@ void InitEventData(void)
 {
     memset(gSaveBlock1Ptr->flags, 0, sizeof(gSaveBlock1Ptr->flags));
     memset(gSaveBlock1Ptr->vars, 0, sizeof(gSaveBlock1Ptr->vars));
+#if defined(MAPS_EMERALD) && IS_HNS
+    memset(gSaveBlock2Ptr->hoennVars, 0, sizeof(gSaveBlock2Ptr->hoennVars));
+#endif
     memset(sSpecialFlags, 0, sizeof(sSpecialFlags));
 }
 
@@ -73,6 +76,10 @@ void ClearDailyFlags(void)
     u16 i;
     for (i = DAILY_FLAGS_START; i <= DAILY_FLAGS_END; i++)
         FlagClear(i);
+#ifdef MAPS_EMERALD
+    for (i = HOENN_DAILY_FLAGS_START; i <= HOENN_DAILY_FLAGS_END; i++)
+        FlagClear(i);
+#endif
 #else
     memset(&gSaveBlock1Ptr->flags[DAILY_FLAGS_START / 8], 0, DAILY_FLAGS_SIZE);
 #endif
@@ -191,8 +198,14 @@ u16 *GetVarPointer(u16 id)
 {
     if (id < VARS_START)
         return NULL;
-    else if (id < SPECIAL_VARS_START)
+#if defined(MAPS_EMERALD) && IS_HNS
+    else if (id >= HOENN_VARS_START && id <= HOENN_VARS_END)
+        return &gSaveBlock2Ptr->hoennVars[id - HOENN_VARS_START];
+#endif
+    else if (id <= VARS_END)
         return &gSaveBlock1Ptr->vars[id - VARS_START];
+    else if (id < SPECIAL_VARS_START)
+        return NULL;
 #if TESTING
     else if (id >= TESTING_VARS_START)
         return &sTestVars[id - TESTING_VARS_START];

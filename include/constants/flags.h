@@ -2519,4 +2519,9 @@
 #endif // TESTING
 
 
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD)
+// Heart & Soul with Hoenn maps: Hoenn's flags get their own range (generated).
+#include "constants/hoenn_flags.h"
+#endif
+
 #endif // GUARD_CONSTANTS_FLAGS_H
