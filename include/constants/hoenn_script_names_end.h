@@ -23,3 +23,4 @@
 #pragma pop_macro("FLAG_RECEIVED_REVIVED_FOSSIL_MON")
 #pragma pop_macro("FLAG_GOOD_LUCK_SAFARI_ZONE")
 #pragma pop_macro("FLAG_DAILY_PICKED_LOTO_TICKET")
+#pragma pop_macro("FLAG_PENDING_DAYCARE_EGG")

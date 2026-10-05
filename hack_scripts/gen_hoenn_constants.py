@@ -43,6 +43,7 @@ REGION_SPECIFIC_FLAGS = [
     "FLAG_RECEIVED_HM_STRENGTH", "FLAG_RECEIVED_HM_SURF",
     "FLAG_DEFEATED_SUDOWOODO", "FLAG_RECEIVED_REVIVED_FOSSIL_MON",
     "FLAG_GOOD_LUCK_SAFARI_ZONE", "FLAG_DAILY_PICKED_LOTO_TICKET",
+    "FLAG_PENDING_DAYCARE_EGG",  # each region has its own Day Care (GetActiveDaycare)
 ]
 
 # Engine flags both regions share, even when only one side's scripts mention them.

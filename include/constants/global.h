@@ -97,7 +97,13 @@ enum Language
 #define POKEBLOCKS_COUNT 40
 #define OBJECT_EVENTS_COUNT 16
 #define MAIL_COUNT (10 + PARTY_SIZE)
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD) && defined(MAPS_FIRERED)
+// Combined build: only the player's own base. The other 19 come from link record mixing, and the
+// space holds Hoenn's and FireRed Kanto's Day Cares.
+#define SECRET_BASES_COUNT 1
+#else
 #define SECRET_BASES_COUNT 20
+#endif
 #define POKE_NEWS_COUNT 16
 #define PC_ITEMS_COUNT 50
 #define OBJECT_EVENT_TEMPLATES_COUNT 64

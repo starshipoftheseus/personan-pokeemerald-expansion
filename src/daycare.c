@@ -31,6 +31,62 @@
 #include "constants/region_map_sections.h"
 #include "nuzlocke.h"
 
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD) && defined(MAPS_FIRERED)
+#include "regions.h"
+
+// Each region has its own Day Care (design/overview.md): Heart & Soul's (Johto and its Kanto) in
+// SaveBlock1's daycare, Hoenn's and FireRed Kanto's in regionDaycares. The one in use is the
+// region the player is in. FireRed's maps share Kanto's map sections, so they're told apart by layout.
+enum { DAYCARE_HNS, DAYCARE_HOENN, DAYCARE_FRLG, DAYCARE_REGION_COUNT };
+
+static struct DayCare *GetRegionDaycare(u32 region)
+{
+    switch (region)
+    {
+    case DAYCARE_HOENN: return &gSaveBlock1Ptr->regionDaycares[0];
+    case DAYCARE_FRLG:  return &gSaveBlock1Ptr->regionDaycares[1];
+    default:            return &gSaveBlock1Ptr->daycare;
+    }
+}
+
+static u32 GetDaycareRegion(struct DayCare *daycare)
+{
+    if (daycare == &gSaveBlock1Ptr->regionDaycares[0])
+        return DAYCARE_HOENN;
+    if (daycare == &gSaveBlock1Ptr->regionDaycares[1])
+        return DAYCARE_FRLG;
+    return DAYCARE_HNS;
+}
+
+// The flag the region's Day Care man checks for a waiting Egg.
+static u16 GetDaycarePendingEggFlag(struct DayCare *daycare)
+{
+    switch (GetDaycareRegion(daycare))
+    {
+    case DAYCARE_HOENN: return FLAG_HOENN_PENDING_DAYCARE_EGG;
+    case DAYCARE_FRLG:  return FLAG_FRLG_PENDING_DAYCARE_EGG;
+    default:            return FLAG_PENDING_DAYCARE_EGG;
+    }
+}
+
+struct DayCare *GetActiveDaycare(void)
+{
+    if (gMapHeader.mapLayout != NULL && gMapHeader.mapLayout->layoutVersion == LAYOUT_VERSION_FRLG)
+        return GetRegionDaycare(DAYCARE_FRLG);
+    if (GetCurrentRegion() == REGION_HOENN)
+        return GetRegionDaycare(DAYCARE_HOENN);
+    return GetRegionDaycare(DAYCARE_HNS);
+}
+#else
+struct DayCare *GetActiveDaycare(void)
+{
+    return &gSaveBlock1Ptr->daycare;
+}
+
+#define GetDaycarePendingEggFlag(daycare) FLAG_PENDING_DAYCARE_EGG
+#endif
+
+
 #define IS_DITTO(species) (gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_DITTO || gSpeciesInfo[species].eggGroups[1] == EGG_GROUP_DITTO)
 
 static void ClearDaycareMonMail(struct DaycareMail *mail);
@@ -197,7 +253,7 @@ static void TransferEggMovesFromPool(u32 daycareIdx, u16 poolSpecies)
 {
     u32 j, k, l;
     u16 numEggMoves;
-    u16 moveLearnerSpecies = GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[daycareIdx].mon, MON_DATA_SPECIES);
+    u16 moveLearnerSpecies = GetBoxMonData(&GetActiveDaycare()->mons[daycareIdx].mon, MON_DATA_SPECIES);
 
     ClearHatchedEggMoves();
     numEggMoves = GetEggMovesBySpecies(poolSpecies, sHatchedEggEggMoves);
@@ -206,23 +262,23 @@ static void TransferEggMovesFromPool(u32 daycareIdx, u16 poolSpecies)
         // Go through other Daycare mons
         for (k = 0; k < DAYCARE_MON_COUNT; k++)
         {
-            u16 moveTeacherSpecies = GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[k].mon, MON_DATA_SPECIES);
+            u16 moveTeacherSpecies = GetBoxMonData(&GetActiveDaycare()->mons[k].mon, MON_DATA_SPECIES);
 
-            if (k == daycareIdx || !GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[k].mon, MON_DATA_SANITY_HAS_SPECIES))
+            if (k == daycareIdx || !GetBoxMonData(&GetActiveDaycare()->mons[k].mon, MON_DATA_SANITY_HAS_SPECIES))
                 continue;
 
             // Check if you can inherit from them
             if (GET_BASE_SPECIES_ID(moveTeacherSpecies) != GET_BASE_SPECIES_ID(moveLearnerSpecies)
-                && (P_EGG_MOVE_TRANSFER < GEN_9 || GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[daycareIdx].mon, MON_DATA_HELD_ITEM) != ITEM_MIRROR_HERB)
+                && (P_EGG_MOVE_TRANSFER < GEN_9 || GetBoxMonData(&GetActiveDaycare()->mons[daycareIdx].mon, MON_DATA_HELD_ITEM) != ITEM_MIRROR_HERB)
             )
                 continue;
 
             for (l = 0; l < MAX_MON_MOVES; l++)
             {
-                if (GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[k].mon, MON_DATA_MOVE1 + l) != sHatchedEggEggMoves[j])
+                if (GetBoxMonData(&GetActiveDaycare()->mons[k].mon, MON_DATA_MOVE1 + l) != sHatchedEggEggMoves[j])
                     continue;
 
-                if (GiveMoveToBoxMon(&gSaveBlock1Ptr->daycare.mons[daycareIdx].mon, sHatchedEggEggMoves[j]) == MON_HAS_MAX_MOVES)
+                if (GiveMoveToBoxMon(&GetActiveDaycare()->mons[daycareIdx].mon, sHatchedEggEggMoves[j]) == MON_HAS_MAX_MOVES)
                     break;
             }
         }
@@ -235,11 +291,11 @@ static void TransferEggMoves(void)
 
     for (i = 0; i < DAYCARE_MON_COUNT; i++)
     {
-        u16 moveLearnerSpecies = GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_SPECIES);
+        u16 moveLearnerSpecies = GetBoxMonData(&GetActiveDaycare()->mons[i].mon, MON_DATA_SPECIES);
         u16 eggSpecies = GetEggSpecies(moveLearnerSpecies);
         u16 nonBabySpecies = SPECIES_NONE;
 
-        if (!GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[i].mon, MON_DATA_SANITY_HAS_SPECIES))
+        if (!GetBoxMonData(&GetActiveDaycare()->mons[i].mon, MON_DATA_SANITY_HAS_SPECIES))
             continue;
 
         // GetEggSpecies walks all the way back to the Incense baby, whose Egg Move list is a
@@ -316,7 +372,7 @@ void StoreSelectedPokemonInDaycare(void)
     {
         mon = &gPlayerParty[gSpecialVar_0x8004];
     }
-    StorePokemonInEmptyDaycareSlot(mon, &gSaveBlock1Ptr->daycare);
+    StorePokemonInEmptyDaycareSlot(mon, GetActiveDaycare());
     if (gSpecialVar_0x8004 == PC_MON_CHOSEN)
         Free(mon);
 }
@@ -416,7 +472,7 @@ static u16 TakeSelectedPokemonMonFromDaycareShiftSlots(struct DayCare *daycare, 
 
 u16 TakePokemonFromDaycare(void)
 {
-    return TakeSelectedPokemonMonFromDaycareShiftSlots(&gSaveBlock1Ptr->daycare, gSpecialVar_0x8004);
+    return TakeSelectedPokemonMonFromDaycareShiftSlots(GetActiveDaycare(), gSpecialVar_0x8004);
 }
 
 static u8 GetLevelAfterDaycareSteps(struct BoxPokemon *mon, u32 steps)
@@ -466,19 +522,19 @@ static u16 GetDaycareCostForMon(struct DayCare *daycare, u8 slotId)
 
 void GetDaycareCost(void)
 {
-    gSpecialVar_0x8005 = GetDaycareCostForMon(&gSaveBlock1Ptr->daycare, gSpecialVar_0x8004);
+    gSpecialVar_0x8005 = GetDaycareCostForMon(GetActiveDaycare(), gSpecialVar_0x8004);
 }
 
 static void UNUSED Debug_AddDaycareSteps(u16 numSteps)
 {
-    gSaveBlock1Ptr->daycare.mons[0].steps += numSteps;
-    gSaveBlock1Ptr->daycare.mons[1].steps += numSteps;
+    GetActiveDaycare()->mons[0].steps += numSteps;
+    GetActiveDaycare()->mons[1].steps += numSteps;
 }
 
 u8 GetNumLevelsGainedFromDaycare(void)
 {
-    if (GetBoxMonData(&gSaveBlock1Ptr->daycare.mons[gSpecialVar_0x8004].mon, MON_DATA_SPECIES) != 0)
-        return GetNumLevelsGainedForDaycareMon(&gSaveBlock1Ptr->daycare.mons[gSpecialVar_0x8004]);
+    if (GetBoxMonData(&GetActiveDaycare()->mons[gSpecialVar_0x8004].mon, MON_DATA_SPECIES) != 0)
+        return GetNumLevelsGainedForDaycareMon(&GetActiveDaycare()->mons[gSpecialVar_0x8004]);
 
     return 0;
 }
@@ -611,24 +667,24 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
         daycare->offspringPersonality = personality;
     }
 
-    FlagSet(FLAG_PENDING_DAYCARE_EGG);
+    FlagSet(GetDaycarePendingEggFlag(daycare));
 }
 
 // Functionally unused
 static void _TriggerPendingDaycareMaleEgg(struct DayCare *daycare)
 {
     daycare->offspringPersonality = (Random()) | (EGG_GENDER_MALE);
-    FlagSet(FLAG_PENDING_DAYCARE_EGG);
+    FlagSet(GetDaycarePendingEggFlag(daycare));
 }
 
 void TriggerPendingDaycareEgg(void)
 {
-    _TriggerPendingDaycareEgg(&gSaveBlock1Ptr->daycare);
+    _TriggerPendingDaycareEgg(GetActiveDaycare());
 }
 
 static void UNUSED TriggerPendingDaycareMaleEgg(void)
 {
-    _TriggerPendingDaycareMaleEgg(&gSaveBlock1Ptr->daycare);
+    _TriggerPendingDaycareMaleEgg(GetActiveDaycare());
 }
 
 static void InheritIVs(struct Pokemon *egg, struct DayCare *daycare)
@@ -968,7 +1024,7 @@ static void RemoveEggFromDayCare(struct DayCare *daycare)
 
 void RejectEggFromDayCare(void)
 {
-    RemoveEggFromDayCare(&gSaveBlock1Ptr->daycare);
+    RemoveEggFromDayCare(GetActiveDaycare());
 }
 
 static void AlterEggSpeciesWithIncenseItem(u16 *species, struct DayCare *daycare)
@@ -1207,8 +1263,29 @@ static void SetInitialEggData(struct Pokemon *mon, u16 species, struct DayCare *
 
 void GiveEggFromDaycare(void)
 {
-    _GiveEggFromDaycare(&gSaveBlock1Ptr->daycare);
+    _GiveEggFromDaycare(GetActiveDaycare());
 }
+
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD) && defined(MAPS_FIRERED)
+// One step for a Day Care the player isn't in: its mons gain a step and may make an Egg.
+// (Hatching the party's Eggs happens once, through the active Day Care.)
+static void ProduceDaycareEggStep(struct DayCare *daycare)
+{
+    u32 i, validEggs = 0;
+
+    for (i = 0; i < DAYCARE_MON_COUNT; i++)
+    {
+        if (GetBoxMonData(&daycare->mons[i].mon, MON_DATA_SANITY_HAS_SPECIES))
+            daycare->mons[i].steps++, validEggs++;
+    }
+    if (daycare->offspringPersonality == 0 && validEggs == DAYCARE_MON_COUNT && (daycare->mons[1].steps & 0xFF) == 0xFF)
+    {
+        u8 compatibility = ModifyBreedingScoreForOvalCharm(GetDaycareCompatibilityScore(daycare));
+        if (compatibility > (Random() * 100u) / USHRT_MAX)
+            _TriggerPendingDaycareEgg(daycare);
+    }
+}
+#endif
 
 static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
 {
@@ -1225,7 +1302,7 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
     {
         u8 compatibility = ModifyBreedingScoreForOvalCharm(GetDaycareCompatibilityScore(daycare));
         if (compatibility > (Random() * 100u) / USHRT_MAX)
-            TriggerPendingDaycareEgg();
+            _TriggerPendingDaycareEgg(daycare);
     }
 
     // Try to hatch Egg
@@ -1277,7 +1354,21 @@ bool8 ShouldEggHatch(void)
     if (GetBoxMonData(&gSaveBlock1Ptr->route5DayCareMon.mon, MON_DATA_SANITY_HAS_SPECIES))
         gSaveBlock1Ptr->route5DayCareMon.steps++;
 #endif
-    return TryProduceOrHatchEgg(&gSaveBlock1Ptr->daycare);
+#if defined(POKEMON_HNS) && defined(MAPS_EMERALD) && defined(MAPS_FIRERED)
+    {
+        // Mons left in the other regions' Day Cares keep gaining steps and making Eggs.
+        u32 region;
+        struct DayCare *active = GetActiveDaycare();
+
+        for (region = 0; region < DAYCARE_REGION_COUNT; region++)
+        {
+            struct DayCare *daycare = GetRegionDaycare(region);
+            if (daycare != active)
+                ProduceDaycareEggStep(daycare);
+        }
+    }
+#endif
+    return TryProduceOrHatchEgg(GetActiveDaycare());
 }
 
 static bool8 IsEggPending(struct DayCare *daycare)
@@ -1313,18 +1404,18 @@ u16 GetSelectedMonNicknameAndSpecies(void)
 
 void GetDaycareMonNicknames(void)
 {
-    _GetDaycareMonNicknames(&gSaveBlock1Ptr->daycare);
+    _GetDaycareMonNicknames(GetActiveDaycare());
 }
 
 u8 GetDaycareState(void)
 {
     u8 numMons;
-    if (IsEggPending(&gSaveBlock1Ptr->daycare))
+    if (IsEggPending(GetActiveDaycare()))
     {
         return DAYCARE_EGG_WAITING;
     }
 
-    numMons = CountPokemonInDaycare(&gSaveBlock1Ptr->daycare);
+    numMons = CountPokemonInDaycare(GetActiveDaycare());
     if (numMons != 0)
     {
         return numMons + 1; // DAYCARE_ONE_MON or DAYCARE_TWO_MONS
@@ -1335,7 +1426,7 @@ u8 GetDaycareState(void)
 
 static u8 UNUSED GetDaycarePokemonCount(void)
 {
-    u8 ret = CountPokemonInDaycare(&gSaveBlock1Ptr->daycare);
+    u8 ret = CountPokemonInDaycare(GetActiveDaycare());
     if (ret)
         return ret;
 
@@ -1425,7 +1516,7 @@ u8 GetDaycareCompatibilityScore(struct DayCare *daycare)
 static u8 GetDaycareCompatibilityScoreFromSave(void)
 {
     // Changed to also store result for scripts
-    gSpecialVar_Result = GetDaycareCompatibilityScore(&gSaveBlock1Ptr->daycare);
+    gSpecialVar_Result = GetDaycareCompatibilityScore(GetActiveDaycare());
     return gSpecialVar_Result;
 }
 
@@ -1577,8 +1668,8 @@ static void DaycarePrintMonInfo(u8 windowId, u32 daycareSlotId, u8 y)
 {
     if (daycareSlotId < (unsigned) DAYCARE_MON_COUNT)
     {
-        DaycarePrintMonNickname(&gSaveBlock1Ptr->daycare, windowId, daycareSlotId, y);
-        DaycarePrintMonLvl(&gSaveBlock1Ptr->daycare, windowId, daycareSlotId, y);
+        DaycarePrintMonNickname(GetActiveDaycare(), windowId, daycareSlotId, y);
+        DaycarePrintMonLvl(GetActiveDaycare(), windowId, daycareSlotId, y);
     }
 }
 

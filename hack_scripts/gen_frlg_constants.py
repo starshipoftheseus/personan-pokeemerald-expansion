@@ -44,7 +44,7 @@ C_COPIES = [f"FLAG_BADGE0{i}_GET" for i in range(1, 9)] + [
     # FireRed's HM gifts: HM01 Cut, 02 Fly, 03 Surf, 04 Strength, 05 Flash, 06 Rock Smash, 07 Waterfall
     "FLAG_GOT_HM01", "FLAG_GOT_HM02", "FLAG_GOT_HM03", "FLAG_GOT_HM04", "FLAG_GOT_HM05", "FLAG_GOT_HM06",
     "FLAG_HIDE_FOUR_ISLAND_ICEFALL_CAVE_1F_HM07",  # HM07 Waterfall is an item ball; set once it is picked up
-    "FLAG_SYS_GAME_CLEAR", "FLAG_IS_CHAMPION",
+    "FLAG_SYS_GAME_CLEAR", "FLAG_IS_CHAMPION", "FLAG_PENDING_DAYCARE_EGG",
 ]
 
 

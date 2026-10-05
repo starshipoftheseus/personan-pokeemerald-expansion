@@ -3747,12 +3747,12 @@ static void DebugAction_Give_MaxBattlePoints(u8 taskId)
 
 static void DebugAction_Give_DayCareEgg(u8 taskId)
 {
-    s32 emptySlot = Daycare_FindEmptySpot(&gSaveBlock1Ptr->daycare);
+    s32 emptySlot = Daycare_FindEmptySpot(GetActiveDaycare());
     if (emptySlot == 0) // no daycare mons
         Debug_DestroyMenu_Full_Script(taskId, DebugScript_ZeroDaycareMons);
     else if (emptySlot == 1) // 1 daycare mon
         Debug_DestroyMenu_Full_Script(taskId, DebugScript_OneDaycareMons);
-    else if (GetDaycareCompatibilityScore(&gSaveBlock1Ptr->daycare) == PARENTS_INCOMPATIBLE) // not compatible parents
+    else if (GetDaycareCompatibilityScore(GetActiveDaycare()) == PARENTS_INCOMPATIBLE) // not compatible parents
         Debug_DestroyMenu_Full_Script(taskId, DebugScript_DaycareMonsNotCompatible);
     else // 2 pokemon which can have a pokemon baby together
         TriggerPendingDaycareEgg();
