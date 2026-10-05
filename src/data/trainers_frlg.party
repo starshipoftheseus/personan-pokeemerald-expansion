@@ -13337,13 +13337,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Supersonic
 - Rain Dance
 
-Piloswine
+SPECIES_GLACEON
 Level: 63
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Blizzard
-- Earthquake
-- Double Edge
-- Rock Slide
 
 Jynx
 Level: 66
@@ -13372,13 +13368,9 @@ Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 Mugshot: Green
 
-Steelix
+SPECIES_LUCARIO
 Level: 65
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Earthquake
-- Iron Tail
-- Crunch
-- Rock Tomb
 
 Hitmonchan
 Level: 65
@@ -13396,13 +13388,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Earthquake
 - Rock Slide
 
-Steelix
+SPECIES_LUCARIO
 Level: 66
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Earthquake
-- Iron Tail
-- Crunch
-- Dragon Breath
 
 Machamp @ Persim Berry
 Level: 68
@@ -13431,21 +13419,13 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Confuse Ray
 - Hypnosis
 
-Crobat
+SPECIES_DRIFBLIM
 Level: 66
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Sludge Bomb
-- Air Cutter
-- Shadow Ball
-- Confuse Ray
 
-Misdreavus
+SPECIES_MISMAGIUS
 Level: 65
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Shadow Ball
-- Psychic
-- Thunderbolt
-- Attract
 
 Arbok
 Level: 68
@@ -13490,13 +13470,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Dragon Claw
 - Flamethrower
 
-Kingdra
+SPECIES_GARCHOMP
 Level: 66
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hyper Beam
-- Dragon Dance
-- Surf
-- Ice Beam
 
 Aerodactyl
 Level: 70
@@ -13525,13 +13501,9 @@ Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 Mugshot: Yellow
 
-Heracross
+SPECIES_PINSIR
 Level: 72
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Megahorn
-- Earthquake
-- Counter
-- Rock Tomb
 
 Alakazam
 Level: 73
@@ -13541,13 +13513,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Calm Mind
 - Reflect
 
-Tyranitar
+SPECIES_RHYPERIOR
 Level: 72
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Crunch
-- Earthquake
-- Thunderbolt
-- Aerial Ace
 
 Arcanine
 Level: 73
@@ -13584,13 +13552,9 @@ Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 Mugshot: Yellow
 
-Heracross
+SPECIES_PINSIR
 Level: 72
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Megahorn
-- Earthquake
-- Counter
-- Rock Tomb
 
 Alakazam
 Level: 73
@@ -13600,13 +13564,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Calm Mind
 - Reflect
 
-Tyranitar
+SPECIES_RHYPERIOR
 Level: 72
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Crunch
-- Earthquake
-- Thunderbolt
-- Aerial Ace
 
 Gyarados
 Level: 73
@@ -13643,13 +13603,9 @@ Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 Mugshot: Yellow
 
-Heracross
+SPECIES_PINSIR
 Level: 72
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Megahorn
-- Earthquake
-- Counter
-- Rock Tomb
 
 Alakazam
 Level: 73
@@ -13659,13 +13615,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Calm Mind
 - Reflect
 
-Tyranitar
+SPECIES_RHYPERIOR
 Level: 72
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Crunch
-- Earthquake
-- Thunderbolt
-- Aerial Ace
 
 Exeggutor
 Level: 73

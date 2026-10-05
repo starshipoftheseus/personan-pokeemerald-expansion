@@ -537,7 +537,7 @@ Mightyena
 Level: 34
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
-Golbat
+SPECIES_SKRELP
 Level: 34
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
@@ -602,7 +602,7 @@ Mightyena
 Level: 41
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
-Crobat
+SPECIES_DRAGALGE
 Level: 41
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
@@ -4700,13 +4700,9 @@ IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
 - Dragon Dance
 - Aerial Ace
 
-Kingdra
+SPECIES_GOODRA
 Level: 53
 IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Smokescreen
-- Dragon Dance
-- Surf
-- Body Slam
 
 Flygon
 Level: 53
@@ -4734,21 +4730,13 @@ Items: Potion / Potion
 Double Battle: No
 AI: Basic Trainer
 
-Geodude
+SPECIES_NACLI
 Level: 12
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Tackle
-- Defense Curl
-- Rock Throw
-- Rock Tomb
 
-Geodude
+SPECIES_NACLI
 Level: 12
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Tackle
-- Defense Curl
-- Rock Throw
-- Rock Tomb
 
 Nosepass @ Oran Berry
 Level: 15
@@ -4768,13 +4756,9 @@ Items: Super Potion / Super Potion
 Double Battle: No
 AI: Basic Trainer
 
-Machop
+SPECIES_PANCHAM
 Level: 16
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
-- Karate Chop
-- Low Kick
-- Seismic Toss
-- Bulk Up
 
 Meditite
 Level: 16
@@ -4802,13 +4786,9 @@ Items: Super Potion / Super Potion
 Double Battle: No
 AI: Basic Trainer
 
-Voltorb
+SPECIES_DEDENNE
 Level: 20
 IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Rollout
-- Spark
-- Self Destruct
-- Shock Wave
 
 Electrike
 Level: 20
@@ -4818,13 +4798,9 @@ IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
 - Quick Attack
 - Howl
 
-Magneton
+SPECIES_KLEFKI
 Level: 22
 IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Supersonic
-- Shock Wave
-- Thunder Wave
-- Sonic Boom
 
 Manectric @ Sitrus Berry
 Level: 24
@@ -4852,13 +4828,9 @@ IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
 - Magnitude
 - Sunny Day
 
-Slugma
+SPECIES_LITLEO
 Level: 24
 IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
-- Overheat
-- Smog
-- Light Screen
-- Sunny Day
 
 Camerupt
 Level: 26
@@ -4952,13 +4924,9 @@ IVs: 25 HP / 25 Atk / 25 Def / 25 SpA / 25 SpD / 25 Spe
 - Protect
 - Aerial Ace
 
-Skarmory
+SPECIES_BOMBIRDIER
 Level: 31
 IVs: 26 HP / 26 Atk / 26 Def / 26 SpA / 26 SpD / 26 Spe
-- Sand Attack
-- Fury Attack
-- Steel Wing
-- Aerial Ace
 
 Altaria @ Oran Berry
 Level: 33
@@ -4986,13 +4954,9 @@ IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
 - Psychic
 - Light Screen
 
-Xatu
+SPECIES_ESPATHRA
 Level: 41
 IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Psychic
-- Sunny Day
-- Confuse Ray
-- Calm Mind
 
 Lunatone @ Sitrus Berry
 Level: 42
@@ -5052,13 +5016,9 @@ IVs: 24 HP / 24 Atk / 24 Def / 24 SpA / 24 SpD / 24 Spe
 - Taunt
 - Leer
 
-Kingdra @ Chesto Berry
+SPECIES_TATSUGIRI_CURLY @ Chesto Berry
 Level: 46
 IVs: 30 HP / 30 Atk / 30 Def / 30 SpA / 30 SpD / 30 Spe
-- Water Pulse
-- Double Team
-- Ice Beam
-- Rest
 
 === TRAINER_JERRY_1 ===
 Name: JERRY
@@ -6194,13 +6154,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Double Edge
 - Blizzard
 
-Tentacruel
+SPECIES_DRAGALGE
 Level: 55
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Toxic
-- Hydro Pump
-- Sludge Bomb
-- Ice Beam
 
 Ludicolo
 Level: 56
@@ -6218,13 +6174,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Amnesia
 - Hyper Beam
 
-Gyarados
+SPECIES_PALAFIN_ZERO
 Level: 56
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Dragon Dance
-- Earthquake
-- Hyper Beam
-- Surf
 
 Milotic @ Sitrus Berry
 Level: 58
@@ -9230,7 +9182,7 @@ Mightyena
 Level: 38
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
-Golbat
+SPECIES_GRAFAIAI
 Level: 40
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
@@ -9336,13 +9288,9 @@ IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 - Giga Drain
 - Toxic
 
-Magneton
+SPECIES_KLEFKI
 Level: 41
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
-- Supersonic
-- Thunderbolt
-- Tri Attack
-- Screech
 
 Gardevoir
 Level: 45
@@ -9374,7 +9322,7 @@ Music: Male
 Double Battle: No
 AI: Basic Trainer
 
-Slugma
+SPECIES_LITLEO
 Level: 18
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
@@ -9395,7 +9343,7 @@ Music: Male
 Double Battle: No
 AI: Basic Trainer
 
-Slugma
+SPECIES_LITLEO
 Level: 29
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
@@ -9488,7 +9436,7 @@ Lombre
 Level: 18
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
-Slugma
+SPECIES_LITLEO
 Level: 18
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
@@ -9509,7 +9457,7 @@ Lombre
 Level: 29
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
-Slugma
+SPECIES_LITLEO
 Level: 29
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
@@ -9543,7 +9491,7 @@ Wingull
 Level: 18
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
-Slugma
+SPECIES_LITLEO
 Level: 18
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
@@ -9560,7 +9508,7 @@ Music: Female
 Double Battle: No
 AI: Basic Trainer
 
-Slugma
+SPECIES_LITLEO
 Level: 29
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
@@ -9653,7 +9601,7 @@ Lombre
 Level: 18
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
-Slugma
+SPECIES_LITLEO
 Level: 18
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
@@ -9674,7 +9622,7 @@ Lombre
 Level: 29
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
-Slugma
+SPECIES_LITLEO
 Level: 29
 IVs: 12 HP / 12 Atk / 12 Def / 12 SpA / 12 SpD / 12 Spe
 
@@ -10795,7 +10743,7 @@ Numel
 Level: 22
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
-Zubat
+SPECIES_SHROODLE
 Level: 22
 IVs: 6 HP / 6 Atk / 6 Def / 6 SpA / 6 SpD / 6 Spe
 
@@ -10826,7 +10774,7 @@ Music: Male
 Double Battle: No
 AI: Basic Trainer
 
-Slugma
+SPECIES_LITLEO
 Level: 13
 IVs: 3 HP / 3 Atk / 3 Def / 3 SpA / 3 SpD / 3 Spe
 
@@ -10865,7 +10813,7 @@ Mightyena
 Level: 37
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
-Crobat
+SPECIES_GLIMMORA
 Level: 38
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
@@ -10887,7 +10835,7 @@ Mightyena
 Level: 24
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
-Zubat
+SPECIES_SHROODLE
 Level: 24
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
@@ -11914,13 +11862,9 @@ IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 - Giga Drain
 - Toxic
 
-Magneton
+SPECIES_KLEFKI
 Level: 44
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
-- Supersonic
-- Thunderbolt
-- Tri Attack
-- Screech
 
 Gardevoir
 Level: 48
@@ -11964,13 +11908,9 @@ IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 - Giga Drain
 - Toxic
 
-Magneton
+SPECIES_KLEFKI
 Level: 47
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
-- Supersonic
-- Thunderbolt
-- Tri Attack
-- Screech
 
 Gardevoir
 Level: 51
@@ -12014,13 +11954,9 @@ IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 - Giga Drain
 - Toxic
 
-Magneton
+SPECIES_KLEFKI
 Level: 50
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
-- Supersonic
-- Thunderbolt
-- Tri Attack
-- Screech
 
 Gardevoir
 Level: 54
@@ -12064,13 +12000,9 @@ IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 - Giga Drain
 - Toxic
 
-Magneton
+SPECIES_KLEFKI
 Level: 53
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
-- Supersonic
-- Thunderbolt
-- Tri Attack
-- Screech
 
 Gardevoir
 Level: 57
@@ -12093,7 +12025,7 @@ Tropius
 Level: 31
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
-Slugma
+SPECIES_LITLEO
 Level: 32
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
@@ -12147,7 +12079,7 @@ Ludicolo
 Level: 32
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
-Slugma
+SPECIES_LITLEO
 Level: 32
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
@@ -12168,7 +12100,7 @@ Tropius
 Level: 31
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
-Slugma
+SPECIES_LITLEO
 Level: 32
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
@@ -12222,7 +12154,7 @@ Ludicolo
 Level: 32
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
-Slugma
+SPECIES_LITLEO
 Level: 32
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
@@ -13331,7 +13263,7 @@ Mightyena
 Level: 28
 IVs: 9 HP / 9 Atk / 9 Def / 9 SpA / 9 SpD / 9 Spe
 
-Zubat
+SPECIES_SHROODLE
 Level: 30
 IVs: 9 HP / 9 Atk / 9 Def / 9 SpA / 9 SpD / 9 Spe
 
@@ -13370,7 +13302,7 @@ Mightyena
 Level: 42
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
-Crobat
+SPECIES_GLIMMORA
 Level: 43
 IVs: 18 HP / 18 Atk / 18 Def / 18 SpA / 18 SpD / 18 Spe
 
@@ -13994,29 +13926,17 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Golem
+SPECIES_GARGANACL
 Level: 32
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Protect
-- Rollout
-- Magnitude
-- Explosion
 
-Kabuto @ Sitrus Berry
+SPECIES_ANORITH @ Sitrus Berry
 Level: 35
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Swords Dance
-- Ice Beam
-- Surf
-- Rock Slide
 
-Onix
+SPECIES_CARBINK
 Level: 35
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Iron Tail
-- Explosion
-- Roar
-- Rock Slide
 
 Nosepass @ Sitrus Berry
 Level: 37
@@ -14036,37 +13956,21 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Omanyte
+SPECIES_LILEEP
 Level: 37
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Protect
-- Ice Beam
-- Rock Slide
-- Surf
 
-Golem
+SPECIES_GARGANACL
 Level: 37
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Protect
-- Rollout
-- Magnitude
-- Explosion
 
-Kabutops @ Sitrus Berry
+SPECIES_ARMALDO @ Sitrus Berry
 Level: 40
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Swords Dance
-- Ice Beam
-- Surf
-- Rock Slide
 
-Onix
+SPECIES_CARBINK
 Level: 40
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Iron Tail
-- Explosion
-- Roar
-- Rock Slide
 
 Nosepass @ Sitrus Berry
 Level: 42
@@ -14086,37 +13990,21 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Omastar
+SPECIES_CRADILY
 Level: 42
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Protect
-- Ice Beam
-- Rock Slide
-- Surf
 
-Golem
+SPECIES_GARGANACL
 Level: 42
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Protect
-- Rollout
-- Earthquake
-- Explosion
 
-Kabutops @ Sitrus Berry
+SPECIES_ARMALDO @ Sitrus Berry
 Level: 45
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Swords Dance
-- Ice Beam
-- Surf
-- Rock Slide
 
-Onix
+SPECIES_CARBINK
 Level: 45
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Iron Tail
-- Explosion
-- Roar
-- Rock Slide
 
 Nosepass @ Sitrus Berry
 Level: 47
@@ -14136,45 +14024,25 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Aerodactyl
+SPECIES_GLIMMORA
 Level: 47
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Rock Slide
-- Hyper Beam
-- Supersonic
-- Protect
 
-Golem
+SPECIES_GARGANACL
 Level: 47
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Focus Punch
-- Rollout
-- Earthquake
-- Explosion
 
-Omastar
+SPECIES_CRADILY
 Level: 47
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Protect
-- Ice Beam
-- Rock Slide
-- Surf
 
-Kabutops @ Sitrus Berry
+SPECIES_ARMALDO @ Sitrus Berry
 Level: 50
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Swords Dance
-- Ice Beam
-- Surf
-- Rock Slide
 
-Steelix
+SPECIES_TYRANTRUM
 Level: 50
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Iron Tail
-- Explosion
-- Roar
-- Rock Slide
 
 Nosepass @ Sitrus Berry
 Level: 52
@@ -14194,13 +14062,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Machamp @ Sitrus Berry
+SPECIES_PANGORO @ Sitrus Berry
 Level: 33
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Karate Chop
-- Rock Slide
-- Focus Punch
-- Bulk Up
 
 Meditite
 Level: 33
@@ -14210,13 +14074,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Reflect
 - Focus Punch
 
-Hitmontop
+SPECIES_HAWLUCHA
 Level: 35
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Pursuit
-- Counter
-- Protect
-- Triple Kick
 
 Hariyama @ Sitrus Berry
 Level: 37
@@ -14236,13 +14096,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Machamp @ Sitrus Berry
+SPECIES_PANGORO @ Sitrus Berry
 Level: 38
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Karate Chop
-- Rock Slide
-- Focus Punch
-- Bulk Up
 
 Medicham
 Level: 38
@@ -14252,13 +14108,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Reflect
 - Focus Punch
 
-Hitmontop
+SPECIES_HAWLUCHA
 Level: 40
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Pursuit
-- Counter
-- Protect
-- Triple Kick
 
 Hariyama @ Sitrus Berry
 Level: 42
@@ -14278,21 +14130,13 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Hitmonchan
+SPECIES_FLAMIGO
 Level: 40
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Sky Uppercut
-- Protect
-- Fire Punch
-- Ice Punch
 
-Machamp @ Sitrus Berry
+SPECIES_PANGORO @ Sitrus Berry
 Level: 43
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Karate Chop
-- Rock Slide
-- Focus Punch
-- Bulk Up
 
 Medicham
 Level: 43
@@ -14302,13 +14146,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Reflect
 - Psychic
 
-Hitmontop
+SPECIES_HAWLUCHA
 Level: 45
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Pursuit
-- Counter
-- Protect
-- Triple Kick
 
 Hariyama @ Sitrus Berry
 Level: 47
@@ -14328,29 +14168,17 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Hitmonlee
+SPECIES_ANNIHILAPE
 Level: 46
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Mega Kick
-- Focus Punch
-- Earthquake
-- Bulk Up
 
-Hitmonchan
+SPECIES_FLAMIGO
 Level: 46
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Sky Uppercut
-- Protect
-- Fire Punch
-- Ice Punch
 
-Machamp @ Sitrus Berry
+SPECIES_PANGORO @ Sitrus Berry
 Level: 48
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Cross Chop
-- Rock Slide
-- Focus Punch
-- Bulk Up
 
 Medicham
 Level: 48
@@ -14360,13 +14188,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Reflect
 - Psychic
 
-Hitmontop
+SPECIES_HAWLUCHA
 Level: 50
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Pursuit
-- Counter
-- Protect
-- Triple Kick
 
 Hariyama @ Sitrus Berry
 Level: 52
@@ -14386,29 +14210,17 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Mareep
+SPECIES_PAWMI
 Level: 36
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder
-- Protect
-- Thunder Wave
-- Light Screen
 
-Electrode
+SPECIES_BELLIBOLT
 Level: 36
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Rollout
-- Thunder
-- Explosion
-- Rain Dance
 
-Magneton @ Sitrus Berry
+SPECIES_KLEFKI @ Sitrus Berry
 Level: 38
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Supersonic
-- Protect
-- Thunder
-- Rain Dance
 
 Manectric @ Sitrus Berry
 Level: 40
@@ -14428,37 +14240,21 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Pikachu
+SPECIES_PLUSLE
 Level: 39
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder
-- Slam
-- Rain Dance
-- Shock Wave
 
-Flaaffy
+SPECIES_PAWMO
 Level: 41
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder
-- Protect
-- Thunder Wave
-- Light Screen
 
-Electrode
+SPECIES_BELLIBOLT
 Level: 41
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Rollout
-- Thunder
-- Explosion
-- Rain Dance
 
-Magneton @ Sitrus Berry
+SPECIES_KLEFKI @ Sitrus Berry
 Level: 43
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Supersonic
-- Protect
-- Thunder
-- Rain Dance
 
 Manectric @ Sitrus Berry
 Level: 45
@@ -14478,37 +14274,21 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Raichu
+SPECIES_HELIOLISK
 Level: 44
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder
-- Slam
-- Rain Dance
-- Protect
 
-Ampharos
+SPECIES_PAWMOT
 Level: 46
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder
-- Protect
-- Thunder Wave
-- Light Screen
 
-Electrode
+SPECIES_BELLIBOLT
 Level: 46
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Rollout
-- Thunder
-- Explosion
-- Rain Dance
 
-Magneton @ Sitrus Berry
+SPECIES_KLEFKI @ Sitrus Berry
 Level: 48
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Supersonic
-- Protect
-- Thunder
-- Rain Dance
 
 Manectric @ Sitrus Berry
 Level: 50
@@ -14528,45 +14308,25 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Electabuzz
+SPECIES_KILOWATTREL
 Level: 50
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Swift
-- Focus Punch
-- Thunder Punch
-- Light Screen
 
-Raichu
+SPECIES_HELIOLISK
 Level: 51
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder
-- Slam
-- Rain Dance
-- Protect
 
-Ampharos
+SPECIES_PAWMOT
 Level: 51
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder
-- Protect
-- Thunder Wave
-- Light Screen
 
-Electrode
+SPECIES_BELLIBOLT
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Rollout
-- Thunder
-- Explosion
-- Rain Dance
 
-Magneton @ Sitrus Berry
+SPECIES_KLEFKI @ Sitrus Berry
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Supersonic
-- Protect
-- Thunder
-- Rain Dance
 
 Manectric @ Sitrus Berry
 Level: 55
@@ -14586,21 +14346,13 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Magcargo @ White Herb
+SPECIES_PYROAR @ White Herb
 Level: 38
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Overheat
-- Attract
-- Light Screen
-- Rock Slide
 
-Ponyta
+SPECIES_CHARCADET
 Level: 36
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Flamethrower
-- Attract
-- Solar Beam
-- Bounce
 
 Camerupt @ White Herb
 Level: 38
@@ -14628,29 +14380,17 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Growlithe
+SPECIES_FLETCHINDER
 Level: 41
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Helping Hand
-- Flamethrower
-- Roar
-- Sunny Day
 
-Magcargo @ White Herb
+SPECIES_PYROAR @ White Herb
 Level: 43
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Overheat
-- Attract
-- Light Screen
-- Rock Slide
 
-Ponyta
+SPECIES_CHARCADET
 Level: 41
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Flamethrower
-- Attract
-- Solar Beam
-- Bounce
 
 Camerupt @ White Herb
 Level: 43
@@ -14678,37 +14418,21 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Houndour
+SPECIES_CAPSAKID
 Level: 46
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Roar
-- Solar Beam
-- Taunt
-- Sunny Day
 
-Growlithe
+SPECIES_FLETCHINDER
 Level: 46
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Helping Hand
-- Flamethrower
-- Sunny Day
-- Roar
 
-Magcargo @ White Herb
+SPECIES_PYROAR @ White Herb
 Level: 48
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Overheat
-- Attract
-- Light Screen
-- Rock Slide
 
-Rapidash
+SPECIES_CERULEDGE
 Level: 46
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Flamethrower
-- Attract
-- Solar Beam
-- Bounce
 
 Camerupt @ White Herb
 Level: 48
@@ -14736,37 +14460,21 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Arcanine
+SPECIES_TALONFLAME
 Level: 51
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Helping Hand
-- Flamethrower
-- Sunny Day
-- Roar
 
-Magcargo @ White Herb
+SPECIES_PYROAR @ White Herb
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Overheat
-- Attract
-- Light Screen
-- Rock Slide
 
-Houndoom
+SPECIES_SCOVILLAIN
 Level: 51
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Roar
-- Solar Beam
-- Taunt
-- Sunny Day
 
-Rapidash
+SPECIES_CERULEDGE
 Level: 51
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Flamethrower
-- Attract
-- Solar Beam
-- Bounce
 
 Camerupt @ White Herb
 Level: 53
@@ -14794,13 +14502,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Chansey
+SPECIES_MAUSHOLD_THREE
 Level: 42
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Light Screen
-- Sing
-- Skill Swap
-- Focus Punch
 
 Slaking @ Sitrus Berry
 Level: 42
@@ -14844,21 +14548,13 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Double Edge
 - Fire Blast
 
-Chansey
+SPECIES_MAUSHOLD_THREE
 Level: 47
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Light Screen
-- Sing
-- Skill Swap
-- Focus Punch
 
-Kangaskhan
+SPECIES_OINKOLOGNE_M
 Level: 45
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Fake Out
-- Dizzy Punch
-- Endure
-- Reversal
 
 Spinda
 Level: 48
@@ -14894,21 +14590,13 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Double Edge
 - Fire Blast
 
-Blissey
+SPECIES_FARIGIRAF
 Level: 52
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Light Screen
-- Sing
-- Skill Swap
-- Focus Punch
 
-Kangaskhan
+SPECIES_OINKOLOGNE_M
 Level: 50
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Fake Out
-- Dizzy Punch
-- Endure
-- Reversal
 
 Spinda
 Level: 53
@@ -14944,29 +14632,17 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Double Edge
 - Fire Blast
 
-Blissey
+SPECIES_FARIGIRAF
 Level: 57
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Protect
-- Sing
-- Skill Swap
-- Focus Punch
 
-Kangaskhan
+SPECIES_OINKOLOGNE_M
 Level: 55
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Fake Out
-- Dizzy Punch
-- Endure
-- Reversal
 
-Tauros
+SPECIES_TAUROS_PALDEA_COMBAT
 Level: 57
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Take Down
-- Protect
-- Fire Blast
-- Earthquake
 
 Spinda
 Level: 58
@@ -14994,13 +14670,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer / Risky
 
-Dratini @ Sitrus Berry
+SPECIES_NOIBAT @ Sitrus Berry
 Level: 40
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder Wave
-- Thunderbolt
-- Protect
-- Ice Beam
 
 Tropius
 Level: 38
@@ -15018,13 +14690,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Protect
 - Aerial Ace
 
-Skarmory
+SPECIES_BOMBIRDIER
 Level: 43
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Whirlwind
-- Spikes
-- Steel Wing
-- Aerial Ace
 
 Altaria @ Chesto Berry
 Level: 45
@@ -15044,13 +14712,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer / Risky
 
-Hoothoot
+SPECIES_FLETCHLING
 Level: 43
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Psychic
-- Reflect
-- Dream Eater
 
 Tropius
 Level: 43
@@ -15060,13 +14724,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Solar Beam
 - Earthquake
 
-Dragonair @ Sitrus Berry
+SPECIES_NOIBAT @ Sitrus Berry
 Level: 45
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder Wave
-- Thunderbolt
-- Protect
-- Ice Beam
 
 Pelipper
 Level: 46
@@ -15076,13 +14736,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Protect
 - Aerial Ace
 
-Skarmory
+SPECIES_BOMBIRDIER
 Level: 48
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Whirlwind
-- Spikes
-- Steel Wing
-- Aerial Ace
 
 Altaria @ Chesto Berry
 Level: 50
@@ -15102,13 +14758,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer / Risky
 
-Noctowl
+SPECIES_SQUAWKABILLY_GREEN
 Level: 48
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Psychic
-- Reflect
-- Dream Eater
 
 Tropius
 Level: 49
@@ -15118,13 +14770,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Solar Beam
 - Earthquake
 
-Dragonair @ Sitrus Berry
+SPECIES_NOIBAT @ Sitrus Berry
 Level: 50
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Thunder Wave
-- Thunderbolt
-- Protect
-- Ice Beam
 
 Pelipper
 Level: 51
@@ -15134,13 +14782,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Protect
 - Aerial Ace
 
-Skarmory
+SPECIES_BOMBIRDIER
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Whirlwind
-- Spikes
-- Steel Wing
-- Aerial Ace
 
 Altaria @ Chesto Berry
 Level: 55
@@ -15160,13 +14804,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer / Risky
 
-Noctowl
+SPECIES_SQUAWKABILLY_GREEN
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Psychic
-- Reflect
-- Dream Eater
 
 Tropius
 Level: 54
@@ -15184,21 +14824,13 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Protect
 - Aerial Ace
 
-Dragonite @ Sitrus Berry
+SPECIES_NOIVERN @ Sitrus Berry
 Level: 55
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hyper Beam
-- Thunderbolt
-- Earthquake
-- Ice Beam
 
-Skarmory
+SPECIES_BOMBIRDIER
 Level: 58
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Whirlwind
-- Spikes
-- Steel Wing
-- Aerial Ace
 
 Altaria @ Chesto Berry
 Level: 60
@@ -15218,13 +14850,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Slowpoke
+SPECIES_INKAY
 Level: 48
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Yawn
-- Psychic
-- Calm Mind
-- Protect
 
 Claydol
 Level: 49
@@ -15234,13 +14862,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Psychic
 - Light Screen
 
-Xatu @ Chesto Berry
+SPECIES_ESPATHRA @ Chesto Berry
 Level: 49
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Psychic
-- Rest
-- Confuse Ray
-- Calm Mind
 
 Lunatone @ Chesto Berry
 Level: 50
@@ -15268,21 +14892,13 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Drowzee
+SPECIES_ESPURR
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Dream Eater
-- Headbutt
-- Protect
 
-Slowpoke
+SPECIES_INKAY
 Level: 53
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Yawn
-- Psychic
-- Calm Mind
-- Protect
 
 Claydol
 Level: 54
@@ -15292,13 +14908,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Psychic
 - Light Screen
 
-Xatu @ Chesto Berry
+SPECIES_ESPATHRA @ Chesto Berry
 Level: 54
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Psychic
-- Rest
-- Confuse Ray
-- Calm Mind
 
 Lunatone @ Chesto Berry
 Level: 55
@@ -15326,13 +14938,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Hypno
+SPECIES_MEOWSTIC_M
 Level: 58
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Dream Eater
-- Headbutt
-- Protect
 
 Claydol
 Level: 59
@@ -15342,21 +14950,13 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Psychic
 - Light Screen
 
-Slowpoke
+SPECIES_INKAY
 Level: 58
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Yawn
-- Psychic
-- Calm Mind
-- Protect
 
-Xatu @ Chesto Berry
+SPECIES_ESPATHRA @ Chesto Berry
 Level: 59
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Psychic
-- Rest
-- Confuse Ray
-- Calm Mind
 
 Lunatone @ Chesto Berry
 Level: 60
@@ -15384,13 +14984,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Hypno
+SPECIES_MEOWSTIC_M
 Level: 63
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Dream Eater
-- Headbutt
-- Protect
 
 Claydol
 Level: 64
@@ -15400,21 +14996,13 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Psychic
 - Light Screen
 
-Slowking
+SPECIES_MALAMAR
 Level: 63
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Yawn
-- Psychic
-- Calm Mind
-- Protect
 
-Xatu @ Chesto Berry
+SPECIES_ESPATHRA @ Chesto Berry
 Level: 64
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Psychic
-- Rest
-- Confuse Ray
-- Calm Mind
 
 Lunatone @ Chesto Berry
 Level: 65
@@ -15442,13 +15030,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Poliwag
+SPECIES_CLAUNCHER
 Level: 46
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Rain Dance
-- Protect
-- Hydro Pump
 
 Whiscash
 Level: 46
@@ -15474,13 +15058,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Taunt
 - Double Team
 
-Kingdra @ Chesto Berry
+SPECIES_TATSUGIRI_CURLY @ Chesto Berry
 Level: 51
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Water Pulse
-- Double Team
-- Ice Beam
-- Rest
 
 === TRAINER_JUAN_3 ===
 Name: JUAN
@@ -15492,13 +15072,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Poliwhirl
+SPECIES_FINIZEN
 Level: 50
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Rain Dance
-- Protect
-- Hydro Pump
 
 Whiscash
 Level: 51
@@ -15524,13 +15100,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Taunt
 - Double Team
 
-Kingdra @ Chesto Berry
+SPECIES_TATSUGIRI_CURLY @ Chesto Berry
 Level: 56
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Water Pulse
-- Double Team
-- Ice Beam
-- Rest
 
 === TRAINER_JUAN_4 ===
 Name: JUAN
@@ -15542,13 +15114,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Lapras
+SPECIES_DONDOZO
 Level: 56
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hydro Pump
-- Perish Song
-- Ice Beam
-- Confuse Ray
 
 Whiscash
 Level: 58
@@ -15558,13 +15126,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Double Team
 - Fissure
 
-Poliwhirl
+SPECIES_FINIZEN
 Level: 56
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Rain Dance
-- Protect
-- Hydro Pump
 
 Walrein
 Level: 58
@@ -15582,13 +15146,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Taunt
 - Double Team
 
-Kingdra @ Chesto Berry
+SPECIES_TATSUGIRI_CURLY @ Chesto Berry
 Level: 61
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Water Pulse
-- Double Team
-- Ice Beam
-- Rest
 
 === TRAINER_JUAN_5 ===
 Name: JUAN
@@ -15600,13 +15160,9 @@ Items: Full Restore / Full Restore / Full Restore
 Double Battle: Yes
 AI: Basic Trainer
 
-Lapras
+SPECIES_DONDOZO
 Level: 61
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hydro Pump
-- Perish Song
-- Ice Beam
-- Confuse Ray
 
 Whiscash
 Level: 63
@@ -15616,13 +15172,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Double Team
 - Fissure
 
-Politoed
+SPECIES_CLAWITZER
 Level: 61
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Hypnosis
-- Rain Dance
-- Hydro Pump
-- Perish Song
 
 Walrein
 Level: 63
@@ -15640,13 +15192,9 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 - Taunt
 - Double Team
 
-Kingdra @ Chesto Berry
+SPECIES_TATSUGIRI_CURLY @ Chesto Berry
 Level: 66
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Water Pulse
-- Double Team
-- Ice Beam
-- Rest
 
 === TRAINER_ANGELO ===
 Name: ANGELO
@@ -15694,13 +15242,9 @@ Items: Full Restore / Full Restore / Full Restore / Full Restore
 Double Battle: No
 AI: Basic Trainer
 
-Skarmory
+SPECIES_TINKATON
 Level: 77
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
-- Toxic
-- Aerial Ace
-- Spikes
-- Steel Wing
 
 Claydol
 Level: 75
