@@ -4,6 +4,9 @@ Route101_MapScripts::
 	.byte 0
 
 Route101_OnTransition:
+#ifdef POKEMON_HNS
+	call_if_lt VAR_BIRCH_LAB_STATE, 5, Hoenn_EventScript_SkipOpening
+#endif
 	call ProfBirch_EventScript_UpdateLocation
 	end
 

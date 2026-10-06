@@ -184,6 +184,11 @@ enum __attribute__((__packed__)) Flavor
 #define BERRY_TREE_TAMATO_2     126
 #define BERRY_TREE_TAMATO_3     127
 
+// Hoenn's trees whose Emerald ids Heart & Soul's Johto also uses (src/event_object_movement.c)
+#define BERRY_TREE_HOENN_ROUTE_102_ORAN     57
+#define BERRY_TREE_HOENN_ROUTE_118_SITRUS_1 107
+#define BERRY_TREE_HOENN_ROUTE_118_SITRUS_2 109
+
 #define BERRY_TREES_COUNT 128
 
 #endif // GUARD_CONSTANTS_BERRY_H

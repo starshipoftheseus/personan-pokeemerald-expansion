@@ -18,13 +18,14 @@ The swaps made are listed in design/trainer_species_swaps.md. Re-running is safe
 
     python3 hack_scripts/regionalize_trainers.py [--dry-run]
 """
-import argparse, collections, glob, os, re, sys
+import argparse, collections, glob, os, re, sys, zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from boss_teams import BOSS_SWAPS, KEEP
 from regionalize_wild_encounters import (ROOT, REGION_GENS, STARTERS, PSEUDO, load_species,
                                          mark_default_forms, is_candidate, families, map_regions)
 
+ORIGINAL_GEN = {"Kanto": 1, "Johto": 2, "Hoenn": 3}
 PARTY_FILES = {"src/data/trainers.party": "Hoenn", "src/data/trainers_frlg.party": "Kanto",
                "src/data/trainers_hns.party": "Johto"}
 BOSS_CLASS = re.compile(r"Leader|Elite|Champion|Rival|Boss|Admin|Executive", re.I)
@@ -72,10 +73,16 @@ def main():
                          and is_candidate(b, species[b])
                          and all(is_candidate(x, species[x]) for st in lines[b].values() for x in st)]
     family_swap = {r: {} for r in REGION_GENS}
+    # Regular trainers also swap about half of their region's original-generation Pokémon for a
+    # newer generation of the region (Hoenn's Zigzagoon trainers meet Gen 6/9 too).
+    fresh_pools = {r: [b for b in pools[r] if species[b]["gen"] != ORIGINAL_GEN[r]] for r in REGION_GENS}
+    fresh_swap = {r: {} for r in REGION_GENS}
     used = {r: collections.Counter() for r in REGION_GENS}
 
-    def swap_family(region, base):
-        if base not in family_swap[region]:
+    def swap_family(region, base, fresh=False):
+        cache = (fresh_swap if fresh else family_swap)[region]
+        pool = fresh_pools[region] if fresh else pools[region]
+        if base not in cache:
             types = set(species[base]["types"])
             length = len(lines[base])
             final = lines[base][length - 1][0]
@@ -87,13 +94,13 @@ def main():
                         -(clen == length),
                         abs(species[lines[c][clen - 1][0]]["bst"] - species[final]["bst"]), c)
 
-            options = [c for c in pools[region] if (c in PSEUDO) == (base in PSEUDO)] or pools[region]
-            family_swap[region][base] = min(options, key=score)
-            used[region][family_swap[region][base]] += 1
-        return family_swap[region][base]
+            options = [c for c in pool if (c in PSEUDO) == (base in PSEUDO)] or pool
+            cache[base] = min(options, key=score)
+            used[region][cache[base]] += 1
+        return cache[base]
 
-    def swap(region, s):
-        choice = swap_family(region, base_of[s])
+    def swap(region, s, fresh=False):
+        choice = swap_family(region, base_of[s], fresh)
         stage = min(stage_of[s], len(lines[choice]) - 1)
         members = lines[choice][stage]
         return members[lines[base_of[s]][stage_of[s]].index(s) % len(members)] if s in lines[base_of[s]][stage_of[s]] else members[0]
@@ -114,6 +121,7 @@ def main():
             if m:
                 trainer = m.group(1)
                 region = by_trainer.get(trainer, default_region)
+                mon_index = 0
                 boss, in_header, drop = False, True, False
                 out.append(line)
                 continue
@@ -144,7 +152,11 @@ def main():
             name = nick.group(2) if nick and nick.group(2) not in ("M", "F") else re.sub(r"\s*\((?:M|F)\)\s*$", "", head).strip()
             const = species_constant(name)
             new = None
-            if const in species and species[const]["gen"] not in REGION_GENS[region]:
+            mon_index += 1
+            if (not boss and const in species and species[const]["gen"] == ORIGINAL_GEN[region]
+                    and zlib.crc32(f"{trainer}{mon_index}".encode()) % 2 == 0):
+                new = swap(region, const, fresh=True)
+            elif const in species and species[const]["gen"] not in REGION_GENS[region]:
                 if not boss:
                     new = swap(region, const)
                 elif (boss_name, region) not in KEEP:

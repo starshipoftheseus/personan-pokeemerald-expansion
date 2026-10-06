@@ -82,7 +82,7 @@ def main():
     parser.add_argument("--rom", default=os.path.join(ROOT, "pokehns.gba"))
     parser.add_argument("--elf", default=os.path.join(ROOT, "pokehns.elf"))
     parser.add_argument("--timeout", type=float, default=30)
-    parser.add_argument("--trainers", type=int, choices=(1, 2, 3), metavar="MODE",
+    parser.add_argument("--trainers", type=int, choices=(1, 2, 3, 4), metavar="MODE",
                         help="build every trainer's party on the first map given and check it "
                              "(2: with every badge and league won, so level scaling applies; "
                              "3: start a starter rumour there and report it)")

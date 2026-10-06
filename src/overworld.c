@@ -1995,13 +1995,13 @@ void CB2_NewGame(void)
 
 // Starts a new game on another map instead of the usual start, then hands over to callback2.
 // Used by the headless smoke test (src/smoke_test.c).
-void NewGameOnMap(s8 mapGroup, s8 mapNum, void (*callback2)(void))
+void NewGameOnMap(s8 mapGroup, s8 mapNum, s8 x, s8 y, void (*callback2)(void))
 {
     FieldClearVBlankHBlankCallbacks();
     StopMapMusic();
     ResetSafariZoneFlag_();
     NewGameInitData();
-    SetWarpDestination(mapGroup, mapNum, 0, -1, -1); // first warp, or the middle of the map
+    SetWarpDestination(mapGroup, mapNum, x < 0 ? 0 : WARP_ID_NONE, x, y); // x < 0: first warp, or the middle of the map
     WarpIntoMap();
     ResetInitialPlayerAvatarState();
     PlayTimeCounter_Start();

@@ -1318,7 +1318,8 @@ static void PokeballGlowEffect_PlaceBalls(struct Sprite *sprite)
     {
         sprite->sTimer = 25;
         spriteId = CreateSpriteAtEnd(&sSpriteTemplate_PokeballGlow, sPokeballCoordOffsets[sprite->sCounter].x + sprite->x2, sPokeballCoordOffsets[sprite->sCounter].y + sprite->y2, 0);
-        gSprites[spriteId].oam.priority = 3;
+        // Hoenn's Pokémon Centers (Emerald layouts) need Emerald's priority, or the counter hides the balls
+        gSprites[spriteId].oam.priority = (gMapHeader.mapLayout->layoutVersion == LAYOUT_VERSION_EMERALD) ? 2 : 3;
         gSprites[spriteId].sEffectSpriteId = sprite->sSpriteId;
         sprite->sCounter++;
         sprite->sNumMons--;

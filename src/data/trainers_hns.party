@@ -206,11 +206,11 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Raticate
+SPECIES_BIBAREL
 Level: 59
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Arbok
+SPECIES_SKUNTANK
 Level: 59
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -270,11 +270,11 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Electrode
+SPECIES_PACHIRISU
 Level: 59
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Magnemite
+SPECIES_TOGEDEMARU
 Level: 59
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -304,11 +304,11 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Tauros
+SPECIES_KOMALA
 Level: 59
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Victreebel
+SPECIES_ROSERADE
 Level: 59
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -359,7 +359,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Vileplume
+SPECIES_ROSERADE
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -389,15 +389,15 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Parasect
+SPECIES_KRICKETUNE
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Poliwrath
+SPECIES_WISHIWASHI_SOLO
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Ditto
+SPECIES_BUNEARY
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -444,7 +444,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Aipom
+SPECIES_DEERLING_SPRING
 Level: 62
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -465,7 +465,7 @@ SPECIES_PIDOVE
 Level: 7
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Natu
+SPECIES_WOOBAT
 Level: 7
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -563,11 +563,11 @@ SPECIES_UNFEZANT
 Level: 36
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Murkrow
+SPECIES_VULLABY
 Level: 36
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Xatu
+SPECIES_SWOOBAT
 Level: 36
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -626,7 +626,7 @@ SPECIES_RATTATA_ALOLA
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Dodrio
+SPECIES_STARAVIA
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -707,7 +707,7 @@ Music: Hg Suspicious 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_BRONZOR
+SPECIES_AERODACTYL
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -737,7 +737,7 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-Aipom
+SPECIES_DEERLING_SPRING
 Level: 16
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -834,7 +834,7 @@ SPECIES_BELLOSSOM
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Pidgeot
+SPECIES_CHATOT
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -851,15 +851,15 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-Parasect
+SPECIES_KRICKETUNE
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Tangela
+SPECIES_FOMANTIS
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Parasect
+SPECIES_KRICKETUNE
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -910,7 +910,7 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-Wigglytuff
+SPECIES_ROSERADE
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1052,7 +1052,7 @@ SPECIES_FURRET
 Level: 50
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Donphan
+SPECIES_EXCADRILL
 Level: 50
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1123,7 +1123,7 @@ SPECIES_ELECTABUZZ
 Level: 43
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Quagsire
+SPECIES_DREDNAW
 Level: 44
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1156,7 +1156,7 @@ Sneasel
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Ursaring
+SPECIES_ZOROARK_HISUI
 Level: 43
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1257,15 +1257,15 @@ Rhyhorn
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_LUMINEON
+SPECIES_KINGLER
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_SNORLAX
+SPECIES_PERSIAN
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Charizard
+SPECIES_ORICORIO_BAILE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1408,11 +1408,11 @@ SPECIES_DRAKLOAK
 Level: 41
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Mantine
+SPECIES_CRAMORANT
 Level: 42
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Lanturn
+SPECIES_BARRASKEWDA
 Level: 41
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1463,11 +1463,11 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Togetic
+SPECIES_FLAPPLE
 Level: 37
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Ampharos
+SPECIES_EMOLGA
 Level: 37
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1529,7 +1529,7 @@ Miltank
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Lanturn
+SPECIES_BARRASKEWDA
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1546,7 +1546,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 44
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1562,7 +1562,7 @@ SPECIES_ELECTRODE_HISUI
 Level: 43
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1604,7 +1604,7 @@ SPECIES_ELECTRODE_HISUI
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 61
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1621,11 +1621,11 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Ivysaur
+SPECIES_ROSELIA
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Starmie
+SPECIES_ARAQUANID
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1655,11 +1655,11 @@ SPECIES_LEAVANNY
 Level: 40
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Bellossom
+SPECIES_AMOONGUSS
 Level: 37
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Quagsire
+SPECIES_DREDNAW
 Level: 38
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1672,11 +1672,11 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_CHEWTLE
+SPECIES_PANPOUR
 Level: 24
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1740,7 +1740,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Sentret
+SPECIES_SKWOVET
 Level: 15
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1753,7 +1753,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Sentret
+SPECIES_SKWOVET
 Level: 15
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1766,7 +1766,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Furret
+SPECIES_GREEDENT
 Level: 16
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1796,15 +1796,15 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Marill
+SPECIES_CINCCINO
 Level: 30
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_ARROKUDA
+SPECIES_BASCULIN_RED_STRIPED
 Level: 32
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Marill
+SPECIES_CINCCINO
 Level: 30
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1843,7 +1843,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Sentret
+SPECIES_SKWOVET
 Level: 15
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1856,7 +1856,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Sentret
+SPECIES_SKWOVET
 Level: 15
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1882,7 +1882,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Sentret
+SPECIES_SKWOVET
 Level: 15
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1895,11 +1895,11 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Parasect
+SPECIES_KRICKETUNE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Exeggutor
+SPECIES_ABOMASNOW
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -1946,7 +1946,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Corsola
+SPECIES_TIRTOUGA
 Level: 21
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2019,7 +2019,7 @@ Music: Hg Suspicious 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_SIMIPOUR
+SPECIES_ALOMOMOLA
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2100,11 +2100,11 @@ Music: Hg Suspicious 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_PANPOUR
+SPECIES_ALOMOMOLA
 Level: 15
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_PANPOUR
+SPECIES_ALOMOMOLA
 Level: 15
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2121,11 +2121,11 @@ SPECIES_KROKOROK
 Level: 40
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Pupitar
+SPECIES_ZWEILOUS
 Level: 37
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Heracross
+SPECIES_DURANT
 Level: 38
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2159,7 +2159,7 @@ SPECIES_TRUBBISH
 Level: 12
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_PANPOUR
+SPECIES_ALOMOMOLA
 Level: 13
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2214,7 +2214,7 @@ Music: Rocket
 Double Battle: No
 AI: Check Bad Move
 
-Aipom
+SPECIES_DEERLING_SPRING
 Level: 34
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2222,7 +2222,7 @@ SPECIES_TRUBBISH
 Level: 34
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Aipom
+SPECIES_DEERLING_SPRING
 Level: 34
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2239,7 +2239,7 @@ Gligar
 Level: 34
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_SWOOBAT
+SPECIES_XATU
 Level: 34
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2294,7 +2294,7 @@ SPECIES_AUDINO
 Level: 35
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_SIMIPOUR
+SPECIES_ALOMOMOLA
 Level: 35
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2370,7 +2370,7 @@ Gligar
 Level: 37
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_SWOOBAT
+SPECIES_XATU
 Level: 35
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2443,11 +2443,11 @@ Music: Rocket
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_WOOBAT
+SPECIES_NATU
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Gligar
+SPECIES_SILICOBRA
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2578,7 +2578,7 @@ SPECIES_DONPHAN
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_SWOOBAT
+SPECIES_XATU
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2633,7 +2633,7 @@ SPECIES_AMOONGUSS
 Level: 35
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DURANT
+SPECIES_HERACROSS
 Level: 35
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2641,7 +2641,7 @@ SPECIES_SNEASLER
 Level: 35
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Murkrow
+SPECIES_VULLABY
 Level: 36
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2662,7 +2662,7 @@ SPECIES_AMOONGUSS
 Level: 35
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Ariados
+SPECIES_WHIRLIPEDE
 Level: 36
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2711,7 +2711,7 @@ Double Battle: No
 AI: Basic Trainer
 Items: Full Restore / Full Restore
 
-Koffing
+SPECIES_SALANDIT
 Level: 30
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2857,11 +2857,11 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Pikachu
+SPECIES_LUXIO
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_LUXRAY
+SPECIES_MAGNEZONE
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2887,7 +2887,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Noctowl
+SPECIES_BRAVIARY
 Level: 22
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2913,7 +2913,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_BARRASKEWDA
+SPECIES_BASCULIN_RED_STRIPED
 Level: 31
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2926,7 +2926,7 @@ Music: Hg Sage
 Double Battle: No
 AI: Check Bad Move
 
-Clefairy
+SPECIES_TRUMBEAK
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2939,7 +2939,7 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_BUNEARY
+SPECIES_LICKITUNG
 Level: 61
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -2973,11 +2973,11 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Ledyba
+SPECIES_DWEBBLE
 Level: 3
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Spinarak
+SPECIES_VENIPEDE
 Level: 3
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3109,11 +3109,11 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Ariados
+SPECIES_WHIRLIPEDE
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DURANT
+SPECIES_HERACROSS
 Level: 62
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3182,7 +3182,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_LUMINEON
+SPECIES_KINGLER
 Level: 61
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3254,7 +3254,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Qwilfish
+SPECIES_DRACOVISH
 Level: 24
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3377,11 +3377,11 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Magikarp
+SPECIES_FINNEON
 Level: 75
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Gyarados
+SPECIES_LUMINEON
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3423,7 +3423,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Qwilfish
+SPECIES_DRACOVISH
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3520,11 +3520,11 @@ SPECIES_QWILFISH
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Remoraid
+SPECIES_FRILLISH
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_CHEWTLE
+SPECIES_PANPOUR
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3571,7 +3571,7 @@ SPECIES_DUCKLETT
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Qwilfish
+SPECIES_DRACOVISH
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3584,15 +3584,15 @@ Music: Hg Boy 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_ARROKUDA
+SPECIES_BASCULIN_RED_STRIPED
 Level: 24
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_BARRASKEWDA
+SPECIES_BASCULIN_RED_STRIPED
 Level: 25
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_ARROKUDA
+SPECIES_BASCULIN_RED_STRIPED
 Level: 24
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3664,11 +3664,11 @@ Music: Hg Boy 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_CHEWTLE
+SPECIES_PANPOUR
 Level: 13
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 18
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3710,7 +3710,7 @@ SPECIES_TENTACOOL
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Cloyster
+SPECIES_GASTRODON_WEST
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3723,11 +3723,11 @@ Music: Hg Boy 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_CHEWTLE
+SPECIES_PANPOUR
 Level: 13
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 18
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3778,11 +3778,11 @@ Music: Hg Boy 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_CHEWTLE
+SPECIES_PANPOUR
 Level: 13
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 18
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3799,11 +3799,11 @@ Music: Hg Boy 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_CHEWTLE
+SPECIES_PANPOUR
 Level: 13
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 18
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3820,15 +3820,15 @@ Music: Hg Boy 2
 Double Battle: No
 AI: Check Bad Move
 
-Seadra
+SPECIES_FLOATZEL
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Gyarados
+SPECIES_LUMINEON
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Seadra
+SPECIES_FLOATZEL
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3841,7 +3841,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 25
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3854,7 +3854,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_CHEWTLE
+SPECIES_PANPOUR
 Level: 25
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3875,11 +3875,11 @@ SPECIES_LANTURN
 Level: 24
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Lanturn
+SPECIES_BARRASKEWDA
 Level: 24
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Quagsire
+SPECIES_DREDNAW
 Level: 24
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3926,7 +3926,7 @@ SPECIES_ARCTOVISH
 Level: 25
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3969,7 +3969,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_BARRASKEWDA
+SPECIES_BASCULIN_RED_STRIPED
 Level: 28
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -3995,7 +3995,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_BARRASKEWDA
+SPECIES_BASCULIN_RED_STRIPED
 Level: 33
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4051,11 +4051,11 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Starmie
+SPECIES_ARAQUANID
 Level: 62
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Starmie
+SPECIES_ARAQUANID
 Level: 62
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4081,15 +4081,15 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Dewgong
+SPECIES_MANTINE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Cloyster
+SPECIES_GASTRODON_WEST
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Dewgong
+SPECIES_MANTINE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4123,7 +4123,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Seaking
+SPECIES_MANTINE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4131,7 +4131,7 @@ SPECIES_PIDGEOT
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Seaking
+SPECIES_MANTINE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4195,7 +4195,7 @@ SPECIES_REMORAID
 Level: 23
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Chinchou
+SPECIES_ARROKUDA
 Level: 23
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4216,7 +4216,7 @@ SPECIES_QWILFISH
 Level: 24
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Quagsire
+SPECIES_DREDNAW
 Level: 24
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4233,7 +4233,7 @@ SPECIES_NOCTOWL
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Furret
+SPECIES_GREEDENT
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4399,7 +4399,7 @@ Music: Hg Suspicious 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_PORYGON2
+SPECIES_FEAROW
 Level: 62
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4441,7 +4441,7 @@ Magneton
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_PORYGON2
+SPECIES_FEAROW
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4543,7 +4543,7 @@ Music: Hg Suspicious 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_PANPOUR
+SPECIES_ALOMOMOLA
 Level: 19
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4581,7 +4581,7 @@ Magneton
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Jolteon
+SPECIES_SNORLAX
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4708,7 +4708,7 @@ SPECIES_SANDILE
 Level: 38
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Donphan
+SPECIES_EXCADRILL
 Level: 38
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4750,7 +4750,7 @@ SPECIES_RUNERIGUS
 Level: 38
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Gligar
+SPECIES_SILICOBRA
 Level: 39
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4855,15 +4855,15 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Sandslash
+SPECIES_DUGTRIO_ALOLA
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Graveler
+SPECIES_GRAVELER_ALOLA
 Level: 59
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Golem
+SPECIES_GOLEM_ALOLA
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4880,7 +4880,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Machamp
+SPECIES_CRABOMINABLE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4893,11 +4893,11 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Dunsparce
+SPECIES_WOOLOO
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Dunsparce
+SPECIES_WOOLOO
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -4960,7 +4960,7 @@ Koffing
 Level: 59
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Koffing
+SPECIES_SALANDIT
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5054,15 +5054,15 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Koffing
+SPECIES_SALANDIT
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Magmar
+SPECIES_TURTONATOR
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Weezing
+SPECIES_SALAZZLE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5075,7 +5075,7 @@ Music: Hg Suspicious 1
 Double Battle: No
 AI: Check Bad Move
 
-Delibird
+SPECIES_CRYOGONAL
 Level: 35
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5219,7 +5219,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Weezing
+SPECIES_SALAZZLE
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5304,7 +5304,7 @@ SPECIES_VOLTORB_HISUI
 Level: 16
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Pineco
+SPECIES_JOLTIK
 Level: 16
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5342,15 +5342,15 @@ Music: Hg Suspicious 1
 Double Battle: No
 AI: Check Bad Move
 
-Electrode
+SPECIES_PACHIRISU
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Electrode
+SPECIES_PACHIRISU
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Electrode
+SPECIES_PACHIRISU
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5375,7 +5375,7 @@ SPECIES_SAWK
 Level: 38
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Steelix
+SPECIES_CARKOL
 Level: 33
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5520,7 +5520,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Exeggutor
+SPECIES_ABOMASNOW
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5528,7 +5528,7 @@ SPECIES_HYPNO
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Starmie
+SPECIES_ARAQUANID
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5567,11 +5567,11 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_PANPOUR
+SPECIES_ALOMOMOLA
 Level: 22
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_PANPOUR
+SPECIES_ALOMOMOLA
 Level: 23
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5626,7 +5626,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Espeon
+SPECIES_INDEEDEE_M
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5634,7 +5634,7 @@ SPECIES_HATTREM
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Slowking
+SPECIES_BEHEEYEM
 Level: 45
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5647,7 +5647,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Xatu
+SPECIES_SWOOBAT
 Level: 42
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5655,7 +5655,7 @@ SPECIES_FERROTHORN
 Level: 44
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Girafarig
+SPECIES_INDEEDEE_M
 Level: 44
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5689,11 +5689,11 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_WOOBAT
+SPECIES_NATU
 Level: 59
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_SWOOBAT
+SPECIES_XATU
 Level: 63
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5762,11 +5762,11 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-Tentacruel
+SPECIES_TOXAPEX
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Nidoqueen
+SPECIES_TOXICROAK
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5779,7 +5779,7 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_LUXRAY
+SPECIES_MAGNEZONE
 Level: 61
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5792,7 +5792,7 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_GUMSHOOS
+SPECIES_RATICATE
 Level: 61
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5864,11 +5864,11 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-Nidoqueen
+SPECIES_TOXICROAK
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Raichu
+SPECIES_LUXRAY
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5966,7 +5966,7 @@ SPECIES_GOLETT
 Level: 16
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Marill
+SPECIES_CINCCINO
 Level: 16
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -5979,11 +5979,11 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Tentacruel
+SPECIES_TOXAPEX
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Nidoking
+SPECIES_SALAZZLE
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6026,15 +6026,15 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Dugtrio
+SPECIES_PALOSSAND
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Primeape
+SPECIES_LUCARIO
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Poliwrath
+SPECIES_WISHIWASHI_SOLO
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6194,15 +6194,15 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Dugtrio
+SPECIES_PALOSSAND
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Sandslash
+SPECIES_DUGTRIO_ALOLA
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_MUDSDALE
+SPECIES_SANDSLASH
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6215,11 +6215,11 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Skiploom
+SPECIES_ELDEGOSS
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Marill
+SPECIES_CINCCINO
 Level: 26
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6299,7 +6299,7 @@ SPECIES_FOONGUS
 Level: 3
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Hoppip
+SPECIES_GOSSIFLEUR
 Level: 4
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6329,7 +6329,7 @@ Music: Hg Sage
 Double Battle: No
 AI: Check Bad Move
 
-Hoppip
+SPECIES_GOSSIFLEUR
 Level: 7
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6354,7 +6354,7 @@ SPECIES_LAMPENT
 Level: 21
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Murkrow
+SPECIES_VULLABY
 Level: 21
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6367,7 +6367,7 @@ Music: Hg Sage
 Double Battle: No
 AI: Check Bad Move
 
-Misdreavus
+SPECIES_YAMASK
 Level: 22
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6418,7 +6418,7 @@ SPECIES_FOONGUS
 Level: 7
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Sunkern
+SPECIES_COTTONEE
 Level: 8
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6435,7 +6435,7 @@ Music: Hg Sage
 Double Battle: No
 AI: Check Bad Move
 
-Noctowl
+SPECIES_BRAVIARY
 Level: 40
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6456,7 +6456,7 @@ Music: Hg Sage
 Double Battle: No
 AI: Check Bad Move
 
-Noctowl
+SPECIES_BRAVIARY
 Level: 40
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6477,7 +6477,7 @@ Music: Hg Sage
 Double Battle: No
 AI: Check Bad Move
 
-Noctowl
+SPECIES_BRAVIARY
 Level: 40
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6502,7 +6502,7 @@ SPECIES_LAMPENT
 Level: 20
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Houndour
+SPECIES_ZORUA
 Level: 20
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6519,7 +6519,7 @@ SPECIES_LAMPENT
 Level: 20
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Murkrow
+SPECIES_VULLABY
 Level: 20
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6571,15 +6571,15 @@ Music: Hg Sage
 Double Battle: No
 AI: Check Bad Move
 
-Hypno
+SPECIES_BRONZONG
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Jynx
+SPECIES_SANDSLASH_ALOLA
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Hypno
+SPECIES_BRONZONG
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6613,11 +6613,11 @@ Music: Hg Boy 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_BARRASKEWDA
+SPECIES_BASCULIN_RED_STRIPED
 Level: 29
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Delibird
+SPECIES_CRYOGONAL
 Level: 30
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6651,7 +6651,7 @@ SPECIES_REMORAID
 Level: 28
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-SPECIES_ARROKUDA
+SPECIES_BASCULIN_RED_STRIPED
 Level: 28
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6698,7 +6698,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Kangaskhan
+SPECIES_YUNGOOS
 Level: 60
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6766,7 +6766,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Snubbull
+SPECIES_ZIGZAGOON_GALAR
 Level: 15
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6800,7 +6800,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Delibird
+SPECIES_CRYOGONAL
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6813,7 +6813,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Nidoking
+SPECIES_SALAZZLE
 Level: 56
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6821,7 +6821,7 @@ SPECIES_SLOWKING
 Level: 57
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Seaking
+SPECIES_MANTINE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6834,7 +6834,7 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_LICKITUNG
+SPECIES_KANGASKHAN
 Level: 55
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6959,7 +6959,7 @@ SPECIES_FLAAFFY
 Level: 18
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Furret
+SPECIES_GREEDENT
 Level: 18
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6972,11 +6972,11 @@ Music: Hg Girl 2
 Double Battle: Yes
 AI: Check Bad Move
 
-Victreebel
+SPECIES_ROSERADE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Vileplume
+SPECIES_ROSERADE
 Level: 58
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -6989,11 +6989,11 @@ Music: Hg Girl 2
 Double Battle: Yes
 AI: Check Bad Move
 
-Ursaring
+SPECIES_ZOROARK_HISUI
 Level: 54
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Donphan
+SPECIES_EXCADRILL
 Level: 54
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -7031,7 +7031,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Snubbull
+SPECIES_ZIGZAGOON_GALAR
 Level: 20
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -7057,15 +7057,15 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Sentret
+SPECIES_SKWOVET
 Level: 61
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Sentret
+SPECIES_SKWOVET
 Level: 61
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Sentret
+SPECIES_SKWOVET
 Level: 61
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -7116,7 +7116,7 @@ SPECIES_DARUMAKA
 Level: 16
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-Houndour
+SPECIES_ZORUA
 Level: 16
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -9815,7 +9815,7 @@ Double Battle: No
 AI: Basic Trainer
 Items: Full Restore / Full Restore
 
-SPECIES_EMOLGA @ Light Ball
+SPECIES_PINCURCHIN @ Light Ball
 Level: 93
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 
@@ -9854,15 +9854,11 @@ AI: Basic Trainer
 Mugshot: Yellow
 Items: Full Restore / Full Restore
 
-Politoed
+SPECIES_SEISMITOAD
 Level: 27
 IVs: 2 HP / 2 Atk / 2 Def / 2 SpA / 2 SpD / 2 Spe
-- Bubble Beam
-- Rain Dance
-- Hypnosis
-- Icy Wind
 
-SPECIES_SWOOBAT
+SPECIES_XATU
 Level: 27
 IVs: 2 HP / 2 Atk / 2 Def / 2 SpA / 2 SpD / 2 Spe
 
@@ -10239,7 +10235,7 @@ Music: Male
 Double Battle: No
 AI: Basic Trainer
 
-SPECIES_DEINO
+SPECIES_LARVITAR
 Level: 5
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10269,7 +10265,7 @@ Music: Male
 Double Battle: No
 AI: Basic Trainer
 
-SPECIES_DEINO
+SPECIES_LARVITAR
 Level: 5
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10282,7 +10278,7 @@ Music: Male
 Double Battle: No
 AI: Basic Trainer
 
-SPECIES_DEINO
+SPECIES_LARVITAR
 Level: 5
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10312,7 +10308,7 @@ Music: Male
 Double Battle: No
 AI: Basic Trainer
 
-SPECIES_DEINO
+SPECIES_LARVITAR
 Level: 5
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10325,7 +10321,7 @@ Music: Male
 Double Battle: No
 AI: Basic Trainer
 
-SPECIES_DEINO
+SPECIES_LARVITAR
 Level: 5
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
@@ -10389,7 +10385,7 @@ AI: Check Bad Move / Try To Faint / Check Viability
 SPECIES_SCOLIPEDE
 Level: 20
 
-Pineco
+SPECIES_JOLTIK
 Level: 20
 
 === TRAINER_WADE_3_HNS ===
@@ -10428,7 +10424,7 @@ Level: 34
 Forretress
 Level: 35
 
-Ariados
+SPECIES_WHIRLIPEDE
 Level: 36
 
 === TRAINER_WADE_5_HNS ===
@@ -10446,7 +10442,7 @@ Level: 46
 SPECIES_SCOLIPEDE
 Level: 45
 
-Ledian
+SPECIES_CRUSTLE
 Level: 46
 
 Forretress
@@ -10513,12 +10509,8 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Qwilfish
+SPECIES_DRACOVISH
 Level: 55
-- Toxic
-- Minimize
-- Surf
-- Pin Missile
 
 SPECIES_LANTURN
 Level: 58
@@ -10673,7 +10665,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Azumarill
+SPECIES_CINCCINO
 Level: 25
 
 SPECIES_ROGGENROLA
@@ -10718,7 +10710,7 @@ Level: 45
 SPECIES_QUAGSIRE
 Level: 46
 
-Magcargo
+SPECIES_HEATMOR
 Level: 45
 
 === TRAINER_TODD_5_HNS ===
@@ -10730,7 +10722,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Azumarill
+SPECIES_CINCCINO
 Level: 56
 
 SPECIES_GIGALITH
@@ -10769,10 +10761,10 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Jumpluff
+SPECIES_ELDEGOSS
 Level: 36
 
-Jumpluff
+SPECIES_ELDEGOSS
 Level: 36
 
 SPECIES_AMOONGUSS
@@ -10787,10 +10779,10 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Skiploom
+SPECIES_ELDEGOSS
 Level: 45
 
-Skiploom
+SPECIES_ELDEGOSS
 Level: 45
 
 SPECIES_AMOONGUSS
@@ -10834,7 +10826,7 @@ AI: Check Bad Move / Try To Faint / Check Viability
 SPECIES_VOLTORB_HISUI
 Level: 25
 
-Pineco
+SPECIES_JOLTIK
 Level: 25
 
 SPECIES_VOLTORB_HISUI
@@ -10891,12 +10883,8 @@ AI: Check Bad Move / Try To Faint / Check Viability
 SPECIES_ELECTRODE_HISUI
 Level: 55
 
-Forretress
+SPECIES_GALVANTULA
 Level: 56
-- Gyro Ball
-- Spikes
-- Protect
-- Explosion
 
 SPECIES_ELECTRODE_HISUI
 Level: 55
@@ -10911,7 +10899,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Yanma
+SPECIES_KARRABLAST
 Level: 28
 
 SPECIES_SPINARAK
@@ -10953,7 +10941,7 @@ Level: 47
 Scizor
 Level: 48
 
-SPECIES_DURANT
+SPECIES_HERACROSS
 Level: 48
 
 === TRAINER_ARNIE_5_HNS ===
@@ -10968,13 +10956,13 @@ AI: Check Bad Move / Try To Faint / Check Viability
 SPECIES_ARIADOS
 Level: 58
 
-Yanma
+SPECIES_KARRABLAST
 Level: 56
 
-Scizor
+SPECIES_ACCELGOR
 Level: 57
 
-SPECIES_DURANT
+SPECIES_HERACROSS
 Level: 56
 
 === TRAINER_ALAN_2_HNS ===
@@ -11001,13 +10989,13 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Natu
+SPECIES_WOOBAT
 Level: 30
 
 SPECIES_PANSAGE
 Level: 35
 
-Quagsire
+SPECIES_DREDNAW
 Level: 33
 
 SPECIES_DARMANITAN_STANDARD
@@ -11022,13 +11010,13 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Natu
+SPECIES_WOOBAT
 Level: 27
 
 SPECIES_PANSAGE
 Level: 27
 
-Quagsire
+SPECIES_DREDNAW
 Level: 30
 
 Yanma
@@ -11064,12 +11052,8 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Flaaffy
+SPECIES_EMOLGA
 Level: 25
-- Tackle
-- Growl
-- Thunder Shock
-- Thunder Wave
 
 SPECIES_WOOPER
 Level: 25
@@ -11124,12 +11108,8 @@ AI: Check Bad Move / Try To Faint / Check Viability
 SPECIES_QUAGSIRE
 Level: 54
 
-Ampharos
+SPECIES_EMOLGA
 Level: 55
-- Headbutt
-- Thunder Punch
-- Thunder Wave
-- Cotton Spore
 
 === TRAINER_CHAD_2_HNS ===
 Name: CHAD
@@ -11279,7 +11259,7 @@ AI: Check Bad Move / Try To Faint / Check Viability
 SPECIES_LANTURN
 Level: 42
 
-Qwilfish
+SPECIES_DRACOVISH
 Level: 45
 
 SPECIES_LANTURN
@@ -11297,7 +11277,7 @@ AI: Check Bad Move / Try To Faint / Check Viability
 SPECIES_LANTURN
 Level: 52
 
-Qwilfish
+SPECIES_DRACOVISH
 Level: 55
 
 SPECIES_LANTURN
@@ -11396,7 +11376,7 @@ Level: 48
 Xatu
 Level: 47
 
-Skarmory
+SPECIES_MEOWTH_GALAR
 Level: 49
 
 === TRAINER_VANCE_3_HNS ===
@@ -11411,10 +11391,10 @@ AI: Check Bad Move / Try To Faint / Check Viability
 SPECIES_UNFEZANT
 Level: 55
 
-Murkrow
+SPECIES_VULLABY
 Level: 56
 
-Xatu
+SPECIES_SWOOBAT
 Level: 54
 
 Skarmory
@@ -11447,10 +11427,10 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Qwilfish
+SPECIES_DRACOVISH
 Level: 58
 
-Octillery
+SPECIES_JELLICENT
 Level: 56
 
 SPECIES_LANTURN
@@ -11516,13 +11496,13 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Piloswine
+SPECIES_VANILLISH
 Level: 38
 
 SPECIES_RUNERIGUS
 Level: 38
 
-Steelix
+SPECIES_CARKOL
 Level: 38
 
 === TRAINER_ERIN_2_HNS ===
@@ -11606,7 +11586,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Sunflora
+SPECIES_WHIMSICOTT
 Level: 40
 
 SPECIES_DARMANITAN_STANDARD
@@ -11655,7 +11635,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Granbull
+SPECIES_LINOONE_GALAR
 Level: 36
 
 
@@ -11668,7 +11648,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-Granbull
+SPECIES_LINOONE_GALAR
 Level: 46
 
 
@@ -11787,12 +11767,8 @@ Level: 45
 SPECIES_DRAKLOAK
 Level: 45
 
-Porygon2
+SPECIES_HERDIER
 Level: 44
-- Tri Attack
-- Ice Beam
-- Defense Curl
-- Recover
 
 === TRAINER_BETH_2_HNS ===
 Name: BETH
@@ -11820,12 +11796,8 @@ Level: 50
 - Stomp
 - Milk Drink
 
-Lanturn
+SPECIES_BARRASKEWDA
 Level: 50
-- Surf
-- Ice Beam
-- Thunderbolt
-- Thunder Wave
 
 SPECIES_CHANDELURE
 Level: 50
@@ -11842,19 +11814,11 @@ AI: Check Bad Move / Try To Faint / Check Viability
 SPECIES_SIMISEAR
 Level: 55
 
-Ampharos
+SPECIES_EMOLGA
 Level: 55
-- Swift
-- Thunder Punch
-- Thunder Wave
-- Cotton Spore
 
-Miltank
+SPECIES_BOUFFALANT
 Level: 55
-- Rollout
-- Attract
-- Stomp
-- Milk Drink
 
 Lanturn
 Level: 55
@@ -11884,7 +11848,7 @@ Level: 44
 SPECIES_UNFEZANT
 Level: 43
 
-Skarmory
+SPECIES_MEOWTH_GALAR
 Level: 44
 
 === TRAINER_JOSE_3_HNS ===
@@ -11920,7 +11884,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 48
 
 SPECIES_SCOLIPEDE
@@ -11932,7 +11896,7 @@ Level: 48
 SPECIES_ELECTRODE_HISUI
 Level: 47
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 49
 
 === TRAINER_REENA_3_HNS ===
@@ -11944,7 +11908,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move / Try To Faint / Check Viability
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 55
 
 SPECIES_SCOLIPEDE
@@ -11956,7 +11920,7 @@ Level: 54
 SPECIES_ELECTRODE_HISUI
 Level: 56
 
-SPECIES_DREDNAW
+SPECIES_SIMIPOUR
 Level: 57
 
 === TRAINER_ALEX_2_HNS ===
@@ -11977,7 +11941,7 @@ Level: 59
 Seaking
 Level: 60
 
-SPECIES_FLOATZEL
+SPECIES_CLOYSTER
 Level: 53
 
 === TRAINER_ALEX_3_HNS ===
@@ -11995,7 +11959,7 @@ Level: 55
 SPECIES_ARIADOS
 Level: 60
 
-Slowking
+SPECIES_BEHEEYEM
 Level: 61
 
 SPECIES_LANTURN
@@ -12013,10 +11977,10 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Weezing
+SPECIES_SALAZZLE
 Level: 62
 
-Arbok
+SPECIES_SKUNTANK
 Level: 60
 
 === TRAINER_RILEY_3_HNS ===
@@ -12067,7 +12031,7 @@ AI: Check Bad Move
 SPECIES_VESPIQUEN
 Level: 65
 
-SPECIES_BUNEARY
+SPECIES_LICKITUNG
 Level: 40
 
 === TRAINER_TREVOR_3_HNS ===
@@ -12079,7 +12043,7 @@ Music: Hg Suspicious 1
 Double Battle: No
 AI: Check Bad Move
 
-Scizor
+SPECIES_ACCELGOR
 Level: 69
 
 SPECIES_AMBIPOM
@@ -12094,13 +12058,13 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Seaking
+SPECIES_MANTINE
 Level: 60
 
 SPECIES_TENTACOOL
 Level: 59
 
-Poliwhirl
+SPECIES_WISHIWASHI_SOLO
 Level: 60
 
 Seaking
@@ -12136,13 +12100,13 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Bulbasaur
+SPECIES_BUDEW
 Level: 65
 
-Squirtle
+SPECIES_PYUKUMUKU
 Level: 65
 
-Charmander
+SPECIES_ORICORIO_BAILE
 Level: 65
 
 === TRAINER_CARTER_3_HNS ===
@@ -12154,13 +12118,13 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_APPLIN
+SPECIES_PETILIL
 Level: 65
 
-SPECIES_HEATMOR
+SPECIES_SLUGMA
 Level: 65
 
-SPECIES_DRACOVISH
+SPECIES_CORSOLA
 Level: 65
 
 === TRAINER_HILLARY_2_HNS ===
@@ -12175,7 +12139,7 @@ AI: Check Bad Move
 SPECIES_MORELULL
 Level: 40
 
-SPECIES_BUNEARY
+SPECIES_LICKITUNG
 Level: 63
 
 Cubone
@@ -12190,10 +12154,10 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-Sunflora
+SPECIES_WHIMSICOTT
 Level: 65
 
-Aipom
+SPECIES_DEERLING_SPRING
 Level: 63
 
 SPECIES_PHANPY
@@ -12208,10 +12172,10 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-Beedrill
+SPECIES_DRAPION
 Level: 63
 
-Butterfree
+SPECIES_VIKAVOLT
 Level: 63
 
 SPECIES_BUTTERFREE
@@ -12253,7 +12217,7 @@ Level: 63
 Lapras
 Level: 66
 
-SPECIES_PYUKUMUKU
+SPECIES_LAPRAS
 Level: 66
 
 === TRAINER_NICOLE_3_HNS ===
@@ -12265,7 +12229,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Mantine
+SPECIES_CRAMORANT
 Level: 65
 
 SPECIES_ARCTOVISH
@@ -12292,7 +12256,7 @@ Level: 62
 Poliwrath
 Level: 61
 
-Ditto
+SPECIES_BUNEARY
 Level: 62
 
 === TRAINER_BILLY_3_HNS ===
@@ -12328,13 +12292,13 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Sandslash
+SPECIES_DUGTRIO_ALOLA
 Level: 58
 
-Golem
+SPECIES_GOLEM_ALOLA
 Level: 59
 
-Golem
+SPECIES_GOLEM_ALOLA
 Level: 61
 
 SPECIES_BASTIODON
@@ -12379,10 +12343,10 @@ Level: 60
 Tangela
 Level: 60
 
-SPECIES_MAGNETON
+SPECIES_PRIMEAPE
 Level: 60
 
-SPECIES_ROSELIA
+SPECIES_WEEPINBELL
 Level: 60
 
 === TRAINER_JOEL_3_HNS ===
@@ -12418,16 +12382,16 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-Poliwrath
+SPECIES_WISHIWASHI_SOLO
 Level: 56
 
-Charizard
+SPECIES_ORICORIO_BAILE
 Level: 56
 
-Weezing
+SPECIES_SALAZZLE
 Level: 56
 
-SPECIES_SKUNTANK
+SPECIES_SPIRITOMB
 Level: 58
 
 === TRAINER_CHARLES_3_HNS ===
@@ -12442,7 +12406,7 @@ AI: Check Bad Move
 SPECIES_QWILFISH
 Level: 60
 
-SPECIES_ZOROARK_HISUI
+SPECIES_WYRDEER
 Level: 65
 
 SPECIES_MAGMORTAR
@@ -12481,7 +12445,7 @@ IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 EVs: 252 HP / 0 Atk / 0 Def / 4 SpA / 0 SpD / 252 Spe
 Timid Nature
 
-SPECIES_COALOSSAL @ Choice Band
+SPECIES_STONJOURNER @ Choice Band
 Level: 70
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 EVs: 0 HP / 252 Atk / 0 Def / 4 SpA / 0 SpD / 252 Spe
@@ -12521,10 +12485,10 @@ Level: 70
 SPECIES_KLINKLANG
 Level: 70
 
-SPECIES_ALOMOMOLA
+SPECIES_THIEVUL
 Level: 70
 
-SPECIES_CRAMORANT @ Choice Specs
+SPECIES_HONCHKROW @ Choice Specs
 Level: 70
 EVs: 0 HP / 0 Atk / 0 Def / 255 SpA / 6 SpD / 255 Spe
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
@@ -12583,7 +12547,7 @@ IVs: 0 Atk
 SPECIES_QWILFISH @ Life Orb  
 Level: 63  
 
-SPECIES_CORSOLA @ White Herb  
+SPECIES_DREDNAW @ White Herb  
 Level: 68  
 
 
@@ -12596,7 +12560,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_DREDNAW @ Lagging Tail  
+SPECIES_SIMIPOUR @ Lagging Tail  
 Level: 66    
 EVs: 140 HP / 204 Atk / 104 Def / 60 SpD  
 Adamant Nature  
@@ -12619,23 +12583,13 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Corsola @ Zoom Lens  
-Ability: Hustle  
+SPECIES_TIRTOUGA @ Zoom Lens  
 Level: 65   
 Brave Nature  
 IVs: 0 Spe  
-- Liquidation  
-- Head Smash  
-- Recover  
-- Sucker Punch  
 
-Octillery @ Leftovers  
-Ability: Moody  
+SPECIES_JELLICENT @ Leftovers  
 Level: 65  
-- Protect  
-- Octazooka  
-- Gunk Shot  
-- Rock Blast  
 
 Mantine @ Assault Vest  
 Ability: Water Absorb  
@@ -12681,7 +12635,7 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_CORSOLA
+SPECIES_DREDNAW
 Level: 63   
 EVs: 252 Def / 248 Spe  
 Timid Nature  
@@ -12717,7 +12671,7 @@ IVs: 0 Atk
 - Charge  
 - Flash  
 
-SPECIES_CARRACOSTA @ Sitrus Berry  
+SPECIES_BARRASKEWDA @ Sitrus Berry  
 Level: 61 
 EVs: 252 HP / 116 Def / 140 SpD  
 IVs: 0 Atk  
@@ -12737,11 +12691,11 @@ Music: Hg Suspicious 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_STONJOURNER @ Clear Amulet  
+SPECIES_SIGILYPH @ Clear Amulet  
 Level: 63   
 IVs: 0 Atk  
 
-SPECIES_INDEEDEE_M @ Heat Rock  
+SPECIES_SHUCKLE @ Heat Rock  
 Level: 63   
 IVs: 0 Atk  
 
@@ -12763,10 +12717,10 @@ SPECIES_ORBEETLE @ Focus Sash
 Level: 64   
 IVs: 0 Atk  
 
-SPECIES_DURANT @ Life Orb  
+SPECIES_HERACROSS @ Life Orb  
 Level: 61 
 
-SPECIES_WHIMSICOTT
+SPECIES_MARACTUS
 Level: 63
 
 
@@ -12780,7 +12734,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_BRAVIARY
+SPECIES_NOCTOWL
 Level: 63  
 
 SPECIES_SCOLIPEDE @ Scope Lens  
@@ -12801,7 +12755,7 @@ Music: Hg Boy 1
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_DURANT @ Life Orb  
+SPECIES_HERACROSS @ Life Orb  
 Level: 61  
 
 SPECIES_YANMA @ Eviolite  
@@ -12885,10 +12839,10 @@ SPECIES_BOUFFALANT
 Level: 62  
 Happiness: 254  
 
-SPECIES_INDEEDEE_M
+SPECIES_SHUCKLE
 Level: 64  
 
-SPECIES_STONJOURNER @ Normal Gem  
+SPECIES_SIGILYPH @ Normal Gem  
 Level: 64  
 
 
@@ -12902,7 +12856,7 @@ Music: Hg Girl 2
 Double Battle: No
 AI: Check Bad Move
 
-SPECIES_BRAVIARY
+SPECIES_NOCTOWL
 Level: 61  
 IVs: 0 Atk  
 
@@ -12976,13 +12930,8 @@ Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Skarmory  
-Ability: Keen Eye  
+SPECIES_MEOWTH_GALAR
 Level: 61 
-- Iron Defense  
-- Autotomize  
-- Drill Peck  
-- Rock Slide  
 
 SPECIES_GURDURR
 Level: 64  
@@ -13033,35 +12982,20 @@ EVs: 248 HP / 8 Atk / 248 Def / 0 SpA / 4 SpD / 0 Spe
 - Thunder Wave
 - Double-Edge
 
-Miltank @ Hard Stone
+SPECIES_BOUFFALANT @ Hard Stone
 Level: 70
-Ability: Sap Sipper
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 EVs: 4 HP / 252 Atk / 0 Def / 0 SpA / 0 SpD / 252 Spe
-- Milk Drink
-- Defense Curl
-- Body Press 
-- RollOut
 
-Miltank @ Lagging Tail
+SPECIES_BOUFFALANT @ Lagging Tail
 Level: 70
-Ability: Scrappy
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 0 Spe
 EVs: 252 HP / 4 Atk / 252 Def / 0 SpA / 0 SpD / 0 Spe
-- Milk Drink
-- Toxic
-- Counter
-- Facade
 
-Miltank @ Silk Scarf
+SPECIES_BOUFFALANT @ Silk Scarf
 Level: 80
-Ability: Scrappy
 IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
 EVs: 4 HP / 252 Atk / 0 Def / 0 SpA / 0 SpD / 252 Spe
-- Milk Drink
-- Double-Edge
-- Play Rough 
-- Power-Up Punch
 
 === TRAINER_MIHARU_HNS ===
 Name: MIHARU
@@ -13137,7 +13071,7 @@ EVs: 128 Def / 40 SpA / 252 SpD
 Relaxed Nature  
 IVs: 0 Atk  
 
-SPECIES_EXCADRILL @ Light Clay  
+SPECIES_STUNFISK @ Light Clay  
 Level: 77
 EVs: 248 HP / 252 SpA / 8 SpD  
 Modest Nature  
@@ -13158,7 +13092,7 @@ Adamant Nature
 - Cross Poison  
 - Double Team  
 
-SPECIES_HYDREIGON @ Metal Coat  
+SPECIES_TYRANITAR @ Metal Coat  
 Level: 79   
 EVs: 128 HP / 120 Atk / 4 Def / 252 SpD  
 Brave Nature  
@@ -13183,16 +13117,11 @@ Level: 70
 EVs: 252 Atk / 248 Spe  
 Adamant Nature  
 
-Kingdra @ Scope Lens  
-Ability: Sniper  
+SPECIES_DRACOVISH @ Scope Lens  
 Level: 70  
 EVs: 148 Def / 252 SpA / 108 SpD  
 Modest Nature  
 IVs: 0 Atk  
-- Flash Cannon  
-- Muddy Water  
-- Whirlpool  
-- Agility  
 
 SPECIES_FERROTHORN @ White Herb  
 Level: 70 
@@ -13206,16 +13135,11 @@ Music: Hg Girl 1
 Double Battle: Yes
 AI: Smart Trainer / Prediction
 
-Politoed @ Damp Rock  
-Ability: Drizzle  
+SPECIES_SEISMITOAD @ Damp Rock  
 Level: 70
 EVs: 116 HP / 140 SpA / 252 SpD  
 Sassy Nature  
 IVs: 0 Atk  
-- Weather Ball  
-- Earth Power  
-- Seismic Toss  
-- Ice Beam  
 
 SPECIES_QUAGSIRE @ Black Sludge    
 Level: 70 
@@ -13240,7 +13164,7 @@ EVs: 36 HP / 252 Def / 220 SpD
 Bold Nature  
 IVs: 0 Atk  
 
-SPECIES_CORSOLA @ Shell Bell
+SPECIES_DREDNAW @ Shell Bell
 Level: 70    
 EVs: 252 Atk / 252 Spe  
 Jolly Nature  
@@ -13275,15 +13199,10 @@ IVs: 0 Spe
 - Psychic Fangs  
 - Fire Fang  
 
-Scizor @ Covert Cloak  
-Ability: Technician  
+SPECIES_ACCELGOR @ Covert Cloak  
 Level: 70  
 EVs: 172 HP / 124 Atk / 88 Def / 124 SpD  
 Adamant Nature  
-- Pounce  
-- Dual Wingbeat  
-- Iron Head  
-- Curse  
 
 SPECIES_KLINKLANG @ Loaded Dice  
 Level: 70   
@@ -13319,17 +13238,12 @@ Level: 70
 EVs: 124 Atk / 252 Def / 132 SpD  
 Adamant Nature  
 
-Crobat @ Big Root  
-Ability: Inner Focus  
+SPECIES_CORVIKNIGHT @ Big Root  
 Level: 70 
 EVs: 252 HP / 252 Atk / 4 SpD  
 Adamant Nature  
-- Cross Poison  
-- Brave Bird  
-- Roost  
-- Leech Life  
 
-SPECIES_BRAVIARY @ Flame Orb  
+SPECIES_NOCTOWL @ Flame Orb  
 Level: 70  
 EVs: 252 Atk / 252 Spe  
 Adamant Nature  
@@ -14298,7 +14212,7 @@ Double Battle: No
 AI: Smart Trainer / Prediction
 Items: Full Restore / Full Restore
 
-SPECIES_EMOLGA @ Light Ball  
+SPECIES_PINCURCHIN @ Light Ball  
 Level: 95
 
 SPECIES_WATCHOG @ Chesto Berry  

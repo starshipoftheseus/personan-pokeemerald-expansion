@@ -3,6 +3,9 @@ OldaleTown_MapScripts::
 	.byte 0
 
 OldaleTown_OnTransition:
+#ifdef POKEMON_HNS
+	call_if_lt VAR_BIRCH_LAB_STATE, 5, Hoenn_EventScript_SkipOpening
+#endif
 	call Common_EventScript_SetupRivalGfxId
 	setflag FLAG_VISITED_OLDALE_TOWN
 	call_if_unset FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_BlockWestEntrance

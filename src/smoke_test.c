@@ -4,6 +4,8 @@
 #include "data.h"
 #include "event_data.h"
 #include "rumour.h"
+#include "berry.h"
+#include "event_object_movement.h"
 #include "pokemon.h"
 #include "overworld.h"
 #include "script.h"
@@ -19,9 +21,11 @@
 
 const volatile u16 gSmokeTestMap = SMOKE_TEST_OFF; // (map group << 8) | map number
 const volatile u16 gSmokeTestFrames = 300;
+const volatile s16 gSmokeTestX = -1, gSmokeTestY = -1; // start position (-1: the map's first warp)
 const volatile u16 gSmokeTestTrainers = FALSE; // 1: build every trainer's party and check it;
                                                // 2: the same with every badge and league won (level scaling on)
                                                // 3: start a starter rumour on this map and log it
+                                               // 4: log the map's object events (graphics, visibility, berry tree stage)
 
 enum
 {
@@ -127,6 +131,39 @@ static void CB2_SmokeTest(void)
 {
     u32 group, num;
 
+    if (gSmokeTestTrainers == 4 && sFramesRun == 60)
+    {
+        u32 i;
+        for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
+        {
+            struct ObjectEvent *obj = &gObjectEvents[i];
+            if (!obj->active)
+                continue;
+            LogValue("obj_gfx=", obj->graphicsId);
+            LogValue("obj_invisible=", obj->invisible);
+            LogValue("obj_sprite=", obj->spriteId);
+            if (obj->movementType == MOVEMENT_TYPE_BERRY_TREE_GROWTH)
+            {
+                struct Sprite *sprite = &gSprites[obj->spriteId];
+                LogValue("obj_berry_stage=", GetStageByBerryTreeId(obj->trainerRange_berryTreeId));
+                LogValue("obj_spr_invisible=", sprite->invisible);
+                LogValue("obj_spr_pal=", sprite->oam.paletteNum);
+                LogValue("obj_spr_tile=", sprite->oam.tileNum);
+                LogValue("obj_spr_x=", sprite->x);
+                LogValue("obj_spr_y=", sprite->y);
+                LogValue("obj_spr_images=", sprite->images != NULL);
+                {
+                    u32 c, nonzero = 0;
+                    for (c = 1; c < 16; c++)
+                        nonzero += (((vu16 *)OBJ_PLTT)[sprite->oam.paletteNum * 16 + c] != 0);
+                    LogValue("obj_spr_pal_colours=", nonzero);
+                }
+            }
+        }
+        for (i = 1; i <= 6; i++)
+            LogValue("obj_tree_stage=", GetStageByBerryTreeId(i));
+        Exit(SMOKE_TEST_ON_MAP);
+    }
     if (gSmokeTestTrainers == 3)
     {
         TryStartStarterRumour(NULL);
@@ -137,7 +174,7 @@ static void CB2_SmokeTest(void)
         LogValue("rumour_level=", gSaveBlock1Ptr->outbreakPokemonLevel);
         Exit(SMOKE_TEST_ON_MAP);
     }
-    if (gSmokeTestTrainers)
+    if (gSmokeTestTrainers == 1 || gSmokeTestTrainers == 2)
         CheckTrainerParties();
 
     CB2_Overworld();
@@ -173,6 +210,6 @@ void SmokeTest_Start(void)
     FreeAllSpritePalettes();
     sFramesRun = 0;
     gMain.state = 0; // the map loader runs from state 0; the copyright screen left its own state here
-    NewGameOnMap(gSmokeTestMap >> 8, gSmokeTestMap & 0xFF, CB2_SmokeTest);
+    NewGameOnMap(gSmokeTestMap >> 8, gSmokeTestMap & 0xFF, gSmokeTestX, gSmokeTestY, CB2_SmokeTest);
     LogValue("loaded=", 1); // a timeout without this line hung while loading the map
 }

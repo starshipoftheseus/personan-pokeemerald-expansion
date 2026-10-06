@@ -525,7 +525,7 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_Lugia,                 OBJ_EVENT_PAL_TAG_LUGIA},
     {gObjectEventPal_RubySapphireBrendan,   OBJ_EVENT_PAL_TAG_RS_BRENDAN},
     {gObjectEventPal_RubySapphireMay,       OBJ_EVENT_PAL_TAG_RS_MAY},
-#if IS_FRLG
+#if IS_FRLG || defined(MAPS_FIRERED) // FireRed palettes, also needed when FireRed maps are built in
     {gObjectEventPal_PlayerFrlg,            OBJ_EVENT_PAL_TAG_PLAYER_RED},
     {gObjectEventPal_PlayerReflectionFrlg,  OBJ_EVENT_PAL_TAG_PLAYER_RED_REFLECTION},
     {gObjectEventPal_PlayerFrlg,            OBJ_EVENT_PAL_TAG_PLAYER_GREEN},
@@ -1662,6 +1662,23 @@ static bool8 ShouldInitObjectEventStateFromTemplate(const struct ObjectEventTemp
     return TRUE;
 }
 
+#if IS_HNS && defined(MAPS_EMERALD)
+// Heart & Soul's Johto reuses three of Emerald's berry tree ids, so Hoenn's trees with those ids
+// use free ids instead (planted at new game: EventScript_ResetAllMapFlags).
+static u8 GetHoennBerryTreeId(u8 id, u8 mapNum, u8 mapGroup)
+{
+    if (Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum)->mapLayout->layoutVersion != LAYOUT_VERSION_EMERALD)
+        return id;
+    switch (id)
+    {
+    case BERRY_TREE_ROUTE_102_ORAN:     return BERRY_TREE_HOENN_ROUTE_102_ORAN;
+    case BERRY_TREE_ROUTE_118_SITRUS_1: return BERRY_TREE_HOENN_ROUTE_118_SITRUS_1;
+    case BERRY_TREE_ROUTE_118_SITRUS_2: return BERRY_TREE_HOENN_ROUTE_118_SITRUS_2;
+    default:                            return id;
+    }
+}
+#endif
+
 static u8 InitObjectEventStateFromTemplate(const struct ObjectEventTemplate *template, u8 mapNum, u8 mapGroup)
 {
     struct ObjectEvent *objectEvent;
@@ -1735,6 +1752,10 @@ static u8 InitObjectEventStateFromTemplate(const struct ObjectEventTemplate *tem
     objectEvent->trainerType = template->trainerType;
     objectEvent->mapNum = mapNum;
     objectEvent->trainerRange_berryTreeId = template->trainerRange_berryTreeId;
+#if IS_HNS && defined(MAPS_EMERALD)
+    if (template->movementType == MOVEMENT_TYPE_BERRY_TREE_GROWTH)
+        objectEvent->trainerRange_berryTreeId = GetHoennBerryTreeId(template->trainerRange_berryTreeId, mapNum, mapGroup);
+#endif
     objectEvent->previousMovementDirection = gInitialMovementTypeFacingDirections[template->movementType];
     SetObjectEventDirection(objectEvent, objectEvent->previousMovementDirection);
     if (sMovementTypeHasRange[objectEvent->movementType])

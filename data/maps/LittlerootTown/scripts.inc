@@ -37,7 +37,7 @@ LittlerootTown_MapScripts::
 LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
 #ifdef POKEMON_HNS
-	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 0, LittlerootTown_EventScript_ArriveFromAnotherRegion
+	call_if_lt VAR_BIRCH_LAB_STATE, 5, Hoenn_EventScript_SkipOpening
 #endif
 	call Common_EventScript_SetupRivalGfxId
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_MoveMomToMaysDoor
@@ -74,13 +74,33 @@ LittlerootTown_EventScript_SetExitedHouseAfterLatiSSTicketEvent::
 	return
 
 #ifdef POKEMON_HNS
-@ Arriving from another region: skip the moving-truck intro and start where Emerald does after
-@ the clock-setting scene, with the player's next step being to visit the rival next door.
-LittlerootTown_EventScript_ArriveFromAnotherRegion::
+@ The player reaches Hoenn from Kanto as an experienced trainer, so Hoenn's opening (moving van,
+@ Birch chased on Route 101, first rival battle, Pokédex) counts as already played: Birch is back
+@ in his lab and Littleroot is a settled town. Called from the maps the opening uses.
+Hoenn_EventScript_SkipOpening::
 	setvar VAR_LITTLEROOT_INTRO_STATE, 7
+	setvar VAR_LITTLEROOT_TOWN_STATE, 4
+	setvar VAR_ROUTE101_STATE, 3
+	setvar VAR_BIRCH_LAB_STATE, 5
+	setvar VAR_LITTLEROOT_RIVAL_STATE, 4
+	setvar VAR_OLDALE_TOWN_STATE, 1
+	setflag FLAG_RESCUED_BIRCH
+	setflag FLAG_ADVENTURE_STARTED
+	setflag FLAG_RECEIVED_POKEDEX_FROM_BIRCH
+	setflag FLAG_DEFEATED_RIVAL_ROUTE103
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_TRUCK
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_TRUCK
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_RIVAL
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCH
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_RIVAL
+	clearflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_BIRCH
+	setflag FLAG_HIDE_ROUTE_101_BIRCH
+	setflag FLAG_HIDE_ROUTE_101_BIRCH_ZIGZAGOON_BATTLE
+	setflag FLAG_HIDE_ROUTE_101_BIRCH_STARTERS_BAG
+	setflag FLAG_HIDE_ROUTE_101_ZIGZAGOON
+	setflag FLAG_HIDE_ROUTE_103_RIVAL
+	setflag FLAG_HIDE_OLDALE_TOWN_RIVAL
 	return
 
 #endif
