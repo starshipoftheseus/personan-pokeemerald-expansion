@@ -43,7 +43,15 @@ Small, specific tasks for Claude. One per request.
 4. Legendary events, rumour-style ones first (legendary_events.md).
 5. Trainer card badges for Hoenn and FireRed; Hoenn rematches.
 6. Dewford Gym redesign (Porymap sketch).
-7. Unconfirmed: berry trees "missing" in Hoenn (draw fine in the harness; need the map it happened on).
+7. Bug (playtest 8): FireRed Kanto forest (Viridian Forest?) shows blue striped garbage tiles at the
+   map edge (the area outside the map). Likely the map's border blocks drawn with the wrong tiles in
+   the combined build (FireRed layout border / tileset). Check other FireRed maps' edges too.
+8. Every gym leader: a full 6-Pokémon team, themed by type and from the region's generations
+   (Kanto 1/4/7, Johto 2/5/8, Hoenn 3/6/9); extend hack_scripts/boss_teams.py into full teams.
+9. Unconfirmed: berry trees "missing" in Hoenn (draw fine in the harness; need the map it happened on).
+
+## Playtest 8 results
+- Ferry to Kanto works.
 
 ## Done since playtests 4-5
 - Wild encounters rebuilt: day/night on all outdoor maps, themed routes, every non-legendary family of a region catchable (build_wild_encounters.py)
