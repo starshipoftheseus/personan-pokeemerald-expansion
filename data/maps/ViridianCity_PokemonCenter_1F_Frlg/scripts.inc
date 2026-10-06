@@ -25,6 +25,7 @@ ViridianCity_PokemonCenter_1F_EventScript_Gentleman::
 	goto_if_eq VAR_RESULT, TRUE, ViridianCity_PokemonCenter_1F_EventScript_GentlemanEnd
 	msgbox ViridianCity_PokemonCenter_1F_Text_FeelFreeToUsePC, MSGBOX_DEFAULT
 ViridianCity_PokemonCenter_1F_EventScript_GentlemanEnd:
+	call Common_EventScript_RegionTravel
 	release
 	end
 

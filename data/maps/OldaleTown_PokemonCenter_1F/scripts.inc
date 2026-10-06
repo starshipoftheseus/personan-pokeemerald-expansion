@@ -23,6 +23,7 @@ OldaleTown_PokemonCenter_1F_EventScript_Gentleman::
 	goto_if_eq VAR_RESULT, TRUE, OldaleTown_PokemonCenter_1F_EventScript_GentlemanEnd
 	msgbox OldaleTown_PokemonCenter_1F_Text_TrainersCanUsePC, MSGBOX_DEFAULT
 OldaleTown_PokemonCenter_1F_EventScript_GentlemanEnd:
+	call Common_EventScript_RegionTravel
 	release
 	end
 

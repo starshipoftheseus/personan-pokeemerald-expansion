@@ -22,6 +22,7 @@ CherryGrove_Pokecenter_EventScript_Gentleman::
 	msgbox CherryGrove_Pokecenter_Text_Gentleman, MSGBOX_DEFAULT
 	closemessage
 CherryGrove_Pokecenter_EventScript_GentlemanEnd:
+	call Common_EventScript_RegionTravel
 	release
 	end
 
