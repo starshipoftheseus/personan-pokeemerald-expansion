@@ -1,0 +1,58 @@
+SESSION HANDOFF - Pokemon multi-region ROM hack (read this first)
+=================================================================
+
+REPO / BRANCH
+- github.com/starshipoftheseus/personan-pokeemerald-expansion, branch claude/focused-bohr-vobh1a
+- Base: Pokemon Heart & Soul 2.0.6 (pokeemerald-expansion decomp). Build: make hns -> pokehns.gba
+- Local setup: design/local_setup.md (WSL/Ubuntu toolchain; remove the cloud SessionStart hook
+  from .claude/settings.json when working locally). Rules: CLAUDE.md (maps via Porymap, small
+  diffs, build + test before saying it works).
+- Key docs in design/: todo.md (next steps), story.md, balance.md, events.md,
+  legendary_events.md, region_links.md, test_plan.md, wild_encounters.md, credits/README.md,
+  extended_cut_notes.md, rom_budget.md
+
+WHAT THE GAME IS
+- One ROM with Johto (Heart & Soul), Hoenn (Emerald maps) and Kanto (FireRed maps = first era).
+  Heart & Soul's own Kanto is kept as a later era (time jump; proposed: Celebi time travel).
+- All Gen 1-9 Pokemon; cries at lower quality; generic surf blob; each region has its own badges,
+  Elite Four and champion; end game after all three; a Day Care per region.
+- Story plan: one story starting in Kanto (Pallet); visit Johto and Hoenn; meet Gold and Ruby
+  (and Sapphire) as characters. New game currently still starts in New Bark (to change).
+- Region rule (honour system): until a region's E4 is beaten use only its generations:
+  Kanto 1/4/7, Johto 2/5/8, Hoenn 3/6/9.
+- Credits/permissions: Francis III (Emerald Extended Cut), BelialClover (Pokemon R.O.W.E.).
+
+BUILT SO FAR (all pushed)
+- Combined build: Hoenn + FireRed flags/vars/trainers moved into own ranges and "contexts"
+  (hack_scripts/gen_hoenn_constants.py, gen_frlg_constants.py).
+- Ferry between regions: Pokemon Center gentleman in Cherrygrove / Viridian / Oldale
+  (data/scripts/rumours.inc). Tested: ferry to Kanto works.
+- Hoenn arrival skips Emerald's opening (Hoenn_EventScript_SkipOpening in
+  data/maps/LittlerootTown/scripts.inc).
+- Starter rumours: same gentleman reveals where a region's starters appear once (src/rumour.c).
+- Wild encounters rebuilt (hack_scripts/build_wild_encounters.py): day/night on all outdoor maps,
+  themed routes, every non-legendary family of a region catchable there.
+- Trainers (hack_scripts/regionalize_trainers.py): regional generations, half of original-gen
+  mons swapped to newer gens; bosses hand-picked in hack_scripts/boss_teams.py.
+- Level caps per region + revisit level scaling (src/level_scaling.c, src/caps.c).
+- Region-aware Town Map/Fly; move relearner + rename in summary/party menu.
+- Fixes: FireRed NPC sprites and palettes, Hoenn/FireRed doors, Hoenn healing balls, Hoenn berry
+  tree ids, new-game flag resets for all regions.
+- Test harness: hack_scripts/smoke_test.py (--all emerald|frlg|hns; --trainers 1|2|3|4 MAP).
+  Last results: 516/518 Hoenn, 416/417 Kanto, 558/560 Johto maps load; 2128 trainers, 0 bad.
+- Latest playable ROM: test 8. Checklist: design/test_plan.md.
+
+NEXT (from design/todo.md, in order)
+1. Bug: FireRed Kanto forest (Viridian Forest?) shows blue striped garbage tiles outside the map
+   edge (border blocks drawn with wrong tiles in the combined build). Check other FireRed maps.
+2. Every gym leader: full 6-Pokemon team, type-themed, region generations (extend boss_teams.py).
+3. Start new game in Pallet Town with FireRed's opening.
+4. Porymap: Crossroads route (Pallet west, Littleroot south, New Bark) + Hoenn<->Cinnabar sea route
+   (plan: design/region_links.md).
+5. Littleroot as a lived-in town: Ruby, Sapphire and parents.
+6. Legendary events (design/legendary_events.md), rumour-style first.
+7. Trainer card badges for Hoenn/FireRed; Hoenn rematches; Dewford Gym redesign.
+8. Unconfirmed: Hoenn berry trees "missing" (draw fine in harness; need the map).
+
+FIRST MESSAGE FOR THE NEXT SESSION
+"Read design/session_handoff.txt and design/todo.md, then fix next item 1 and do item 2."
