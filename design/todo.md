@@ -38,7 +38,7 @@ Small, specific tasks for Claude. One per request.
 
 ## Next session (priority order)
 1. Start in Pallet Town with FireRed's opening (story.md: one story starting in Kanto); new game currently starts in New Bark.
-2. Porymap: routes linking Pallet (west), Littleroot (south) and New Bark via a crossroads route; Hoenn <-> Cinnabar sea route.
+2. Porymap: routes linking Pallet (west), Littleroot (south) and New Bark via a crossroads route; Hoenn <-> Cinnabar sea route. Plan: region_links.md
 3. Littleroot as a lived-in town: Ruby, Sapphire and parents (scripts once houses are placed).
 4. Legendary events, rumour-style ones first (legendary_events.md).
 5. Trainer card badges for Hoenn and FireRed; Hoenn rematches.
