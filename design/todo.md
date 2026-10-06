@@ -14,14 +14,14 @@ Small, specific tasks for Claude. One per request.
 - [x] Headless smoke test (`hack_scripts/smoke_test.py`): 516/518 Hoenn maps and 558/560 Johto maps load and run
 
 ## Hoenn: still to do
-- [ ] Travel link Johto <-> Hoenn (e.g. a ship between Olivine and Slateport/Lilycove). Right now Hoenn is only reachable with the debug menu warp.
-- [ ] Hoenn's start: Hoenn's story expects a new trainer arriving by truck (Littleroot intro, Birch, starter). Decide how a player who arrives from Johto starts Hoenn's story.
+- [x] Travel: ferry from the Pokémon Center gentlemen (Cherrygrove, Viridian, Oldale) to each hometown. Later: real routes (Pallet west, Littleroot south, a crossroads route; sea route Hoenn <-> Cinnabar) in Porymap
+- [x] Hoenn's start: arriving counts the opening as played (Hoenn_EventScript_SkipOpening). Next: Ruby and Sapphire with their parents in Littleroot's houses (story.md)
 - [x] Day Cares: one per region (GetActiveDaycare); mons in other regions' Day Cares keep making Eggs. FireRed's single-mon Route 5 Day Care is still FireRed-build-only.
 - [ ] Rematches: Heart & Soul reuses the REMATCH_* table for its own trainers, so Hoenn's VS Seeker/Match Call rematches are off.
 - [x] End game after all three champions: each Hall of Fame sets its region's game-clear flag; FLAG_SYS_GAME_CLEAR needs all three. Continue warp goes to that region's hometown.
 - [ ] Trainer card shows 16 badges (Johto + Kanto); Hoenn's 8 are not shown yet.
-- [ ] Town Map / Fly in Hoenn shows the Johto map; switch to Emerald's Hoenn region map when in Hoenn.
-- [ ] Level caps, prize money and the catch malus count only Johto's 8 badges (gBadgeFlags). Open-world design decision.
+- [x] Town Map / Fly show Hoenn's and FireRed Kanto's maps in those regions
+- [x] Level caps per region (src/level_scaling.c); revisit scaling. Prize money and catch malus still count Johto's badges
 - [ ] Hoenn and Johto share some story-gift flags where that seemed harmless (TM Attract/Torment gifts, running shoes effect, Pokédex). Revisit if it matters.
 
 ## FireRed Kanto (first era)
@@ -30,11 +30,26 @@ Small, specific tasks for Claude. One per request.
 - [x] Map sections: 31 own values, 31 share a name (`frlg_alias`); MAPSEC_NONE = 251 (limit 0xFC)
 - [x] Field moves, obedience and badge totals count FireRed's badges and HM gifts
 - [x] Smoke test 416/417 FireRed maps (Union Room needs a link)
-- [ ] Getting there: no link to FireRed Kanto yet (debug warp only). Future Kanto vs. FireRed Kanto via a portal/time travel: to design later.
+- [x] Getting there: ferry to Pallet Town. Future Kanto via Celebi time travel: proposed in legendary_events.md
 - [ ] FireRed's own start (Oak's lab, Pallet intro, rival name) and how it relates to the player arriving from another region
 - [ ] FireRed-only features compiled for FireRed builds only (Fame Checker UI, Trainer Tower, Sevii pass, help system, teachy TV): check each FireRed script that uses them
-- [ ] Trainer card shows neither Hoenn's nor FireRed's badges; region map/Fly shows Johto
+- [ ] Trainer card shows neither Hoenn's nor FireRed's badges (region map/Fly fixed)
 - [x] ROM: 30.97 MB, ~2.6 MB free (empty trainer slide table shrunk)
+
+## Next session (priority order)
+1. Start in Pallet Town with FireRed's opening (story.md: one story starting in Kanto); new game currently starts in New Bark.
+2. Porymap: routes linking Pallet (west), Littleroot (south) and New Bark via a crossroads route; Hoenn <-> Cinnabar sea route.
+3. Littleroot as a lived-in town: Ruby, Sapphire and parents (scripts once houses are placed).
+4. Legendary events, rumour-style ones first (legendary_events.md).
+5. Trainer card badges for Hoenn and FireRed; Hoenn rematches.
+6. Dewford Gym redesign (Porymap sketch).
+7. Unconfirmed: berry trees "missing" in Hoenn (draw fine in the harness; need the map it happened on).
+
+## Done since playtests 4-5
+- Wild encounters rebuilt: day/night on all outdoor maps, themed routes, every non-legendary family of a region catchable (build_wild_encounters.py)
+- Regular trainers: region generations, half of original-gen Pokémon swapped to newer gens; bosses hand-picked (boss_teams.py)
+- Starter rumours (src/rumour.c); move relearner and rename everywhere
+- Fixes: doors, healing balls, Kanto NPC palettes, Hoenn berry tree ids, Hoenn opening
 
 ## Your requests: status
 | Request | Status |
