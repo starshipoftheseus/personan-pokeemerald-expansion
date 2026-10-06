@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Make every Pokémon of a region's generations catchable in that region (design/balance.md):
+"""Superseded by hack_scripts/build_wild_encounters.py, which rebuilds the tables and imports the
+helpers here. Kept for those helpers; running it on its own adds species to rare slots only.
+
+Make every Pokémon of a region's generations catchable in that region (design/balance.md):
 
     Kanto (FireRed and Heart & Soul's Kanto): Gen 1, 4, 7
     Johto:                                   Gen 2, 5, 8
@@ -63,7 +66,8 @@ def load_species():
             stats = [int(x) for x in re.findall(r"\.base(?:HP|Attack|Defense|Speed|SpAttack|SpDefense)\s*=\s*(\d+)", body)[:6]]
             types = (re.findall(r"\.types\s*=\s*MON_TYPES\(([^)]*)\)", body) or [None])[-1]
             flags = set(re.findall(r"\.(is\w+)\s*=\s*TRUE", body))
-            evos = re.findall(r"\{\s*EVO_\w+\s*,\s*[^,{}]+,\s*(SPECIES_\w+)", body)
+            evo_list = re.findall(r"\{\s*(EVO_\w+)\s*,\s*([^,{}]+),\s*(SPECIES_\w+)", body)
+            evos = [t for _, _, t in evo_list]
             dex = re.search(r"\.natDexNum\s*=\s*(NATIONAL_DEX_\w+)", body)
             if dex and dex.group(1) in dexnum:   # the family files group families, not generations
                 gen = sum(dexnum[dex.group(1)] >= start for start in GEN_STARTS)
@@ -75,6 +79,9 @@ def load_species():
                 "types": [t.strip() for t in types.split(",")] if types else [],
                 "flags": flags,
                 "evos": [e for e in evos if e != name],
+                # level each evolution happens at (non-level evolutions: 36, as in src/level_scaling.c)
+                "evo_level": {t: (int(p) if m == "EVO_LEVEL" and p.strip().isdigit() and int(p) > 0 else 36)
+                              for m, p, t in evo_list},
             }
     return species
 
